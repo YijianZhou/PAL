@@ -24,11 +24,13 @@ def main(args):
     # define algorithm
     picker     = pickers.Trad_PS()
     associator = associators.Simple_Assoc()
-    locator    = locators.Simple_Loc(sta_dict)
+    locator    = locators.Simple_Loc(sta_dict, cfg.resp)
 
     # get time range
     start_date = UTCDateTime(args.time_range.split(',')[0])
     end_date   = UTCDateTime(args.time_range.split(',')[1])
+    print('Making catalog')
+    print('time range: {} to {}'.format(start_date, end_date))
 
     # for all days
     num_day = (end_date.date - start_date.date).days
@@ -47,7 +49,7 @@ def main(args):
             stream += read(data_dict[sta][2])
 
             # phase picking
-            picksi = picker.pick(st)
+            picksi = picker.pick(stream)
             if i==0: picks = picksi
             else:    picks = np.append(picks, picksi)
 
@@ -60,17 +62,20 @@ def main(args):
         for event_pick in event_picks:
             event_loc = locator.locate(event_pick)
             # 4. estimate magnitude
-            event_loc = locator.calc_mag(event_pick, event_loc)
+            event_loc_mag = locator.calc_mag(event_pick, event_loc)
             # write catalog
-            locator.write(event_loc, out_ctlg)
+            locator.write(event_loc_mag, out_ctlg)
 
+    # finish making catalog
+    out_pha.close()
+    out_ctlg.close()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str, 
-                        default='/data3/XJ_SAC/*/*')
+                        default='/data3/XJ_SAC/ZSY/*')
     parser.add_argument('--sta_file', type=str, 
-                        default='/data3/XJ_SAC/station.dat')
+                        default='/data3/XJ_SAC/header/station.dat')
     parser.add_argument('--time_range', type=str,
                         default='20160901,20180901')
     parser.add_argument('--out_ctlg', type=str,

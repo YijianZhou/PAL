@@ -13,6 +13,7 @@ class Config(object):
     self.pca_win     = 1.         # win len for PCA filter
     self.trig_stride = 1.         # time stride for picker triggering
     self.pick_stride = 0.01       # time stride for picking
+    self.amp_win     = 5.         # time win to get S amplitude
     # 2. assoc params
     self.ot_dev      = 2.5        # win len for assoc picks
     self.assoc_num   = 4          # num of stations to assoc
@@ -21,5 +22,6 @@ class Config(object):
     self.dep_rng     = [0., 30.]  # range of loc depth
     self.xy_grid     = 0.05       # lateral grid width, in degree
     self.z_grid      = 2.5        # in km
+    self.resp        = 3.02e8     # instrumental response
     
 

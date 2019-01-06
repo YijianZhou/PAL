@@ -18,6 +18,7 @@ class Trad_PS(object):
     pca_win: win len for calc PCA
     trig_stride: time stride for picker triggering
     pick_stride: time stride for picking
+    amp_win: time win to get S amplitude
     *all time related params are in sec
   Outputs
     all picks in the stream, and header info
@@ -29,13 +30,14 @@ class Trad_PS(object):
 
   def __init__(self, 
                pick_win    = [10., 1.],
-               trig_thres  = 5., 
+               trig_thres  = 4., 
                pick_thres  = 0.95,
                p_win       = 2.,
                pca_win     = 1.,
                s_win       = 20.,
                trig_stride = 1.,
-               pick_stride = 0.01):
+               pick_stride = 0.01,
+               amp_win     = 5.):
 
     # change sec to points for time params
     self.pick_win    = [int(100*pick_win[0]), int(100*pick_win[1])] 
@@ -47,15 +49,16 @@ class Trad_PS(object):
     self.pca_win     = int(100*pca_win)
     self.trig_stride = int(100*trig_stride)
     self.pick_stride = int(100*pick_stride)
+    self.amp_win     = int(100*amp_win)
 
 
   def pick(self, stream):
 
     # read header
     header = stream[2].stats
-    sta = header.station
-    sta_lon = header.lon
-    sta_lat = header.lat
+    sta     = header.sac.kstnm
+    sta_lon = header.sac.stlo
+    sta_lat = header.sac.stla
     start_time = header.starttime
     
     # read data
@@ -67,11 +70,12 @@ class Trad_PS(object):
 
     # pick P and S
     picks = []
+    print('-'*40)
     # 1. trig picker
+    print('triggering phase picker')
     cf_trig = self.calc_cf(dataz, self.pick_win, self.trig_stride)
     trig_ppk = np.where(cf_trig > self.trig_thres)[0]
     slide_idx = 0
-    print('-'*40)
     print('picking phase:')
     for _ in trig_ppk:
 
@@ -93,23 +97,32 @@ class Trad_PS(object):
                 np.where(cf_s1 >= self.pick_thres *np.amax(cf_s1))[0][0]))
         ts = start_time + idx_s/100
 
-        # next detected phase
-        rest_det = np.where(trig_ppk > max(idx_p, idx_s, idx_trig))[0]
-        if len(rest_det)==0: break
-        slide_idx = rest_det[0]
+        # get related S amplitude
+        ampx = self.get_amp(datax[idx_s :idx_s+self.amp_win])
+        ampy = self.get_amp(datay[idx_s :idx_s+self.amp_win])
+        ampz = self.get_amp(dataz[idx_s :idx_s+self.amp_win])
+        amp = np.sqrt(ampx**2 + ampy**2 + ampz**2)
+
         # output
-        if ts-tp<1: continue
         print('{}, {}, {}'.format(sta, tp, ts))
         ot0 = self.est_ot(tp, ts) # est. of ot for assoc
-        picks.append((sta, ot0, tp, ts))
+        if not ts-tp<1:
+            picks.append((sta, sta_lon, sta_lat, ot0, tp, ts, amp))
+
+        # next detected phase
+        rest_det = np.where(trig_ppk >\
+                   max(idx_p, idx_s, idx_trig, 2*idx_s-idx_p))[0]
+        if len(rest_det)==0: break
+        slide_idx = rest_det[0]
 
     # convert to structed np.array
     picks = np.array(picks, dtype=[('station','O'),
                                    ('sta_lon','O'),
                                    ('sta_lat','O'),
-                                   ('org_time0','O'),
+                                   ('org_t0','O'),
                                    ('p_arr','O'),
-                                   ('s_arr','O')])
+                                   ('s_arr','O'),
+                                   ('s_amp','O')])
     return picks
 
 
@@ -134,6 +147,9 @@ class Trad_PS(object):
         sta[idx] = np.std(data[idx:idx+swin])
         lta[idx] = np.std(data[idx-lwin:idx])
     cf = sta/lta
+    # avoid bad points
+    cf[np.isinf(cf)] = 0.
+    cf[np.isnan(cf)] = 0.
     return cf
 
 
@@ -184,6 +200,7 @@ class Trad_PS(object):
     return r, vec
 
 
+  # estimate original time
   def est_ot(self, tp, ts):
     vp = 5.8
     vs = 3.2
@@ -191,3 +208,13 @@ class Trad_PS(object):
     r = (ts-tp) /(1/vs - 1/vp)
     Tp = r/vp
     return tp-Tp
+
+  # get S amplitide
+  def get_amp(self, velo):
+    # velocity to displacement
+    disp = np.zeros(len(velo))
+    for i in range(len(velo)-1):
+        disp[i+1] = np.sum(velo[0:i])
+    disp = 0.01*disp # 100 sps
+    return (np.amax(disp) - np.amin(disp)) /2
+
