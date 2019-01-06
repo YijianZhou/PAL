@@ -12,7 +12,8 @@ class Config(object):
     self.s_win       = 20.        # win len for S picking
     self.pca_win     = 1.         # win len for PCA filter
     self.trig_stride = 1.         # time stride for picker triggering
-    self.pick_stride = 0.01       # time stride for picking
+    self.p_stride    = 0.01       # time stride for picking P
+    self.s_stride    = 0.05       # time stride for picking S
     self.amp_win     = 5.         # time win to get S amplitude
     # 2. assoc params
     self.ot_dev      = 3.         # win len for assoc picks
