@@ -83,6 +83,8 @@ class Trad_PS(object):
 
         # 2. pick detected P
         idx_trig = trig_ppk[slide_idx]
+        if idx_trig -self.p_win[0] -self.idx_shift[0] <0:
+            slide_idx+=1; continue
         data_p = dataz[idx_trig -self.p_win[0] -self.idx_shift[0]
                       :idx_trig +self.p_win[1] +self.idx_shift[1]]
         cf_p = self.calc_cf(data_p, self.pick_win, self.p_stride)
