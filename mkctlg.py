@@ -3,7 +3,7 @@ import argparse
 import numpy as np
 import obspy
 from obspy.core import *
-# import DetPpk package
+# import PpkAssocLoc package
 import config
 import data_pipeline
 import pickers
