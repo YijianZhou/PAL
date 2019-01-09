@@ -1,3 +1,11 @@
+"""
+Simple script for parallel computing
+My usage in bash shell:
+$screen -S parallel_mkctlg
+$source activate obspy
+$python parallel.py
+then, kill screen to kill the process, if necessary.
+"""
 import os
 from obspy.core import *
 
