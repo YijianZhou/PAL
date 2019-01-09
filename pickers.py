@@ -56,13 +56,19 @@ class Trad_PS(object):
 
   def pick(self, stream):
 
+    # time alignment
+    hd0 = stream[0].stats
+    hd1 = stream[1].stats
+    hd2 = stream[2].stats
+    start_time = max(hd0.starttime, hd1.starttime, hd2.starttime)
+    end_time   = min(hd0.endtime,   hd1.endtime,   hd2.endtime)
+    stream = stream.slice(start_time, end_time)
+
     # read header
-    header = stream[2].stats
-    sta     = header.sac.kstnm
-    sta_lon = header.sac.stlo
-    sta_lat = header.sac.stla
-    start_time = header.starttime
-    
+    sta     = hd0.sac.kstnm
+    sta_lon = hd0.sac.stlo
+    sta_lat = hd0.sac.stla
+
     # read data
     stream.detrend('constant').filter('highpass', freq=1.)
     datax = stream[0].data
