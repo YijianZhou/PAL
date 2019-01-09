@@ -65,7 +65,7 @@ class Trad_PS(object):
     stream = stream.slice(start_time, end_time)
 
     # read header
-    sta     = hd0.sac.kstnm
+    sta     = hd0.station
     sta_lon = hd0.sac.stlo
     sta_lat = hd0.sac.stla
 
