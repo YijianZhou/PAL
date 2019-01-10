@@ -56,12 +56,22 @@ class Trad_PS(object):
 
   def pick(self, stream):
 
+    # set output format
+    dtype = [('station','O'),
+             ('sta_lon','O'),
+             ('sta_lat','O'),
+             ('org_t0','O'),
+             ('p_arr','O'),
+             ('s_arr','O'),
+             ('s_amp','O')]
+
     # time alignment
     hd0 = stream[0].stats
     hd1 = stream[1].stats
     hd2 = stream[2].stats
     start_time = max(hd0.starttime, hd1.starttime, hd2.starttime)
     end_time   = min(hd0.endtime,   hd1.endtime,   hd2.endtime)
+    if start_time > end_time: return np.array([],dtype=dtype)
     stream = stream.slice(start_time, end_time)
 
     # read header
@@ -127,14 +137,7 @@ class Trad_PS(object):
         slide_idx = rest_det[0]
 
     # convert to structed np.array
-    picks = np.array(picks, dtype=[('station','O'),
-                                   ('sta_lon','O'),
-                                   ('sta_lat','O'),
-                                   ('org_t0','O'),
-                                   ('p_arr','O'),
-                                   ('s_arr','O'),
-                                   ('s_amp','O')])
-    return picks
+    return np.array(picks, dtype=dtype)
 
 
   def calc_cf(self, data, win, stride=1, decim=1):
