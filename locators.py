@@ -5,11 +5,9 @@ class Simple_Loc(object):
   """Simple location by grid search
   Input
     sta_dict: station location info
-    resp: instrumental response (cnt/(m/s))
+    resp_dict: instrumental response dict for all networks (cnt/(m/s))
     side_width: ratio of sides relative to the station range
-    dep_rng: range of location depth (in km)
     xy_grid: grid width for x-y axis (in degree)
-    z_grid: grid width for z axis (in km)
     vp, vs: P&S velo of the uniform model
     *lateral spatial range (x-y) in degree; depth in km; elevation in m
   Usage
@@ -20,20 +18,16 @@ class Simple_Loc(object):
   
   def __init__(self,
                sta_dict,
-               resp,
+               resp_dict,
                side_width = 0.2,
-               dep_rng    = [0.,30.],
                xy_grid    = 0.05,
-               z_grid     = 2.5,
-               vp         = 5.8,
-               vs         = 3.2):
-               
+               vp         = 5.9,
+               vs         = 3.4):
+
     self.sta_dict   = sta_dict
-    self.resp       = resp
+    self.resp_dict  = resp_dict
     self.side_width = side_width
-    self.dep_rng    = dep_rng
     self.xy_grid    = xy_grid
-    self.z_grid     = z_grid
     self.vp         = vp
     self.vs         = vs
     self.time_table = self.calc_tt(sta_dict)
@@ -63,19 +57,19 @@ class Simple_Loc(object):
         res += np.abs(res_p) + np.abs(res_s)
 
     # find min res in the map
-    min_res = np.amin(res)
-    x, y, z = np.unravel_index(np.argmin(res), res.shape)
+    min_res = np.amin(res)/ num_sta /2.
+    x, y = np.unravel_index(np.argmin(res), res.shape)
     lon = self.lon_rng[0] + x*self.xy_grid
     lat = self.lat_rng[0] + y*self.xy_grid
-    dep = self.dep_rng[0] + z*self.z_grid
 
     # output
-    print('locate event: org_time {}, lon {}, lat {}, dep {}km, res ={}'\
-          .format(ot, round(lon,2), round(lat,2), dep, round(min_res,1)))
+    print('locate event: org_time {}, lon {:.2f}, lat {:.2f}, res {:.1f}'\
+          .format(ot, lon, lat, min_res))
     event_loc = {'org_time' : ot, 
                  'longitude': round(lon,2), 
-                 'latitude' : round(lat,2), 
-                 'depth'    : dep}
+                 'latitude' : round(lat,2),
+                 'residual': round(min_res,1)
+                 }
     return event_loc
 
 
@@ -89,7 +83,6 @@ class Simple_Loc(object):
     print('Making time table')
     time_table = {}
     dist_grid = 111*self.xy_grid # in km
-    dep_grid  = self.z_grid
 
     # get x-y range: sta range + side width
     lon = sta_dict['longitude']
@@ -103,11 +96,9 @@ class Simple_Loc(object):
     # get range
     lon_rng = [np.amin(lon)-lon_side, np.amax(lon)+lon_side]
     lat_rng = [np.amin(lat)-lat_side, np.amax(lat)+lat_side]
-    dep_rng = self.dep_rng # in km
-    # set x-y-z axis
+    # set x-y axis
     x_rng = range(int((lon_rng[1] - lon_rng[0]) /self.xy_grid))
     y_rng = range(int((lat_rng[1] - lat_rng[0]) /self.xy_grid))
-    z_rng = range(int((dep_rng[1] - dep_rng[0]) /self.z_grid))
 
     # calc time table
     for sta_info in sta_dict:
@@ -120,15 +111,14 @@ class Simple_Loc(object):
         sta_y = int((lat - lat_rng[0]) /self.xy_grid)
 
         # calc P and S travel time
-        tt_p = -np.ones([len(x_rng), len(y_rng), len(z_rng)])
-        tt_s = -np.ones([len(x_rng), len(y_rng), len(z_rng)])
+        tt_p = -np.ones([len(x_rng), len(y_rng)])
+        tt_s = -np.ones([len(x_rng), len(y_rng)])
         for i,x in enumerate(x_rng):
           for j,y in enumerate(y_rng):
-            for k,z in enumerate(z_rng):
-                dist = dist_grid *np.sqrt((x-sta_x)**2 + (y-sta_y)**2)
-                dep  = ele + dep_grid *z
-                tt_p[i,j,k] = np.sqrt(dep**2 + dist**2) /self.vp
-                tt_s[i,j,k] = np.sqrt(dep**2 + dist**2) /self.vs
+            dist = dist_grid *np.sqrt((x-sta_x)**2 + (y-sta_y)**2)
+            dep  = ele+5 # fix event depth to 5km
+            tt_p[i,j] = np.sqrt(dep**2 + dist**2) /self.vp
+            tt_s[i,j] = np.sqrt(dep**2 + dist**2) /self.vs
         time_table[sta] = [tt_p, tt_s]
 
     self.lon_rng = lon_rng
@@ -139,20 +129,22 @@ class Simple_Loc(object):
   def calc_mag(self, event_pick, event_loc):
     """ calc magnitude with event picks (amp) and loc
     """
-    mag = []
-    for pick in event_pick:
+    num_sta = len(event_pick)
+    mag  = np.zeros(num_sta)
+    dist = np.zeros(num_sta)
+    for i,pick in enumerate(event_pick):
         # get S amplitude
-        amp = pick['s_amp'] /self.resp *1e6
+        resp = self.resp_dict[pick['network']]
+        amp = pick['s_amp'] /resp *1e6 # in miu m
         # get epicentral distance
         dist_lon = 111*(pick['sta_lon'] - event_loc['longitude'])
         dist_lat = 111*(pick['sta_lat'] - event_loc['latitude'])
-        dist = np.sqrt(dist_lon**2 + dist_lat**2) # in km
-        magi = np.log10(amp) + np.log10(dist)
-        mag.append(magi)
-    mag = np.array(mag)
+        dist[i] = np.sqrt(dist_lon**2 + dist_lat**2) # in km
+        mag[i]  = np.log10(amp) + np.log10(dist[i])
+    mag = mag[dist<2*np.amin(dist)] # drop bad data
     event_loc['magnitude'] = round(np.mean(mag),1)
-    print('estimated mag: {} delta{}'.\
-          format(round(np.mean(mag),1), round(np.std(mag),1)))
+    print('estimated mag: {:.1f} delta {:.1f}'.\
+          format(np.mean(mag), np.std(mag)))
     return event_loc
 
 
@@ -162,9 +154,9 @@ class Simple_Loc(object):
     ot  = event_loc_mag['org_time']
     lon = event_loc_mag['longitude']
     lat = event_loc_mag['latitude']
-    dep = event_loc_mag['depth']
     mag = event_loc_mag['magnitude']
-    out_ctlg.write('{},{},{},{},{}\n'\
-                  .format(ot, lon, lat, dep, mag))
+    res = event_loc_mag['residual']
+    out_ctlg.write('{},{},{},5,{},{}\n'\
+                  .format(ot, lon, lat, mag, res))
     return
 

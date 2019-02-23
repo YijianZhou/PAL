@@ -1,16 +1,16 @@
 """
 params
-    data_dir_
-    time range
+    data_dir
+    datetime: obspy.UTCDateTime
 return
     data_dict - 3 chn data paths for each sta
 """
 import os, glob
 import numpy as np
 
-def get_zsy(data_dir, datetime):
+def get_xj(data_dir, datetime):
     """ get data paths (in dict) from dir, for certain date
-    data paths for ZSY network:
+    data paths for XJ network:
         net/sta/year/month/day/[net].[sta].[year].[jday].[chn].SAC
     """
     data_dict = {}
@@ -32,10 +32,11 @@ def get_sta_dict(sta_file):
     sta_dict = []
     f = open(sta_file); lines = f.readlines(); f.close()
     for line in lines:
-        sta, lon, lat, ele = line.split('\t')
-        sta_dict.append((sta, float(lon), float(lat), float(ele)))
+        net, sta, lon, lat, ele = line.split('\t')
+        sta_dict.append((net, sta, float(lon), float(lat), float(ele)))
     # convert to struct np.array
-    sta_dict = np.array(sta_dict, dtype=[('station','O'),
+    sta_dict = np.array(sta_dict, dtype=[('network','O'),
+                                         ('station','O'),
                                          ('longitude','O'),
                                          ('latitude','O'),
                                          ('elevation','O')])

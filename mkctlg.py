@@ -23,8 +23,8 @@ def main(args):
 
     # define algorithm
     picker     = pickers.Trad_PS()
-    associator = associators.Simple_Assoc()
-    locator    = locators.Simple_Loc(sta_dict, cfg.resp)
+    associator = associators.Simple_Assoc(cfg.assoc_num)
+    locator    = locators.Simple_Loc(sta_dict, cfg.resp_dict)
 
     # get time range
     start_date = UTCDateTime(args.time_range.split(',')[0])
@@ -38,12 +38,13 @@ def main(args):
 
         # get data paths
         datetime = start_date + day_idx*86400
-        data_dict = data_pipeline.get_zsy(args.data_dir, datetime)
+        data_dict = data_pipeline.get_xj(args.data_dir, datetime)
 
         # 1. waveform --> phase picks
         # pick all sta
         for i,sta in enumerate(data_dict):
             # read data
+            if len(data_dict[sta])<3: continue
             stream  = read(data_dict[sta][0])
             stream += read(data_dict[sta][1])
             stream += read(data_dict[sta][2])
@@ -73,7 +74,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str, 
-                        default='/data3/XJ_SAC/ZSY/*')
+                        default='/data3/XJ_SAC/[Y-Z]*/*')
     parser.add_argument('--sta_file', type=str, 
                         default='/data3/XJ_SAC/header/station.dat')
     parser.add_argument('--time_range', type=str,

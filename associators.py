@@ -44,10 +44,14 @@ class Simple_Assoc(object):
       org_t0  = event_pick['org_t0'][int(num_sta/2)]
       out_pha.write('{},{}\n'.format(org_t0, num_sta))
       for pick in event_pick:
+        net   = pick['network']
         sta   = pick['station']
         p_arr = pick['p_arr']
         s_arr = pick['s_arr']
         s_amp = pick['s_amp']
-        out_pha.write('{},{},{},{}\n'\
-                    .format(sta, p_arr, s_arr, s_amp))
+        p_snr = pick['p_snr']
+        s_snr0= pick['s_snr0']
+        s_snr1= pick['s_snr1']
+        out_pha.write('{},{},{},{},{},{},{},{}\n'\
+                    .format(net, sta, p_arr, s_arr, s_amp, p_snr, s_snr0, s_snr1))
     return

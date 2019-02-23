@@ -1,5 +1,4 @@
 import numpy as np
-import time
 
 class Trad_PS(object):
 
@@ -57,13 +56,17 @@ class Trad_PS(object):
   def pick(self, stream):
 
     # set output format
-    dtype = [('station','O'),
+    dtype = [('network','O'),
+             ('station','O'),
              ('sta_lon','O'),
              ('sta_lat','O'),
              ('org_t0','O'),
              ('p_arr','O'),
              ('s_arr','O'),
-             ('s_amp','O')]
+             ('s_amp','O'),
+             ('p_snr','O'),
+             ('s_snr0','O'),
+             ('s_snr1','O')]
 
     # time alignment
     hd0 = stream[0].stats
@@ -75,6 +78,7 @@ class Trad_PS(object):
     stream = stream.slice(start_time, end_time)
 
     # read header
+    net     = hd0.network
     sta     = hd0.station
     sta_lon = hd0.sac.stlo
     sta_lat = hd0.sac.stla
@@ -125,10 +129,15 @@ class Trad_PS(object):
         ampz = self.get_amp(dataz[idx_s :idx_s+self.amp_win])
         amp = np.sqrt(ampx**2 + ampy**2 + ampz**2)
 
+        # get p_anr and s_anr
+        p_snr  = np.amax(cf_p)
+        s_snr0 = np.amax(cf_s0)
+        s_snr1 = np.amax(cf_s1)
+
         # output
         print('{}, {}, {}'.format(sta, tp, ts))
         ot0 = self.est_ot(tp, ts) # est. of ot for assoc
-        picks.append((sta, sta_lon, sta_lat, ot0, tp, ts, amp))
+        picks.append((net, sta, sta_lon, sta_lat, ot0, tp, ts, amp, p_snr, s_snr0, s_snr1))
 
         # next detected phase
         rest_det = np.where(trig_ppk >\
@@ -218,8 +227,8 @@ class Trad_PS(object):
 
   # estimate original time
   def est_ot(self, tp, ts):
-    vp = 5.8
-    vs = 3.2
+    vp = 5.9
+    vs = 3.4
     dep = 5 #km
     r = (ts-tp) /(1/vs - 1/vp)
     Tp = r/vp

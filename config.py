@@ -20,8 +20,8 @@ class Config(object):
     self.assoc_num   = 4          # num of stations to assoc
     # 3. loc params
     self.side_width  = 0.2        # ratio of sides relative to sta range
-    self.dep_rng     = [0., 30.]  # range of loc depth
     self.xy_grid     = 0.05       # lateral grid width, in degree
-    self.z_grid      = 2.5        # in km
-    self.resp        = 3.02e8     # instrumental response
-    
+    self.resp_dict   = {'ZSY': 3.02e8,
+                        'YN':  1.67785e9,
+                        'XLS': 1/1.6e-9}     # instrumental response (cnt/m/s)
+
