@@ -11,7 +11,7 @@ Each of the three procedures are implemented in seperate scripts, i.e. the 'pick
 <br>
   
 * phase pickers  
-pickers.py defines various picking algorithms as picker classes. 
+*pickers.py* defines various picking algorithms as picker classes. 
 ```python
 # use picker
 # 1. waveform --> picks
@@ -21,7 +21,7 @@ picks = picker.pick(stream) # input obspy.stream
 ```
   
 * picks associators  
-associators.py defines various methods to associate phase picks to picks of different events.
+*associators.py* defines various methods to associate phase picks to picks of different events.
 ```python
 # use associator
 # 2. associate: picks --> events
@@ -31,7 +31,7 @@ associator.write(event_picks, out_pha)
 ```
   
 * earthquake locators  
-locators.py defines various earthquake locate methods.
+*locators.py* defines various earthquake locate methods.
 ```python
 # use locator
 # 3. locate evnets
