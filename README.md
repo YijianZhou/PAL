@@ -18,8 +18,8 @@ import pickers
 picker = pivkers.Trad_PS()
 picks = picker.pick(stream) # input obspy.stream
 ```
-<br>
-    associators.py defines various methods to associate phase picks to picks of different events.
+  
+associators.py defines various methods to associate phase picks to picks of different events.
 ```python
 # use associator
 # 2. associate: picks --> events
@@ -27,8 +27,8 @@ event_picks = associator.pick2event(picks)
 # write pahse file
 associator.write(event_picks, out_pha)
 ```
-<br>
-    locators.py defines various earthquake locate methods.
+  
+locators.py defines various earthquake locate methods.
 ```python
 # use locator
 # 3. locate evnets
