@@ -8,3 +8,10 @@ procudures include: <br>
 (3) locate events and estimate magnitude. <br>
 <br>
 Each of the three procedures are implemented in seperate scripts, i.e. the 'pickers.py', 'associators.py' and 'locators.py'. An example for combining these processes are shown in 'mkctlg.py', which aims to get an earthquake catalog directly from raw waveforms. 'parallel.py' are also provided for parallel computing.
+
+```python
+# use picker
+import pickers
+picker = pivkers.Trad_PS()
+picks = picker.pick(stream) # input obspy.stream
+```
