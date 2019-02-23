@@ -9,8 +9,9 @@ procudures include: <br>
 <br>
 Each of the three procedures are implemented in seperate scripts, i.e. the 'pickers.py', 'associators.py' and 'locators.py'. An example for combining these processes are shown in 'mkctlg.py', which aims to get an earthquake catalog directly from raw waveforms. 'parallel.py' are also provided for parallel computing.
 <br>
+  
 * phase pickers
-    pickers.py defines various picking algorithms as picker classes. 
+pickers.py defines various picking algorithms as picker classes. 
 ```python
 # use picker
 # 1. waveform --> picks
@@ -19,6 +20,7 @@ picker = pivkers.Trad_PS()
 picks = picker.pick(stream) # input obspy.stream
 ```
   
+* picks associators
 associators.py defines various methods to associate phase picks to picks of different events.
 ```python
 # use associator
@@ -28,6 +30,7 @@ event_picks = associator.pick2event(picks)
 associator.write(event_picks, out_pha)
 ```
   
+* earthquake locators
 locators.py defines various earthquake locate methods.
 ```python
 # use locator
