@@ -16,7 +16,7 @@ Each of the three procedures are implemented in seperate scripts, i.e. the 'pick
 # use picker
 # 1. waveform --> picks
 import pickers
-picker = pivkers.Trad_PS()
+picker = pickers.Trad_PS()
 picks = picker.pick(stream) # input obspy.stream
 ```
   
