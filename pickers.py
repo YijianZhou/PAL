@@ -165,8 +165,8 @@ class Trad_PS(object):
         print('input data too short!')
         return np.zeros(0)
     idx_rng = range(lwin, len(data)-swin, stride)
-    sta = np.ones(len(data))
-    lta = np.ones(len(data))
+    sta = np.zeros(len(data))
+    lta = np.ones( len(data))
     for idx in idx_rng:
         sta[idx] = np.std(data[idx:idx+swin])
         lta[idx] = np.std(data[idx-lwin:idx])
