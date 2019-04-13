@@ -29,7 +29,7 @@ class Trad_PS(object):
 
   def __init__(self, 
                pick_win    = [10., 1.],
-               trig_thres  = 4., 
+               trig_thres  = 20., 
                pick_thres  = 0.95,
                p_win       = 2.,
                pca_win     = 1.,
@@ -84,7 +84,9 @@ class Trad_PS(object):
     sta_lat = hd0.sac.stla
 
     # read data
-    stream.detrend('constant').filter('highpass', freq=1.)
+    stream.detrend('demean').detrend('linear').\
+           taper(max_percentage=0.05).\
+           filter('highpass', freq=1.)
     datax = stream[0].data
     datay = stream[1].data
     dataz = stream[2].data
@@ -94,8 +96,9 @@ class Trad_PS(object):
     picks = []
     print('-'*40)
     # 1. trig picker
-    print('triggering phase picker')
-    cf_trig = self.calc_cf(dataz, self.pick_win, self.trig_stride)
+    print('triggering phase picker: {}, {}'.format(sta, start_time))
+#    cf_trig = self.calc_cf(dataz, self.pick_win, self.trig_stride)
+    cf_trig = self.calc_cf(dataz, self.pick_win, is_trig=True)
     trig_ppk = np.where(cf_trig > self.trig_thres)[0]
     slide_idx = 0
     print('picking phase:')
@@ -141,7 +144,7 @@ class Trad_PS(object):
 
         # next detected phase
         rest_det = np.where(trig_ppk >\
-                   max(idx_trig, idx_s+5*100, 2*idx_s-idx_p))[0]
+                   max(idx_trig, idx_s+5*100, 2*idx_s-idx_p))[0] #TODO
         if len(rest_det)==0: break
         slide_idx = rest_det[0]
 
@@ -149,7 +152,7 @@ class Trad_PS(object):
     return np.array(picks, dtype=dtype)
 
 
-  def calc_cf(self, data, win, stride=1, decim=1):
+  def calc_cf(self, data, win, stride=1, decim=1, is_trig=False):
     """  calc character func of STA/LTA for a single trace
     Inputs
         data: input trace data, in np.array
@@ -163,13 +166,26 @@ class Trad_PS(object):
     swin = int(win[1] /decim)
     if len(data)<lwin+swin:
         print('input data too short!')
-        return np.zeros(0)
-    idx_rng = range(lwin, len(data)-swin, stride)
+        return np.zeros(1)
     sta = np.zeros(len(data))
-    lta = np.ones( len(data))
-    for idx in idx_rng:
-        sta[idx] = np.std(data[idx:idx+swin])
-        lta[idx] = np.std(data[idx-lwin:idx])
+    lta = np.ones(len(data))
+    # to trig: cf = engery
+    if is_trig:
+        # use energy
+        data = np.cumsum(data**2)
+        # Compute the STA and the LTA
+        sta[:-swin] = data[swin:] - data[:-swin]
+        sta /= swin
+        lta[lwin:]  = data[lwin:] - data[:-lwin]
+        lta /= lwin
+        # Pad zeros (same out size as data)
+        sta[:lwin] = 0
+    else:
+        # to ppk: cf = std
+        idx_rng = range(lwin, len(data)-swin, stride)
+        for idx in idx_rng:
+            sta[idx] = np.std(data[idx:idx+swin])
+            lta[idx] = np.std(data[idx-lwin:idx])
     cf = sta/lta
     # avoid bad points
     cf[np.isinf(cf)] = 0.
@@ -229,7 +245,6 @@ class Trad_PS(object):
   def est_ot(self, tp, ts):
     vp = 5.9
     vs = 3.4
-    dep = 5 #km
     r = (ts-tp) /(1/vs - 1/vp)
     Tp = r/vp
     return tp-Tp
