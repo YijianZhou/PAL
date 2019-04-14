@@ -69,13 +69,10 @@ class Trad_PS(object):
              ('s_snr1','O')]
 
     # time alignment
-    hd0 = stream[0].stats
-    hd1 = stream[1].stats
-    hd2 = stream[2].stats
-    start_time = max(hd0.starttime, hd1.starttime, hd2.starttime)
-    end_time   = min(hd0.endtime,   hd1.endtime,   hd2.endtime)
-    if start_time > end_time: return np.array([],dtype=dtype)
+    start_time = max([trace.stats.starttime for trace in stream])
+    end_time   = min([trace.stats.endtime for trace in stream])
     stream = stream.slice(start_time, end_time)
+    if len(stream)!=3: return np.array([],dtype=dtype)
 
     # read header
     net     = hd0.network
