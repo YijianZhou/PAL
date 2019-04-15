@@ -141,7 +141,7 @@ class Trad_PS(object):
 
         # next detected phase
         rest_det = np.where(trig_ppk >\
-                   max(idx_trig, idx_s+5*100, 2*idx_s-idx_p))[0] #TODO
+                   max(idx_trig, idx_s+5*100, idx_p+5*100))[0] #TODO
         if len(rest_det)==0: break
         slide_idx = rest_det[0]
 
