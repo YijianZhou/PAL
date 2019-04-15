@@ -136,8 +136,9 @@ class Trad_PS(object):
 
         # output
         print('{}, {}, {}'.format(sta, tp, ts))
-        ot0 = self.est_ot(tp, ts) # est. of ot for assoc
-        picks.append((net, sta, sta_lon, sta_lat, ot0, tp, ts, amp, p_snr, s_snr0, s_snr1))
+        if not tp<ts:
+            ot0 = self.est_ot(tp, ts) # est. of ot for assoc
+            picks.append((net, sta, sta_lon, sta_lat, ot0, tp, ts, amp, p_snr, s_snr0, s_snr1))
 
         # next detected phase
         rest_det = np.where(trig_ppk >\
