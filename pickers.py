@@ -11,12 +11,11 @@ class Trad_PS(object):
     stream: obspy.stream obj (3 chn, [e, n, z])
     pick_win: win len for STA/LTA ([lwin, swin])
     trig_thres: threshold to trig picker
-    pick_thres: threshold for picking
+    pick_thres: threshold for picking (0 to 1.)
     p_win: win len for pick detected P
     s_win: win len for S arrivla searching
     pca_win: win len for calc PCA
-    trig_stride: time stride for picker triggering
-    pick_stride: time stride for picking
+    s_stride: time stride for S picking
     amp_win: time win to get S amplitude
     *all time related params are in sec
   Outputs
@@ -30,12 +29,10 @@ class Trad_PS(object):
   def __init__(self, 
                pick_win    = [10., 1.],
                trig_thres  = 20., 
-               pick_thres  = 0.95,
+               pick_thres  = 0.96,
                p_win       = 2.,
                pca_win     = 1.,
                s_win       = 20.,
-               trig_stride = 1.,
-               p_stride    = 0.01,
                s_stride    = 0.05,
                amp_win     = 5.):
 
@@ -45,10 +42,8 @@ class Trad_PS(object):
     self.trig_thres  = trig_thres
     self.pick_thres  = pick_thres
     self.p_win       = [int(100*p_win), int(100*p_win)]
-    self.s_win       = [-1*100, int(100*s_win)]
+    self.s_win       = [-1*100, int(100*s_win)] #TODO
     self.pca_win     = int(100*pca_win)
-    self.trig_stride = int(100*trig_stride)
-    self.p_stride    = int(100*p_stride)
     self.s_stride    = int(100*s_stride)
     self.amp_win     = int(100*amp_win)
 
@@ -65,20 +60,21 @@ class Trad_PS(object):
              ('s_arr','O'),
              ('s_amp','O'),
              ('p_snr','O'),
-             ('s_snr0','O'),
-             ('s_snr1','O')]
+             ('s_snr','O')]
 
     # time alignment
     start_time = max([trace.stats.starttime for trace in stream])
     end_time   = min([trace.stats.endtime for trace in stream])
+    if start_time>end_time: return np.array([],dtype=dtype)
     stream = stream.slice(start_time, end_time)
     if len(stream)!=3: return np.array([],dtype=dtype)
 
     # read header
-    net     = hd0.network
-    sta     = hd0.station
-    sta_lon = hd0.sac.stlo
-    sta_lat = hd0.sac.stla
+    head = stream[0].stats
+    net     = head.network
+    sta     = head.station
+    sta_lon = head.sac.stlo
+    sta_lat = head.sac.stla
 
     # read data
     stream.detrend('demean').detrend('linear').\
@@ -94,8 +90,8 @@ class Trad_PS(object):
     print('-'*40)
     # 1. trig picker
     print('triggering phase picker: {}, {}'.format(sta, start_time))
-#    cf_trig = self.calc_cf(dataz, self.pick_win, self.trig_stride)
-    cf_trig = self.calc_cf(dataz, self.pick_win, is_trig=True)
+    cf_trig = self.calc_cf(dataz, self.pick_win)
+    self.cf_trig=cf_trig #TODO
     trig_ppk = np.where(cf_trig > self.trig_thres)[0]
     slide_idx = 0
     print('picking phase:')
@@ -107,7 +103,7 @@ class Trad_PS(object):
             slide_idx+=1; continue
         data_p = dataz[idx_trig -self.p_win[0] -self.idx_shift[0]
                       :idx_trig +self.p_win[1] +self.idx_shift[1]]
-        cf_p = self.calc_cf(data_p, self.pick_win, self.p_stride)
+        cf_p = self.calc_cf(data_p, self.pick_win)
         idx_p = idx_trig -self.idx_shift[0] -self.p_win[0] +\
                 np.where(cf_p >= self.pick_thres *np.amax(cf_p))[0][0]
         tp = start_time + idx_p/100
@@ -115,12 +111,19 @@ class Trad_PS(object):
         # 3. pick related S
         if min(len(data[0]), len(data[1]), len(data[2]))\
            < idx_p +self.s_win[1] +self.pca_win: break
-        data_s0, data_s1 = self.calc_filter(data, idx_p, self.s_stride)
-        cf_s0 = self.calc_cf(data_s0, self.pick_win, decim=self.s_stride)
-        cf_s1 = self.calc_cf(data_s1, self.pick_win, decim=self.s_stride)
-        idx_s = idx_p -self.idx_shift[0] -self.s_win[0] +self.s_stride*int(0.5*(\
-                np.where(cf_s0 >= self.pick_thres *np.amax(cf_s0))[0][0] +\
-                np.where(cf_s1 >= self.pick_thres *np.amax(cf_s1))[0][0]))
+        data_s = self.calc_filter(data, idx_p, self.s_stride)
+        cf_s  = self.calc_cf(data_s,  self.pick_win, decim=self.s_stride)
+        self.cf_s = cf_s #TODO
+        self.data_s = data_s #TODO
+
+        # trig S picker and pick
+        s_trig = np.argmax(data_s)
+        s_rng0 = min(s_trig, int(s_trig +self.idx_shift[0]/self.s_stride)//2)
+        s_rng1 = max(s_trig, int(s_trig +self.idx_shift[0]/self.s_stride)//2)
+        if s_rng0==s_rng1: s_rng1+=1
+        cf_s = cf_s[s_rng0:s_rng1]
+        idx_s = idx_p -self.idx_shift[0] -self.s_win[0]\
+                +self.s_stride*(s_rng0+np.argmax(cf_s))
         ts = start_time + idx_s/100
 
         # get related S amplitude
@@ -130,15 +133,14 @@ class Trad_PS(object):
         amp = np.sqrt(ampx**2 + ampy**2 + ampz**2)
 
         # get p_anr and s_anr
-        p_snr  = np.amax(cf_p)
-        s_snr0 = np.amax(cf_s0)
-        s_snr1 = np.amax(cf_s1)
+        p_snr = np.amax(cf_p)
+        s_snr = np.amax(cf_s)
 
         # output
         print('{}, {}, {}'.format(sta, tp, ts))
-        if not tp<ts:
+        if not tp>ts:
             ot0 = self.est_ot(tp, ts) # est. of ot for assoc
-            picks.append((net, sta, sta_lon, sta_lat, ot0, tp, ts, amp, p_snr, s_snr0, s_snr1))
+            picks.append((net, sta, sta_lon, sta_lat, ot0, tp, ts, amp, p_snr, s_snr))
 
         # next detected phase
         rest_det = np.where(trig_ppk >\
@@ -150,12 +152,11 @@ class Trad_PS(object):
     return np.array(picks, dtype=dtype)
 
 
-  def calc_cf(self, data, win, stride=1, decim=1, is_trig=False):
+  def calc_cf(self, data, win, decim=1.):
     """  calc character func of STA/LTA for a single trace
     Inputs
         data: input trace data, in np.array
         win: win len for STA/LTA, [lwin, swin], in points
-        stride: stride for cf, in points
         decim: decimate rate
     Outputs
         cf: character function
@@ -167,23 +168,15 @@ class Trad_PS(object):
         return np.zeros(1)
     sta = np.zeros(len(data))
     lta = np.ones(len(data))
-    # to trig: cf = engery
-    if is_trig:
-        # use energy
-        data = np.cumsum(data**2)
-        # Compute the STA and the LTA
-        sta[:-swin] = data[swin:] - data[:-swin]
-        sta /= swin
-        lta[lwin:]  = data[lwin:] - data[:-lwin]
-        lta /= lwin
-        # Pad zeros (same out size as data)
-        sta[:lwin] = 0
-    else:
-        # to ppk: cf = std
-        idx_rng = range(lwin, len(data)-swin, stride)
-        for idx in idx_rng:
-            sta[idx] = np.std(data[idx:idx+swin])
-            lta[idx] = np.std(data[idx-lwin:idx])
+    # use energy
+    data = np.cumsum(data**2)
+    # Compute the STA and the LTA
+    sta[:-swin] = data[swin:] - data[:-swin]
+    sta /= swin
+    lta[lwin:]  = data[lwin:] - data[:-lwin]
+    lta /= lwin
+    # Pad zeros (same out size as data)
+    sta[:lwin] = 0
     cf = sta/lta
     # avoid bad points
     cf[np.isinf(cf)] = 0.
@@ -216,9 +209,8 @@ class Trad_PS(object):
         s_r, s_evec = self.calc_pol(s_mat)
         u11 = abs(np.dot(p_evec, s_evec))
         flt[i] = s_r *(1-u11)
-    data_s0 = flt* data[0][idx_rng]
-    data_s1 = flt* data[1][idx_rng]
-    return data_s0, data_s1
+    data_s = flt* np.sqrt(data[0][idx_rng]**2 + data[1][idx_rng]**2)
+    return data_s
 
   def calc_pol(self, mat):
     """ calc polarization by PCA

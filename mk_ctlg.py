@@ -1,0 +1,86 @@
+import os, glob
+import argparse
+import numpy as np
+import obspy
+from obspy import read, UTCDateTime
+# import PpkAssocLoc package
+import config
+import data_pipeline as dp
+import pickers
+import associators
+import locators
+
+def main(args):
+
+    # i/o file
+    out_ctlg = open(args.out_ctlg,'w')
+    out_pha  = open(args.out_pha, 'w')
+    sta_dict = dp.get_sta_dict(args.sta_file)
+    cfg = config.Config()
+
+    # define algorithm
+    picker     = pickers.Trad_PS(trig_thres = cfg.trig_thres)
+    associator = associators.Simple_Assoc(assoc_num = cfg.assoc_num,
+                                          ot_dev = cfg.ot_dev)
+    locator    = locators.Simple_Loc(sta_dict, cfg.resp_dict)
+
+    # get time range
+    start_date = UTCDateTime(args.time_range.split(',')[0])
+    end_date   = UTCDateTime(args.time_range.split(',')[1])
+    print('Making catalog')
+    print('time range: {} to {}'.format(start_date, end_date))
+
+    # for all days
+    num_day = (end_date.date - start_date.date).days
+    for day_idx in range(num_day):
+
+        # get data paths
+        datetime = start_date + day_idx*86400
+        data_dict = dp.get_xj(args.data_dir, datetime)
+        if data_dict=={}: continue
+
+        # 1. waveform --> phase picks
+        # pick all sta
+        for i,sta in enumerate(data_dict):
+            # read data
+            if len(data_dict[sta])<3: continue
+            stream  = read(data_dict[sta][0])
+            stream += read(data_dict[sta][1])
+            stream += read(data_dict[sta][2])
+
+            # phase picking
+            picksi = picker.pick(stream)
+            if i==0: picks = picksi
+            else:    picks = np.append(picks, picksi)
+
+        # 2. associate: picks --> events
+        event_picks = associator.pick2event(picks)
+        # write pahse file
+        associator.write(event_picks, out_pha)
+
+        # 3. locate evnets
+        for event_pick in event_picks:
+            event_loc = locator.locate(event_pick)
+            # 4. estimate magnitude
+            event_loc_mag = locator.calc_mag(event_pick, event_loc)
+            # write catalog
+            locator.write(event_loc_mag, out_ctlg)
+
+    # finish making catalog
+    out_pha.close()
+    out_ctlg.close()
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data_dir', type=str, 
+                        default='/data3/XJ_SAC/XLS/*')
+    parser.add_argument('--sta_file', type=str,
+                        default='/data3/XJ_SAC/header/station_XLS.dat')
+    parser.add_argument('--time_range', type=str,
+                        default='20180113,20180116')
+    parser.add_argument('--out_ctlg', type=str,
+                        default='./output/catalog.dat')
+    parser.add_argument('--out_pha', type=str,
+                        default='./output/phase.dat')
+    args = parser.parse_args()
+    main(args)

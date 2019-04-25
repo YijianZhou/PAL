@@ -5,7 +5,7 @@ class Simple_Assoc(object):
   """ Simple way of associate picks by finding org_time clusters
   """
   def __init__(self, 
-               ot_dev    = 3., 
+               ot_dev    = 2.5, 
                assoc_num = 4):
     
     self.ot_dev    = ot_dev
@@ -50,8 +50,7 @@ class Simple_Assoc(object):
         s_arr = pick['s_arr']
         s_amp = pick['s_amp']
         p_snr = pick['p_snr']
-        s_snr0= pick['s_snr0']
-        s_snr1= pick['s_snr1']
-        out_pha.write('{},{},{},{},{},{},{},{}\n'\
-                    .format(net, sta, p_arr, s_arr, s_amp, p_snr, s_snr0, s_snr1))
+        s_snr = pick['s_snr']
+        out_pha.write('{},{},{},{},{:.1f},{:.1f},{:.1f}\n'\
+                    .format(net, sta, p_arr, s_arr, s_amp, p_snr, s_snr))
     return
