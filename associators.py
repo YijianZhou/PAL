@@ -14,22 +14,21 @@ class Simple_Assoc(object):
 
   def pick2event(self, picks):
     event_picks = []
-    picks.sort(order='org_t0')
-    ots = picks['org_t0']
-
-    # calc neighbour num for each pick
-    num_nbr = np.zeros(len(ots))
-    for i, oti in enumerate(ots):
-        is_nbr = abs(ots-oti) < self.ot_dev
-        num_nbr[i] = sum(is_nbr.astype(float))
+    num_picks = len(picks)
 
     # assoc each cluster
-    for _ in range(len(num_nbr)):
+    for _ in range(num_picks):
+        # calc neighbor num
+        ots = picks['org_t0']
+        num_nbr = np.zeros(len(ots))
+        for i, oti in enumerate(ots):
+            is_nbr = abs(ots-oti) < self.ot_dev
+            num_nbr[i] = sum(is_nbr.astype(float))
         if np.amax(num_nbr) < self.assoc_num: break
         oti = ots[np.argmax(num_nbr)]
         is_nbr = abs(ots-oti) < self.ot_dev
         event_pick = picks[is_nbr]
-        num_nbr[is_nbr] = 0.
+        picks = picks[~is_nbr]
         event_picks.append(event_pick)
 
     print('associated {} events'.format(len(event_picks)))
@@ -41,7 +40,7 @@ class Simple_Assoc(object):
     """
     for event_pick in event_picks:
       num_sta = len(event_pick)
-      org_t0  = event_pick['org_t0'][int(num_sta/2)]
+      org_t0  = event_pick['org_t0'][num_sta//2]
       out_pha.write('{},{}\n'.format(org_t0, num_sta))
       for pick in event_pick:
         net   = pick['network']
