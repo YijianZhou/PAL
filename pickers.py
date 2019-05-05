@@ -16,6 +16,7 @@ class Trad_PS(object):
     s_win: win len for S arrivla searching
     pca_win: win len for calc PCA
     s_stride: time stride for S picking
+    fd_trhes: minimum value of dominant frequency
     amp_win: time win to get S amplitude
     det_gap: time gap between detections
     *all time related params are in sec
@@ -142,9 +143,12 @@ class Trad_PS(object):
         s_snr = np.amax(cf_s)
 
         # calc dominant frequency
-        fd0 = self.calc_domn_freq(stream.slice(tp,tp+(ts-tp)/2)[0].data, 0.01)
-        fd1 = self.calc_domn_freq(stream.slice(tp,tp+(ts-tp)/2)[1].data, 0.01)
-        fd2 = self.calc_domn_freq(stream.slice(tp,tp+(ts-tp)/2)[2].data, 0.01)
+        t0 = min(tp, ts)
+        t1 = min(tp+(ts-tp)/2, head.endtime)
+        st = stream.slice(t0,t1)
+        fd0 = self.calc_domn_freq(st[0].data, 0.01)
+        fd1 = self.calc_domn_freq(st[1].data, 0.01)
+        fd2 = self.calc_domn_freq(st[2].data, 0.01)
 
         # output
         print('{}, {}, {}'.format(sta, tp, ts))
@@ -155,7 +159,7 @@ class Trad_PS(object):
 
         # next detected phase
         rest_det = np.where(trig_ppk >\
-                   max(idx_trig, idx_s, idx_p)+self.det_gap)[0] #TODO
+                   max(idx_trig, idx_s, idx_p)+self.det_gap)[0]
         if len(rest_det)==0: break
         slide_idx = rest_det[0]
 

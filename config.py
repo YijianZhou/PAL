@@ -12,6 +12,7 @@ class Config(object):
     self.s_win       = 15.        # win len for S picking
     self.pca_win     = 1.         # win len for PCA filter
     self.s_stride    = 0.05       # time stride for picking S
+    self.fd_thres    = 2.5        # min value of dominant frequency
     self.amp_win     = 5.         # time win to get S amplitude
     self.det_gap     = 5.         # time gap between detections
     # 2. assoc params
