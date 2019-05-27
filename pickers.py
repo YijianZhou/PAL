@@ -131,7 +131,7 @@ class Trad_PS(object):
         self.data_s=data_s #TODO
 
         # trig S picker and pick
-        s_trig = np.argmax(data_s)
+        s_trig = np.argmax(data_s[self.idx_shift[0]:]) + self.idx_shift[0]
         s_rng0 = min(s_trig, int(s_trig + self.idx_shift[0])//2)
         s_rng1 = max(s_trig, int(s_trig + self.idx_shift[0])//2)
         if s_rng0==s_rng1: s_rng1+=1
@@ -228,6 +228,7 @@ class Trad_PS(object):
   # calc dominant frequency
   def calc_freq_domn(self, data, dt):
     npts = len(data)
+    if npts==0: return 0
     data = data - np.mean(data)
     psd = abs(np.fft.fft(data))**2
     psd = psd[:npts//2]
