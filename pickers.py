@@ -14,11 +14,10 @@ class Trad_PS(object):
     pick_thres: threshold for picking (0 to 1.)
     p_win: win len for pick detected P
     s_win: win len for S arrivla searching
-    pca_win: win len for calc PCA
-    s_stride: time stride for S picking
     fd_trhes: minimum value of dominant frequency
     amp_win: time win to get S amplitude
     det_gap: time gap between detections
+    freq_band: frequency band for phase picking
     *all time related params are in sec
   Outputs
     all picks in the stream, and header info
@@ -30,28 +29,30 @@ class Trad_PS(object):
 
   def __init__(self, 
                pick_win    = [10., 1.],
-               trig_thres  = 20., 
+               trig_thres  = 15.,
                pick_thres  = 0.96,
                p_win       = 2.,
-               pca_win     = 1.,
                s_win       = 20.,
-               s_stride    = 0.05,
                fd_thres    = 2.5,
                amp_win     = 5.,
-               det_gap     = 5.):
+               det_gap     = 5.,
+               freq_band   = ['highpass',1.]):
 
     # change sec to points for time params
-    self.pick_win    = [int(100*pick_win[0]), int(100*pick_win[1])] 
+    self.samp_rate   = 100. #TODO
+    self.pick_win    = [int(self.samp_rate * pick_win[0]), 
+                        int(self.samp_rate * pick_win[1])] 
     self.idx_shift   = self.pick_win
     self.trig_thres  = trig_thres
     self.pick_thres  = pick_thres
-    self.p_win       = [int(100*p_win), int(100*p_win)]
-    self.s_win       = [-1*100, int(100*s_win)] #TODO
-    self.pca_win     = int(100*pca_win)
-    self.s_stride    = int(100*s_stride)
+    self.p_win       = [int(self.samp_rate * p_win), 
+                        int(self.samp_rate * p_win)]
+    self.s_win       = [int(-1*self.samp_rate), 
+                        int(self.samp_rate * s_win)] #TODO
     self.fd_thres    = fd_thres
-    self.amp_win     = int(100*amp_win)
-    self.det_gap     = int(100*det_gap)
+    self.amp_win     = int(self.samp_rate * amp_win)
+    self.det_gap     = int(self.samp_rate * det_gap)
+    self.freq_band   = freq_band
 
 
   def pick(self, stream):
@@ -66,12 +67,13 @@ class Trad_PS(object):
              ('s_arr','O'),
              ('s_amp','O'),
              ('p_snr','O'),
-             ('s_snr','O')]
+             ('s_snr','O'),
+             ('freq_domn','O')]
 
     # time alignment
     start_time = max([trace.stats.starttime for trace in stream])
     end_time   = min([trace.stats.endtime for trace in stream])
-    if start_time>end_time: return np.array([],dtype=dtype)
+    if start_time > end_time: return np.array([],dtype=dtype)
     stream = stream.slice(start_time, end_time)
     if len(stream)!=3: return np.array([],dtype=dtype)
 
@@ -83,13 +85,17 @@ class Trad_PS(object):
     sta_lat = head.sac.stla
 
     # get data
-    stream.detrend('demean').detrend('linear').\
-           taper(max_percentage=0.05).\
-           filter('highpass', freq=1.)
+    stream.detrend('demean').detrend('linear').taper(max_percentage=0.05)
+    flt_type = self.freq_band[0]
+    freqmin  = self.freq_band[1]
+    if len(self.freq_band)==2:
+        stream.filter(flt_type, freq=freqmin)
+    elif len(self.freq_band)==3: 
+        freqmax = self.freq_band[2]
+        stream.filter(flt_type, freqmin=freqmin, freqmax=freqmax)
     datax = stream[0].data
     datay = stream[1].data
     dataz = stream[2].data
-    data  = [datax, datay, dataz]    
 
     # pick P and S
     picks = []
@@ -105,37 +111,39 @@ class Trad_PS(object):
 
         # 2. pick detected P
         idx_trig = trig_ppk[slide_idx]
-        if idx_trig -self.p_win[0] -self.idx_shift[0] <0:
+        if idx_trig < self.p_win[0] + self.idx_shift[0]:
             slide_idx+=1; continue
-        data_p = dataz[idx_trig -self.p_win[0] -self.idx_shift[0]
-                      :idx_trig +self.p_win[1] +self.idx_shift[1]]
+        data_p = dataz[idx_trig - self.p_win[0] - self.idx_shift[0]
+                      :idx_trig + self.p_win[1] + self.idx_shift[1]]
         cf_p = self.calc_cf(data_p, self.pick_win)
-        idx_p = idx_trig -self.idx_shift[0] -self.p_win[0] +\
-                np.where(cf_p >= self.pick_thres *np.amax(cf_p))[0][0]
-        tp = start_time + idx_p/100
+        idx_p = idx_trig - self.idx_shift[0] - self.p_win[0] +\
+                np.where(cf_p >= self.pick_thres * np.amax(cf_p))[0][0]
+        tp = start_time + idx_p / self.samp_rate
 
         # 3. pick related S
-        if min(len(data[0]), len(data[1]), len(data[2]))\
-           < idx_p +self.s_win[1] +self.pca_win: break
-        data_s = self.calc_filter(data, idx_p, self.s_stride)
-        cf_s  = self.calc_cf(data_s,  self.pick_win, decim=self.s_stride)
+        if len(datax) < idx_p + self.s_win[1]: break
+        s_rng = [idx_p - self.s_win[0] - self.idx_shift[0],
+                 idx_p + self.s_win[1] + self.idx_shift[1]]
+        data_s = np.sqrt(datax[s_rng[0] : s_rng[1]]**2\
+                       + datay[s_rng[0] : s_rng[1]]**2)
+        cf_s = self.calc_cf(data_s, self.pick_win)
         self.cf_s=cf_s #TODO
         self.data_s=data_s #TODO
 
         # trig S picker and pick
         s_trig = np.argmax(data_s)
-        s_rng0 = min(s_trig, int(s_trig +self.idx_shift[0]/self.s_stride)//2)
-        s_rng1 = max(s_trig, int(s_trig +self.idx_shift[0]/self.s_stride)//2)
+        s_rng0 = min(s_trig, int(s_trig + self.idx_shift[0])//2)
+        s_rng1 = max(s_trig, int(s_trig + self.idx_shift[0])//2)
         if s_rng0==s_rng1: s_rng1+=1
-        cf_s = cf_s[s_rng0:s_rng1]
-        idx_s = idx_p -self.idx_shift[0] -self.s_win[0]\
-                +self.s_stride*(s_rng0+np.argmax(cf_s))
-        ts = start_time + idx_s/100
+        cf_s = cf_s[s_rng0 : s_rng1]
+        idx_s = idx_p - self.idx_shift[0] - self.s_win[0]\
+                + s_rng0 + np.argmax(cf_s)
+        ts = start_time + idx_s / self.samp_rate
 
         # get related S amplitude
-        ampx = self.get_amp(datax[idx_s :idx_s+self.amp_win])
-        ampy = self.get_amp(datay[idx_s :idx_s+self.amp_win])
-        ampz = self.get_amp(dataz[idx_s :idx_s+self.amp_win])
+        ampx = self.get_amp(datax[idx_s : idx_s + self.amp_win])
+        ampy = self.get_amp(datay[idx_s : idx_s + self.amp_win])
+        ampz = self.get_amp(dataz[idx_s : idx_s + self.amp_win])
         amp = np.sqrt(ampx**2 + ampy**2 + ampz**2)
 
         # get p_anr and s_anr
@@ -146,20 +154,20 @@ class Trad_PS(object):
         t0 = min(tp, ts)
         t1 = min(tp+(ts-tp)/2, head.endtime)
         st = stream.slice(t0,t1)
-        fd0 = self.calc_domn_freq(st[0].data, 0.01)
-        fd1 = self.calc_domn_freq(st[1].data, 0.01)
-        fd2 = self.calc_domn_freq(st[2].data, 0.01)
+        fd0 = self.calc_freq_domn(st[0].data, 1/self.samp_rate)
+        fd1 = self.calc_freq_domn(st[1].data, 1/self.samp_rate)
+        fd2 = self.calc_freq_domn(st[2].data, 1/self.samp_rate)
+        fd  = max(fd0, fd1, fd2)
 
         # output
         print('{}, {}, {}'.format(sta, tp, ts))
-        if tp<ts\
-        and max(fd0,fd1,fd2)>self.fd_thres:
+        if tp<ts and fd>self.fd_thres:
             ot0 = self.est_ot(tp, ts) # est. of ot for assoc
-            picks.append((net, sta, sta_lon, sta_lat, ot0, tp, ts, amp, p_snr, s_snr))
+            picks.append((net, sta, sta_lon, sta_lat, ot0, tp, ts, amp, p_snr, s_snr, fd))
 
         # next detected phase
         rest_det = np.where(trig_ppk >\
-                   max(idx_trig, idx_s, idx_p)+self.det_gap)[0]
+                   max(idx_trig, idx_s, idx_p) + self.det_gap)[0]
         if len(rest_det)==0: break
         slide_idx = rest_det[0]
 
@@ -167,17 +175,16 @@ class Trad_PS(object):
     return np.array(picks, dtype=dtype)
 
 
-  def calc_cf(self, data, win, decim=1.):
+  def calc_cf(self, data, win):
     """  calc character func of STA/LTA for a single trace
     Inputs
         data: input trace data, in np.array
         win: win len for STA/LTA, [lwin, swin], in points
-        decim: decimate rate
     Outputs
         cf: character function
     """
-    lwin = int(win[0] /decim)
-    swin = int(win[1] /decim)
+    lwin = int(win[0])
+    swin = int(win[1])
     if len(data)<lwin+swin:
         print('input data too short!')
         return np.zeros(1)
@@ -199,53 +206,6 @@ class Trad_PS(object):
     return cf
 
 
-  def calc_filter(self, data, idx_p, stride):
-    """ calc S filter by PCA
-    Inputs:
-        data: input 3 chn array
-        idx_p: idx for P in data
-        stride: stride for the filter points
-    Outputs:
-        data_s0, data_s1: filtered S traces (E&N)
-    """
-    # calc P pol
-    p_mat = np.array([data[0][idx_p: idx_p+self.pca_win],
-                      data[1][idx_p: idx_p+self.pca_win],
-                      data[2][idx_p: idx_p+self.pca_win]])
-    p_r, p_evec = self.calc_pol(p_mat)
-    # calc S filter
-    idx_rng = range(idx_p -self.s_win[0] -self.idx_shift[0], 
-                    idx_p +self.s_win[1] +self.idx_shift[1], stride)
-    flt = np.zeros(len(idx_rng))
-    for i, idx in enumerate(idx_rng):
-        s_mat = np.array([data[0][idx: idx+self.pca_win],
-                          data[1][idx: idx+self.pca_win],
-                          data[2][idx: idx+self.pca_win]])
-        s_r, s_evec = self.calc_pol(s_mat)
-        u11 = abs(np.dot(p_evec, s_evec))
-        flt[i] = s_r *(1-u11)
-    data_s = flt* np.sqrt(data[0][idx_rng]**2 + data[1][idx_rng]**2)
-    return data_s
-
-  def calc_pol(self, mat):
-    """ calc polarization by PCA
-    Inputs
-        mat: 3chn time win (matrix)
-    Outputs
-        r: polirization degree
-        vec: dominant eig-vector
-    """
-    cov = np.cov(mat)
-    eval, evec = np.linalg.eig(cov)
-    # calc pol degree
-    lam1  = np.amax(eval)
-    lam23 = np.sum(eval) - lam1
-    r = 1 - (0.5*lam23/lam1)
-    # calc dom vec
-    vec = evec.T[np.argmax(eval)]
-    return r, vec
-
-
   # estimate original time
   def est_ot(self, tp, ts):
     vp = 5.9
@@ -254,18 +214,19 @@ class Trad_PS(object):
     Tp = r/vp
     return tp-Tp
 
+
   # get S amplitide
   def get_amp(self, velo):
     # velocity to displacement
     disp = np.zeros(len(velo))
     for i in range(len(velo)-1):
         disp[i+1] = np.sum(velo[0:i])
-    disp = 0.01*disp # 100 sps
+    disp = disp / self.samp_rate
     return (np.amax(disp) - np.amin(disp)) /2
 
 
   # calc dominant frequency
-  def calc_domn_freq(self, data, dt):
+  def calc_freq_domn(self, data, dt):
     npts = len(data)
     data = data - np.mean(data)
     psd = abs(np.fft.fft(data))**2

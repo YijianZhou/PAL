@@ -19,10 +19,11 @@ def main(args):
     cfg = config.Config()
 
     # define algorithm
-    picker     = pickers.Trad_PS(trig_thres = cfg.trig_thres)
+    picker = pickers.Trad_PS(trig_thres = cfg.trig_thres,
+                             s_win = cfg.s_win)
     associator = associators.Simple_Assoc(assoc_num = cfg.assoc_num,
                                           ot_dev = cfg.ot_dev)
-    locator    = locators.Simple_Loc(sta_dict, cfg.resp_dict)
+    locator = locators.Simple_Loc(sta_dict, cfg.resp_dict)
 
     # get time range
     start_date = UTCDateTime(args.time_range.split(',')[0])
@@ -73,11 +74,11 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str, 
-                        default='/data3/XJ_SAC/XLS/*')
+                        default='/data3/XJ_SAC/[Y-Z]*/*')
     parser.add_argument('--sta_file', type=str,
-                        default='/data3/XJ_SAC/header/station_XLS.dat')
+                        default='/data3/XJ_SAC/header/station_ZSY.dat')
     parser.add_argument('--time_range', type=str,
-                        default='20180113,20180116')
+                        default='20181222,20181223')
     parser.add_argument('--out_ctlg', type=str,
                         default='./output/catalog.dat')
     parser.add_argument('--out_pha', type=str,
