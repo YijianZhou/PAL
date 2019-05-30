@@ -8,8 +8,8 @@ class Config(object):
     self.pick_win    = [10., 1.]      # pick win for STA/LTA
     self.trig_thres  = 15.            # threshold to trig picker (by energy)
     self.pick_thres  = 0.96           # threshold for picking
-    self.p_win       = 2.             # win len for P picking
-    self.s_win       = 15.            # win len for S picking
+    self.p_win       = [1., 1.]       # win len for P picking
+    self.s_win       = [0, 15.]       # win len for S picking
     self.fd_thres    = 2.5            # min value of dominant frequency
     self.amp_win     = 5.             # time win to get S amplitude
     self.det_gap     = 5.             # time gap between detections

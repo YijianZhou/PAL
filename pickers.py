@@ -14,6 +14,8 @@ class Trad_PS(object):
     pick_thres: threshold for picking (0 to 1.)
     p_win: win len for pick detected P
     s_win: win len for S arrivla searching
+    pca_win: time win for calc pca filter
+    pca_rng: time range for pca filter
     fd_trhes: minimum value of dominant frequency
     amp_win: time win to get S amplitude
     det_gap: time gap between detections
@@ -31,8 +33,10 @@ class Trad_PS(object):
                pick_win    = [10., 1.],
                trig_thres  = 15.,
                pick_thres  = 0.96,
-               p_win       = 2.,
-               s_win       = 20.,
+               p_win       = [1., 1.],
+               s_win       = [0., 20.],
+               pca_win     = 1.,
+               pca_rng     = [0., 2.5],
                fd_thres    = 2.5,
                amp_win     = 5.,
                det_gap     = 5.,
@@ -45,10 +49,13 @@ class Trad_PS(object):
     self.idx_shift   = self.pick_win
     self.trig_thres  = trig_thres
     self.pick_thres  = pick_thres
-    self.p_win       = [int(self.samp_rate * p_win), 
-                        int(self.samp_rate * p_win)]
-    self.s_win       = [int(-1*self.samp_rate), 
-                        int(self.samp_rate * s_win)] #TODO
+    self.p_win       = [int(self.samp_rate * p_win[0]), 
+                        int(self.samp_rate * p_win[1])]
+    self.s_win       = [int(self.samp_rate * s_win[0]), 
+                        int(self.samp_rate * s_win[1])]
+    self.pca_win     = int(self.samp_rate*pca_win)
+    self.pca_rng     = [int(self.samp_rate * pca_rng[0]),
+                        int(self.samp_rate * pca_rng[1])]
     self.fd_thres    = fd_thres
     self.amp_win     = int(self.samp_rate * amp_win)
     self.det_gap     = int(self.samp_rate * det_gap)
@@ -73,9 +80,9 @@ class Trad_PS(object):
     # time alignment
     start_time = max([trace.stats.starttime for trace in stream])
     end_time   = min([trace.stats.endtime for trace in stream])
-    if start_time > end_time: return np.array([],dtype=dtype)
+    if start_time > end_time: return np.array([], dtype=dtype)
     stream = stream.slice(start_time, end_time)
-    if len(stream)!=3: return np.array([],dtype=dtype)
+    if len(stream)!=3: return np.array([], dtype=dtype)
 
     # get header
     head = stream[0].stats
@@ -96,6 +103,7 @@ class Trad_PS(object):
     datax = stream[0].data
     datay = stream[1].data
     dataz = stream[2].data
+    data = [datax, datay, dataz]
 
     # pick P and S
     picks = []
@@ -121,6 +129,7 @@ class Trad_PS(object):
         tp = start_time + idx_p / self.samp_rate
 
         # 3. pick related S
+        # calc cf on original E&N data
         if len(datax) < idx_p + self.s_win[1]: break
         s_rng = [idx_p - self.s_win[0] - self.idx_shift[0],
                  idx_p + self.s_win[1] + self.idx_shift[1]]
@@ -131,13 +140,16 @@ class Trad_PS(object):
         self.data_s=data_s #TODO
 
         # trig S picker and pick
+        pca_flt = self.calc_filter(data, idx_p)
+        data_s[self.idx_shift[0] : self.idx_shift[0] + len(pca_flt)] *= pca_flt
         s_trig = np.argmax(data_s[self.idx_shift[0]:]) + self.idx_shift[0]
+        self.amp_max=(s_trig-self.idx_shift[0])/self.samp_rate #TODO
         s_rng0 = min(s_trig, int(s_trig + self.idx_shift[0])//2)
         s_rng1 = max(s_trig, int(s_trig + self.idx_shift[0])//2)
         if s_rng0==s_rng1: s_rng1+=1
         cf_s = cf_s[s_rng0 : s_rng1]
         idx_s = idx_p - self.idx_shift[0] - self.s_win[0]\
-                + s_rng0 + np.argmax(cf_s)
+              + s_rng0 + np.argmax(cf_s)
         ts = start_time + idx_s / self.samp_rate
 
         # get related S amplitude
@@ -204,6 +216,52 @@ class Trad_PS(object):
     cf[np.isinf(cf)] = 0.
     cf[np.isnan(cf)] = 0.
     return cf
+
+
+  def calc_filter(self, data, idx_p):
+    """ calc S filter by PCA
+    Inputs:
+        data: input 3 chn array
+        idx_p: idx for P in data
+    Outputs:
+        pca_flt: pca filter for P wave filtering
+    """
+    # calc P pol
+    p_mat = np.array([data[0][idx_p : idx_p + self.pca_win],
+                      data[1][idx_p : idx_p + self.pca_win],
+                      data[2][idx_p : idx_p + self.pca_win]])
+    p_r, p_evec = self.calc_pol(p_mat)
+    # calc filter
+    idx_rng = range(idx_p - self.s_win[0] - self.pca_rng[0],
+                    idx_p - self.s_win[0] + self.pca_rng[1])
+    pca_flt = np.zeros(len(idx_rng))
+    for i, idx in enumerate(idx_rng):
+        s_mat = np.array([data[0][idx : idx + self.pca_win],
+                          data[1][idx : idx + self.pca_win],
+                          data[2][idx : idx + self.pca_win]])
+        s_r, s_evec = self.calc_pol(s_mat)
+        u11 = abs(np.dot(p_evec, s_evec))
+        pca_flt[i] = s_r * (1-u11)
+    return pca_flt
+
+
+  def calc_pol(self, mat):
+    """ calc polarization by PCA
+    Inputs
+        mat: 3chn time win (matrix)
+    Outputs
+        r: polirization degree
+        vec: dominant eig-vector
+    """
+    cov = np.cov(mat)
+    e_val, e_vec = np.linalg.eig(cov)
+    # calc pol degree
+    lam1  = np.amax(e_val)
+    lam23 = np.sum(e_val) - lam1
+    r = 1 - (0.5 * lam23 / lam1)
+    # calc dom vec
+    vec = e_vec.T[np.argmax(e_val)]
+    return r, vec
 
 
   # estimate original time
