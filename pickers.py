@@ -111,7 +111,6 @@ class Trad_PS(object):
     # 1. trig picker
     print('triggering phase picker: {}, {}'.format(sta, start_time))
     cf_trig = self.calc_cf(dataz, self.pick_win)
-    self.cf_trig=cf_trig #TODO
     trig_ppk = np.where(cf_trig > self.trig_thres)[0]
     slide_idx = 0
     print('picking phase:')
@@ -136,14 +135,11 @@ class Trad_PS(object):
         data_s = np.sqrt(datax[s_rng[0] : s_rng[1]]**2\
                        + datay[s_rng[0] : s_rng[1]]**2)
         cf_s = self.calc_cf(data_s, self.pick_win)
-        self.cf_s=cf_s #TODO
-        self.data_s=data_s #TODO
 
         # trig S picker and pick
         pca_flt = self.calc_filter(data, idx_p)
         data_s[self.idx_shift[0] : self.idx_shift[0] + len(pca_flt)] *= pca_flt
         s_trig = np.argmax(data_s[self.idx_shift[0]:]) + self.idx_shift[0]
-        self.amp_max=(s_trig-self.idx_shift[0])/self.samp_rate #TODO
         s_rng0 = min(s_trig, int(s_trig + self.idx_shift[0])//2)
         s_rng1 = max(s_trig, int(s_trig + self.idx_shift[0])//2)
         if s_rng0==s_rng1: s_rng1+=1
