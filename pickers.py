@@ -282,7 +282,7 @@ class Trad_PS(object):
   # calc dominant frequency
   def calc_freq_domn(self, data, dt):
     npts = len(data)
-    if npts==0: return 0
+    if npts//2==0: return 0
     data = data - np.mean(data)
     psd = abs(np.fft.fft(data))**2
     psd = psd[:npts//2]
