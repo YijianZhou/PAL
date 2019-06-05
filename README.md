@@ -22,7 +22,7 @@ picks = picker.pick(stream) # input obspy.stream
 * earthquake detectors  
 *detectors.py* defines various earthquake detection methods.
 ```python
-# use associator
+# use detector
 # 2. associate by original time (ot) cluster: picks --> events
 event_picks = detector.pick2event(picks)
 ```
