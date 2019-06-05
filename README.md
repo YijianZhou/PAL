@@ -1,4 +1,4 @@
-# PpkAssocLoc
+# PpkDet
 
 Package for processing raw continuous waveform. <br>
 <br>
@@ -20,24 +20,17 @@ picker = pickers.Trad_PS()
 picks = picker.pick(stream) # input obspy.stream
 ```
   
-* picks associators  
-*associators.py* defines various methods to associate phase picks to picks of different events.
+* earthquake detectors  
+*detectors.py* defines various earthquake detection methods.
 ```python
 # use associator
-# 2. associate: picks --> events
-event_picks = associator.pick2event(picks)
-# write pahse file
-associator.write(event_picks, out_pha)
+# 2. associate by original time (ot) cluster: picks --> events
+event_picks = detector.pick2event(picks)
 ```
-  
-* earthquake locators  
-*locators.py* defines various earthquake locate methods.
+
 ```python
-# use locator
-# 3. locate evnets
-event_loc = locator.locate(event_pick)
+# 3. associate by earthquake location (P travel time cluster)
+event_loc, event_pick = detector.locate(event_pick)
 # 4. estimate magnitude
-event_loc_mag = locator.calc_mag(event_pick, event_loc)
-# write catalog
-locator.write(event_loc_mag, out_file)
+event_loc_mag = detector.calc_mag(event_pick, event_loc)
 ```
