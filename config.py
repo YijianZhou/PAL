@@ -10,16 +10,19 @@ class Config(object):
     self.pick_thres  = 0.96           # threshold for picking
     self.p_win       = [1., 1.]       # win len for P picking
     self.s_win       = [0, 15.]       # win len for S picking
+    self.pca_win     = 1.             # # win len for PCA filter
+    self.pca_rng     = [0, 2.5]       # time range to apply PCA filter
     self.fd_thres    = 2.5            # min value of dominant frequency
     self.amp_win     = 5.             # time win to get S amplitude
     self.det_gap     = 5.             # time gap between detections
     self.freq_band   = ['highpass',1] # frequency band for ppk
     # 2. assoc params
-    self.ot_dev      = 3.             # win len for assoc picks
+    self.ot_dev      = 3.             # time deviation for ot assoc
+    self.ttp_dev     = 2.             # time deviation for ttp assoc
     self.assoc_num   = 4              # num of stations to assoc
     # 3. loc params
     self.side_width  = 0.2            # ratio of sides relative to sta range
-    self.xy_grid     = 0.05           # lateral grid width, in degree
+    self.xy_grid     = 0.02           # lateral grid width, in degree
     self.resp_dict   = {'ZSY': 3.02e8,
                          'YN': 1.67785e9,
                         'XLS': 1/1.6e-9}     # instrumental response (cnt/m/s)

@@ -3,12 +3,11 @@ import argparse
 import numpy as np
 import obspy
 from obspy import read, UTCDateTime
-# import PpkAssocLoc package
+# import PpkDet package
 import config
 import data_pipeline as dp
 import pickers
-import associators
-import locators
+import detectors
 
 def main(args):
 
@@ -21,9 +20,10 @@ def main(args):
     # define algorithm
     picker = pickers.Trad_PS(trig_thres = cfg.trig_thres,
                              s_win = cfg.s_win)
-    associator = associators.Simple_Assoc(assoc_num = cfg.assoc_num,
-                                          ot_dev = cfg.ot_dev)
-    locator = locators.Simple_Loc(sta_dict, cfg.resp_dict)
+    detector = detectors.TS_Det(sta_dict, cfg.resp_dict,
+                                assoc_num = cfg.assoc_num,
+                                ot_dev = cfg.ot_dev,
+                                ttp_dev = cfg.ttp_dev)
 
     # get time range
     start_date = UTCDateTime(args.time_range.split(',')[0])
@@ -54,18 +54,18 @@ def main(args):
             if i==0: picks = picksi
             else:    picks = np.append(picks, picksi)
 
-        # 2. associate: picks --> events
-        event_picks = associator.pick2event(picks)
-        # write pahse file
-        associator.write(event_picks, out_pha)
+        # 2. associate ot: picks --> events
+        event_picks = detector.pick2event(picks)
 
-        # 3. locate evnets
+        # 3. assocuate by locate evnets
         for event_pick in event_picks:
-            event_loc = locator.locate(event_pick)
+            event_loc, event_pick = detector.locate(event_pick)
+            if len(event_loc)==0: continue
             # 4. estimate magnitude
-            event_loc_mag = locator.calc_mag(event_pick, event_loc)
-            # write catalog
-            locator.write(event_loc_mag, out_ctlg)
+            event_loc_mag = detector.calc_mag(event_pick, event_loc)
+            # write catalog and phase
+            detector.write_catalog(event_loc_mag, out_ctlg)
+            detector.write_phase(event_loc_mag, event_pick, out_pha)
 
     # finish making catalog
     out_pha.close()
@@ -78,10 +78,10 @@ if __name__ == '__main__':
     parser.add_argument('--sta_file', type=str,
                         default='/data3/XJ_SAC/header/station_ZSY.dat')
     parser.add_argument('--time_range', type=str,
-                        default='20181222,20181223')
+                        default='20161015,20161016')
     parser.add_argument('--out_ctlg', type=str,
-                        default='./output/catalog.dat')
+                        default='./output/catalog.tmp')
     parser.add_argument('--out_pha', type=str,
-                        default='./output/phase.dat')
+                        default='./output/phase.tmp')
     args = parser.parse_args()
     main(args)
