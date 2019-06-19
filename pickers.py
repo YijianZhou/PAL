@@ -62,7 +62,7 @@ class Trad_PS(object):
     self.freq_band   = freq_band
 
 
-  def pick(self, stream):
+  def pick(self, stream, out_file=None):
 
     # set output format
     dtype = [('network','O'),
@@ -110,8 +110,14 @@ class Trad_PS(object):
     print('-'*40)
     # 1. trig picker
     print('triggering phase picker: {}, {}'.format(sta, start_time))
-    cf_trig = self.calc_cf(dataz, self.pick_win)
-    trig_ppk = np.where(cf_trig > self.trig_thres)[0]
+    cf_trig0 = self.calc_cf(datax, self.pick_win)
+    cf_trig1 = self.calc_cf(datay, self.pick_win)
+    cf_trig2 = self.calc_cf(dataz, self.pick_win)
+    self.cf_trig=cf_trig2 #TODO
+    trig_ppk0 = np.where(cf_trig0 > self.trig_thres)[0]
+    trig_ppk1 = np.where(cf_trig1 > self.trig_thres)[0]
+    trig_ppk2 = np.where(cf_trig2 > self.trig_thres)[0]
+    trig_ppk = np.sort( np.unique( np.concatenate((trig_ppk0, trig_ppk1, trig_ppk2))))
     slide_idx = 0
     print('picking phase:')
     for _ in trig_ppk:
@@ -135,6 +141,8 @@ class Trad_PS(object):
         data_s = np.sqrt(datax[s_rng[0] : s_rng[1]]**2\
                        + datay[s_rng[0] : s_rng[1]]**2)
         cf_s = self.calc_cf(data_s, self.pick_win)
+        self.cf_s=cf_s #TODO
+        self.data_s=data_s #TODO
 
         # trig S picker and pick
         pca_flt = self.calc_filter(data, idx_p)
@@ -172,6 +180,7 @@ class Trad_PS(object):
         if tp<ts and fd>self.fd_thres:
             ot0 = self.est_ot(tp, ts) # est. of ot for assoc
             picks.append((net, sta, sta_lon, sta_lat, ot0, tp, ts, amp, p_snr, s_snr, fd))
+            if out_file: out_file.write('{},{},{}\n'.format(sta,tp,ts))
 
         # next detected phase
         rest_det = np.where(trig_ppk >\
@@ -264,9 +273,9 @@ class Trad_PS(object):
   def est_ot(self, tp, ts):
     vp = 5.9
     vs = 3.4
-    r = (ts-tp) /(1/vs - 1/vp)
-    Tp = r/vp
-    return tp-Tp
+    d = (ts-tp) /(1/vs - 1/vp)
+    tt_p = d / vp
+    return tp - tt_p
 
 
   # get S amplitide
