@@ -180,7 +180,10 @@ class Trad_PS(object):
         if tp<ts and fd>self.fd_thres:
             ot0 = self.est_ot(tp, ts) # est. of ot for assoc
             picks.append((net, sta, sta_lon, sta_lat, ot0, tp, ts, amp, p_snr, s_snr, fd))
-            if out_file: out_file.write('{},{},{}\n'.format(sta,tp,ts))
+            if out_file: 
+                pick_line = '{},{},{},{},{},{},{},{},{},{},{}\n'\
+                    .format(net, sta, sta_lon, sta_lat, ot0, tp, ts, amp, p_snr, s_snr, fd)
+                out_file.write(pick_line)
 
         # next detected phase
         rest_det = np.where(trig_ppk >\
