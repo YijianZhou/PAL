@@ -110,14 +110,9 @@ class Trad_PS(object):
     print('-'*40)
     # 1. trig picker
     print('triggering phase picker: {}, {}'.format(sta, start_time))
-    cf_trig0 = self.calc_cf(datax, self.pick_win)
-    cf_trig1 = self.calc_cf(datay, self.pick_win)
-    cf_trig2 = self.calc_cf(dataz, self.pick_win)
-    self.cf_trig=cf_trig2 #TODO
-    trig_ppk0 = np.where(cf_trig0 > self.trig_thres)[0]
-    trig_ppk1 = np.where(cf_trig1 > self.trig_thres)[0]
-    trig_ppk2 = np.where(cf_trig2 > self.trig_thres)[0]
-    trig_ppk = np.sort( np.unique( np.concatenate((trig_ppk0, trig_ppk1, trig_ppk2))))
+    cf_trig = self.calc_cf(dataz, self.pick_win)
+    self.cf_trig=cf_trig #TODO
+    trig_ppk = np.where(cf_trig > self.trig_thres)[0]
     slide_idx = 0
     print('picking phase:')
     for _ in trig_ppk:
