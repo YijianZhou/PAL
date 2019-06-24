@@ -1,6 +1,6 @@
 from obspy import UTCDateTime
 
-net = 'xls'
+net = 'zsy3'
 fpha  = '../output/%s/phase_xj_%s.dat'%(net,net)
 fctlg = '../output/%s/catalog_xj_%s.dat'%(net,net)
 fout  = 'xj.phs'
@@ -23,7 +23,7 @@ def split_datetime(dtime):
 
 idx=0
 for pha in phas:
-  if len(pha.split(','))==2:
+  if len(pha.split(','))==6:
     # write head line
     ot, lon, lat, _,_,_ = ctlgs[idx].split(',')
     lon = float(lon)
