@@ -43,6 +43,7 @@ class Trad_PS(object):
                freq_band   = ['highpass',1.]):
 
     # change sec to points for time params
+    self.samp_rate   = 100. #TODO
     self.pick_win    = [int(self.samp_rate * pick_win[0]), 
                         int(self.samp_rate * pick_win[1])] 
     self.idx_shift   = self.pick_win
@@ -89,7 +90,6 @@ class Trad_PS(object):
     sta     = head.station
     sta_lon = head.sac.stlo
     sta_lat = head.sac.stla
-    self.samp_rate = head.sampling_rate
 
     # get data
     stream.detrend('demean').detrend('linear').taper(max_percentage=0.05)
