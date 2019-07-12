@@ -2,7 +2,7 @@ import numpy as np
 
 class TS_Det(object):
 
-  """ Detect by ot (time, T) and ttp (space, S) cluater
+  """ Detect by searching ot (time, T) and ttp (space, S) cluater
   Input
     sta_dict: station location info
     resp_dict: instrumental response dict for all networks (cnt/(m/s))
@@ -51,23 +51,30 @@ class TS_Det(object):
   def pick2event(self, picks):
     event_picks = []
     num_picks = len(picks)
+    if num_picks==0: print('no events detected'); return event_picks
     picks = np.sort(picks, order='org_t0')
+
+    # calc num_nbr
+    ots = picks['org_t0']
+    num_nbr = np.zeros(num_picks)
+    for i, oti in enumerate(ots):
+        is_nbr = abs(ots-oti) < self.ot_dev
+        num_nbr[i] = sum(is_nbr.astype(float))
 
     # assoc each cluster
     for _ in range(num_picks):
-        # calc neighbor num
-        ots = picks['org_t0']
-        if len(ots)==0: break
-        num_nbr = np.zeros(len(ots))
-        for i, oti in enumerate(ots):
-            is_nbr = abs(ots-oti) < self.ot_dev
-            num_nbr[i] = sum(is_nbr.astype(float))
         if np.amax(num_nbr) < self.assoc_num: break
+        # ot assoc
         oti = ots[np.argmax(num_nbr)]
-        is_nbr = abs(ots-oti) < self.ot_dev
-        event_pick = picks[is_nbr]
-        picks = picks[~is_nbr]
-        event_picks.append(event_pick)
+        to_assoc = abs(ots-oti) < self.ot_dev
+        event_picks.append(picks[to_assoc])
+        num_nbr[to_assoc] = 0
+        # renew num_nbr
+        to_renew = abs(ots-oti) >   self.ot_dev
+        to_renew*= abs(ots-oti) < 2*self.ot_dev
+        ots_todel = ots[to_assoc]
+        nbr_todel = [sum(abs(ots_todel-oti) < self.ot_dev) for oti in ots[to_renew]]
+        num_nbr[to_renew] -= nbr_todel
 
     print('associated {} events'.format(len(event_picks)))
     return event_picks
@@ -161,13 +168,13 @@ class TS_Det(object):
         sta_y = int((lat - lat_rng[0]) / self.xy_grid)
 
         # calc P travel time
-        tt_p = -np.ones([len(x_rng), len(y_rng)])
+        ttp = -np.ones([len(x_rng), len(y_rng)])
         for i,x in enumerate(x_rng):
           for j,y in enumerate(y_rng):
             dist = dist_grid * np.sqrt((x-sta_x)**2 + (y-sta_y)**2)
             dep  = ele + 5 # init event depth 5km
-            tt_p[i,j] = np.sqrt(dep**2 + dist**2) / self.vp
-        time_table[sta] = tt_p
+            ttp[i,j] = np.sqrt(dep**2 + dist**2) / self.vp
+        time_table[sta] = ttp
 
     self.lon_rng = lon_rng
     self.lat_rng = lat_rng
