@@ -43,7 +43,6 @@ class Trad_PS(object):
                freq_band   = ['highpass',1.]):
 
     # change sec to points for time params
-    self.samp_rate   = 100. #TODO
     self.pick_win    = [int(self.samp_rate * pick_win[0]), 
                         int(self.samp_rate * pick_win[1])] 
     self.idx_shift   = self.pick_win
@@ -90,6 +89,7 @@ class Trad_PS(object):
     sta     = head.station
     sta_lon = head.sac.stlo
     sta_lat = head.sac.stla
+    self.samp_rate = head.sampling_rate
 
     # get data
     stream.detrend('demean').detrend('linear').taper(max_percentage=0.05)
@@ -124,6 +124,7 @@ class Trad_PS(object):
         data_p = dataz[idx_trig - self.p_win[0] - self.idx_shift[0]
                       :idx_trig + self.p_win[1] + self.idx_shift[1]]
         cf_p = self.calc_cf(data_p, self.pick_win)
+        self.cf_p=cf_p #TODO
         idx_p = idx_trig - self.idx_shift[0] - self.p_win[0] +\
                 np.where(cf_p >= self.pick_thres * np.amax(cf_p))[0][0]
         tp = start_time + idx_p / self.samp_rate
@@ -137,11 +138,13 @@ class Trad_PS(object):
                        + datay[s_rng[0] : s_rng[1]]**2)
         cf_s = self.calc_cf(data_s, self.pick_win)
         self.cf_s=cf_s #TODO
-        self.data_s=data_s #TODO
+        self.data_s0=data_s*1. #TODO
 
         # trig S picker and pick
         pca_flt = self.calc_filter(data, idx_p)
+        self.pca_flt=pca_flt #TODO
         data_s[self.idx_shift[0] : self.idx_shift[0] + len(pca_flt)] *= pca_flt
+        self.data_s=data_s #TODO
         s_trig = np.argmax(data_s[self.idx_shift[0]:]) + self.idx_shift[0]
         s_rng0 = min(s_trig, int(s_trig + self.idx_shift[0])//2)
         s_rng1 = max(s_trig, int(s_trig + self.idx_shift[0])//2)
