@@ -196,10 +196,9 @@ class TS_Det(object):
         dist_lat = 111*(pick['sta_lat'] - event_loc['latitude'])
         dist[i] = np.sqrt(dist_lon**2 + dist_lat**2) # in km
         mag[i]  = np.log10(amp) + np.log10(dist[i])
-    mag = mag[dist<2*np.amin(dist)] # drop bad data
-    event_loc['magnitude'] = round(np.mean(mag),1)
+    event_loc['magnitude'] = round(np.median(mag),1)
     print('estimated mag: {:.1f} delta {:.1f}'.\
-          format(np.mean(mag), np.std(mag)))
+          format(np.median(mag), np.std(mag)))
     return event_loc
 
 
