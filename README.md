@@ -1,6 +1,6 @@
-# PpkDet
+# PAD
 
-Package for processing raw continuous waveform. <br>
+Package for detecting earthquakes from raw continuous waveform. <br>
 <br>
 procudures include: <br>
 (1) phase picking <br>
