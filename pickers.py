@@ -92,7 +92,7 @@ class Trad_PS(object):
     sta_lat = head.sac.stla
 
     # get data
-    stream.detrend('demean').detrend('linear').taper(max_percentage=0.05)
+    stream.detrend('demean').detrend('linear').taper(max_percentage=0.05, max_length=10.)
     flt_type = self.freq_band[0]
     freqmin  = self.freq_band[1]
     if len(self.freq_band)==2:
