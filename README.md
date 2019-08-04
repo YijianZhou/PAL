@@ -19,17 +19,17 @@ picker = pickers.Trad_PS()
 picks = picker.pick(stream) # input obspy.stream
 ```
   
-* earthquake detectors  
-*detectors.py* defines various earthquake detection methods.
+* phase associators  
+*associators.py* defines various phase associate methods.
 ```python
-# use detector
+# use associator
 # 2. associate by original time (ot) cluster: picks --> events
-event_picks = detector.pick2event(picks)
+event_picks = associator.pick2event(picks)
 ```
 
 ```python
-# 3. associate by earthquake location (P travel time cluster)
-event_loc, event_pick = detector.locate(event_pick)
+# 3. associate by spatial seach: location of P travel time cluster
+event_loc, event_pick = associator.locate(event_pick)
 # 4. estimate magnitude
-event_loc_mag = detector.calc_mag(event_pick, event_loc)
+event_loc_mag = associator.calc_mag(event_pick, event_loc)
 ```
