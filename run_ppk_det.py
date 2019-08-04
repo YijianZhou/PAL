@@ -1,4 +1,4 @@
-""" Run picker and detector with raw waveforms as input
+""" Run picker and associator with raw waveforms as input
 """
 import os, glob
 import argparse
@@ -9,21 +9,21 @@ from obspy import read, UTCDateTime
 import config
 import data_pipeline as dp
 import pickers
-import detectors
+import associators
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str,
-                        default='/data3/XJ_SAC/[Y-Z]*/*')
+                        default='/data3/XJ_SAC/XLS/[1-9]*')
     parser.add_argument('--sta_file', type=str,
-                        default='/data3/XJ_SAC/header/station_ZSY.dat')
+                        default='/data3/XJ_SAC/header/station_XLS.dat')
     parser.add_argument('--time_range', type=str,
-                        default='20170914,20170915')
+                        default='20161219,20161222')
     parser.add_argument('--out_ctlg', type=str,
                         default='./output/catalog.tmp')
     parser.add_argument('--out_pha', type=str,
                         default='./output/phase.tmp')
-    parser.add_argument('--out_ppk_root', type=str,
+    parser.add_argument('--out_ppk_dir', type=str,
                         default='./output/picks')
     args = parser.parse_args()
 
@@ -33,16 +33,16 @@ out_ctlg = open(args.out_ctlg,'w')
 out_pha  = open(args.out_pha, 'w')
 sta_dict = dp.get_sta_dict(args.sta_file)
 cfg = config.Config()
-if not os.path.exists(args.out_ppk_root): 
-    os.makedirs(args.out_ppk_root)
+if not os.path.exists(args.out_ppk_dir): 
+    os.makedirs(args.out_ppk_dir)
 
 # define algorithm
 picker = pickers.Trad_PS(trig_thres = cfg.trig_thres,
                          s_win = cfg.s_win)
-detector = detectors.TS_Det(sta_dict, cfg.resp_dict,
-                            assoc_num = cfg.assoc_num,
-                            ot_dev = cfg.ot_dev,
-                            ttp_dev = cfg.ttp_dev)
+associator = associators.TS_Assoc(sta_dict, cfg.resp_dict,
+                 assoc_num = cfg.assoc_num,
+                 ot_dev = cfg.ot_dev,
+                 ttp_dev = cfg.ttp_dev)
 
 # get time range
 start_date = UTCDateTime(args.time_range.split(',')[0])
@@ -59,7 +59,7 @@ for day_idx in range(num_day):
     data_dict = dp.get_xj(args.data_dir, datetime)
     if data_dict=={}: continue
     # set out file
-    fpath = os.path.join(args.out_ppk_root, str(datetime.date)+'.ppk')
+    fpath = os.path.join(args.out_ppk_dir, str(datetime.date)+'.ppk')
     out_ppk = open(fpath,'w')
 
     # 1. waveform --> phase picks
@@ -77,17 +77,17 @@ for day_idx in range(num_day):
         else:    picks = np.append(picks, picksi)
 
     # 2. associate ot: picks --> events
-    event_picks = detector.pick2event(picks)
+    event_picks = associator.pick2event(picks)
 
-    # 3. assocuate by locate evnets
+    # 3. associate by locate evnets
     for event_pick in event_picks:
-        event_loc, event_pick = detector.locate(event_pick)
+        event_loc, event_pick = associator.locate(event_pick)
         if len(event_loc)==0: continue
         # 4. estimate magnitude
-        event_loc_mag = detector.calc_mag(event_pick, event_loc)
+        event_loc_mag = associator.calc_mag(event_pick, event_loc)
         # write catalog and phase
-        detector.write_catalog(event_loc_mag, out_ctlg)
-        detector.write_phase(event_loc_mag, event_pick, out_pha)
+        associator.write_catalog(event_loc_mag, out_ctlg)
+        associator.write_phase(event_loc_mag, event_pick, out_pha)
 
     out_ppk.close()
 

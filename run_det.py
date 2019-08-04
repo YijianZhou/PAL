@@ -1,6 +1,6 @@
-""" Run detector with picks as input
+""" Run associator with picks as input
 """
-import os, glob
+import os, glob, time
 import argparse
 import numpy as np
 import obspy
@@ -9,7 +9,7 @@ from obspy import read, UTCDateTime
 import config
 import data_pipeline as dp
 import pickers
-import detectors
+import associators
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -33,10 +33,10 @@ sta_dict = dp.get_sta_dict(args.sta_file)
 cfg = config.Config()
 
 # define algorithm
-detector = detectors.TS_Det(sta_dict, cfg.resp_dict,
-                            assoc_num = cfg.assoc_num,
-                            ot_dev = cfg.ot_dev,
-                            ttp_dev = cfg.ttp_dev)
+associator = associators.TS_Assoc(sta_dict, cfg.resp_dict,
+                 assoc_num = cfg.assoc_num,
+                 ot_dev = cfg.ot_dev,
+                 ttp_dev = cfg.ttp_dev)
 
 # get time range
 start_date = UTCDateTime(args.time_range.split(',')[0])
@@ -45,6 +45,7 @@ print('Making catalog')
 print('time range: {} to {}'.format(start_date, end_date))
 
 # for all days
+t0=time.time()
 num_day = (end_date.date - start_date.date).days
 for day_idx in range(num_day):
 
@@ -53,17 +54,18 @@ for day_idx in range(num_day):
     picks = dp.get_xj_picks(args.ppk_dir, datetime)
 
     # 2. associate ot: picks --> events
-    event_picks = detector.pick2event(picks)
+    event_picks = associator.pick2event(picks)
 
     # 3. assocuate by locate evnets
     for event_pick in event_picks:
-        event_loc, event_pick = detector.locate(event_pick)
+        event_loc, event_pick = associator.locate(event_pick)
         if len(event_loc)==0: continue
         # 4. estimate magnitude
-        event_loc_mag = detector.calc_mag(event_pick, event_loc)
+        event_loc_mag = associator.calc_mag(event_pick, event_loc)
         # write catalog and phase
-        detector.write_catalog(event_loc_mag, out_ctlg)
-        detector.write_phase(event_loc_mag, event_pick, out_pha)
+        associator.write_catalog(event_loc_mag, out_ctlg)
+        associator.write_phase(event_loc_mag, event_pick, out_pha)
+    print('associated {}th day, {:.1f}s'.format(day_idx, time.time()-t0))
 
 # finish making catalog
 out_pha.close()

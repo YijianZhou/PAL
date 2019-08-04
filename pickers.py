@@ -40,10 +40,11 @@ class Trad_PS(object):
                fd_thres    = 2.5,
                amp_win     = 5.,
                det_gap     = 5.,
-               freq_band   = ['highpass',1.]):
+               freq_band   = ['highpass',1.],
+               samp_rate   = 100.):
 
     # change sec to points for time params
-    self.samp_rate   = 100. #TODO
+    self.samp_rate   = samp_rate
     self.pick_win    = [int(self.samp_rate * pick_win[0]), 
                         int(self.samp_rate * pick_win[1])] 
     self.idx_shift   = self.pick_win
@@ -65,11 +66,9 @@ class Trad_PS(object):
   def pick(self, stream, out_file=None):
 
     # set output format
-    dtype = [('network','O'),
-             ('station','O'),
-             ('sta_lon','O'),
-             ('sta_lat','O'),
-             ('org_t0','O'),
+    dtype = [('net','O'),
+             ('sta','O'),
+             ('sta_ot','O'),
              ('p_arr','O'),
              ('s_arr','O'),
              ('s_amp','O'),
@@ -88,8 +87,6 @@ class Trad_PS(object):
     head = stream[0].stats
     net     = head.network
     sta     = head.station
-    sta_lon = head.sac.stlo
-    sta_lat = head.sac.stla
 
     # get data
     stream.detrend('demean').detrend('linear').taper(max_percentage=0.05, max_length=10.)
@@ -177,10 +174,10 @@ class Trad_PS(object):
         print('{}, {}, {}'.format(sta, tp, ts))
         if tp<ts and fd>self.fd_thres:
             ot0 = self.est_ot(tp, ts) # est. of ot for assoc
-            picks.append((net, sta, sta_lon, sta_lat, ot0, tp, ts, amp, p_snr, s_snr, fd))
+            picks.append((net, sta, ot0, tp, ts, amp, p_snr, s_snr, fd))
             if out_file: 
-                pick_line = '{},{},{},{},{},{},{},{},{},{},{}\n'\
-                    .format(net, sta, sta_lon, sta_lat, ot0, tp, ts, amp, p_snr, s_snr, fd)
+                pick_line = '{},{},{},{},{},{},{:.2f},{:.2f},{:.2f}\n'\
+                    .format(net, sta, ot0, tp, ts, amp, p_snr, s_snr, fd)
                 out_file.write(pick_line)
 
         # next detected phase
