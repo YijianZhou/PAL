@@ -6,7 +6,7 @@ procudures include: <br>
 (1) phase picking <br>
 (2) phase association <br>
 <br>
-Each of the three procedures are implemented in seperate scripts, i.e. the 'pickers.py' and 'detectors.py'. An example for combining these processes are shown in 'mk_ctlg.py', which aims to get an earthquake catalog directly from raw waveforms. 'parallel.py' are also provided for parallel computing.
+Both procedures are implemented in seperate scripts, i.e. the 'pickers.py' and 'associators.py'. An example for combining these two processes for earthquake detection are shown in 'run_ppk_assoc.py'. 'parallel_ppk_assoc.py' are also provided for parallel computing.
 <br>
   
 * phase pickers  
