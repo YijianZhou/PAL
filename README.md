@@ -26,7 +26,6 @@ picks = picker.pick(stream) # input obspy.stream
 # 2. associate by original time (ot) cluster: picks --> events
 event_picks = associator.pick2event(picks)
 ```
-
 ```python
 # 3. associate by spatial seach: location of P travel time cluster
 event_loc, event_pick = associator.locate(event_pick)
