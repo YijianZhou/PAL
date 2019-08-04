@@ -14,7 +14,7 @@ dt = (te-ts) /num_thread
 for i in range(num_thread):
     t0 = str((ts + i*dt).date)
     t1 = str((ts + (i+1)*dt).date)
-    os.system("python run_ppk_det.py \
+    os.system("python run_ppk_assoc.py \
         --time_range={},{} \
         --sta_file=/data3/XJ_SAC/header/station_ZSY.dat \
         --data_dir=/data3/XJ_SAC/[Y-Z]*/* \
