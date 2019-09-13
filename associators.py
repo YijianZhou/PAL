@@ -200,7 +200,7 @@ class TS_Assoc(object):
         dist_lat = 111*(sta_dict[net][sta]['sta_lat'] - event_loc['evt_lat'])
         dist[i] = np.sqrt(dist_lon**2 + dist_lat**2) # in km
         mag[i]  = np.log10(amp) + np.log10(dist[i])
-    event_loc['mag'] = round(np.median(mag),1)
+    event_loc['mag'] = round(np.median(mag),2)
     print('estimated mag: {:.1f} delta {:.1f}'.\
           format(np.median(mag), np.std(mag)))
     return event_loc
@@ -226,7 +226,7 @@ class TS_Assoc(object):
     lat = event_loc['evt_lat']
     mag = event_loc['mag']
     res = event_loc['res']
-    out_pha.write('{},{},{},5,{},{}\n'\
+    out_pha.write('{},{},{},{},{}\n'\
           .format(ot, lon, lat, mag, res))
     for pick in event_pick:
         net   = pick['net']
