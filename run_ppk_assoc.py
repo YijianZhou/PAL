@@ -5,7 +5,7 @@ import argparse
 import numpy as np
 import obspy
 from obspy import read, UTCDateTime
-# import PpkDet package
+# import PAD package
 import config
 import data_pipeline as dp
 import pickers
