@@ -1,46 +1,52 @@
+""" make phase input file for HypoInverse (COP 3 format)
+  change net to choose input phase file
+"""
 from obspy import UTCDateTime
 
-net = 'rc'
+net = 'zsy'
 fpha  = '../output/%s/phase_%s.dat'%(net,net)
-fctlg = '../output/%s/catalog_%s.dat'%(net,net)
-fout  = 'input/rc.phs'
-f=open(fpha); phas =f.readlines(); f.close()
-f=open(fctlg);ctlgs=f.readlines(); f.close()
+fout  = 'input/%s.phs'%net
+lat_code, lon_code = 'N', 'E'
+f=open(fpha); lines =f.readlines(); f.close()
 out=open(fout,'w')
+mag_corr = 2. # hypoInv do not support neg mag
 
 def split_datetime(dtime):
-    yr  = str(dtime.year)
-    mon = str(dtime.month).zfill(2)
-    day = str(dtime.day).zfill(2)
-    date = yr + mon + day
-    hr  = str(dtime.hour).zfill(2)
-    mi  = str(dtime.minute).zfill(2)
-    sec = str(dtime.second).zfill(2)
-    msc = str(int(dtime.microsecond/1e4)).zfill(2)
-    time = hr + mi + sec + msc
+    yr  = dtime.year
+    mon = dtime.month
+    day = dtime.day
+    date = '{}{:0>2}{:0>2}'.format(yr, mon, day)
+    hr  = dtime.hour
+    mi  = dtime.minute
+    sec = dtime.second
+    msc = int(dtime.microsecond/1e4)
+    time = '{:0>2}{:0>2}{:0>2}{:0>2}'.format(hr, mi, sec, msc)
     return date, time
 
-
 idx=0
-for pha in phas:
-  if len(pha.split(','))==6:
+for line in lines:
+  codes = line.split(',')
+  if len(codes)==5:
     # write head line
-    ot, lon, lat, _,_,_ = ctlgs[idx].split(',')
+    ot, lat, lon, mag = codes[0:4]
+    ot = UTCDateTime(ot)
+    date, time = split_datetime(ot)
+    mag = max(float(mag) + mag_corr, 0.)
+    lat = abs(float(lat))
     lon = abs(float(lon))
     lon_deg = int(lon)
     lon_min = int(100*60*(lon-int(lon)))
-    lat = abs(float(lat))
     lat_deg = int(lat)
     lat_min = int(100*60*(lat-int(lat)))
-    ot = UTCDateTime(ot)
-    date, time = split_datetime(ot)
+    lat = '{:0>2}{}{:0>4}'.format(lat_deg, lat_code, lat_min)
+    lon = '{:0>3}{}{:0>4}'.format(lon_deg, lon_code, lon_min)
     if idx!=0: out.write('\n')
-    out.write('{}{:0>2} {:0>4}{:0>3}W{:0>4} \n'\
-      .format(date+time, lat_deg, lat_min, lon_deg, lon_min))
+    out.write('{}{}{} {}L{:3.2f}{}{:>10}L\n'\
+      .format(date+time, lat, lon, ' '*90, mag, ' '*9, idx))
     idx+=1
   else:
     # write sta line
-    net, sta, tp, ts, _,_,_ = pha.split(',')
+    net, sta, tp, ts  = codes[0:4]
     tp = UTCDateTime(tp)
     ts = UTCDateTime(ts)
     date = split_datetime(tp)[0]
