@@ -18,7 +18,6 @@ for line in lines:
     lon_min = 60*(lon-int(lon))
     lat = '{} {:7.4f}{}'.format(lat_deg, lat_min, lat_code)
     lon = '{} {:7.4f}{}'.format(lon_deg, lon_min, lon_code)
-#    out.write("{:<5} {}  HHZ  {}{}{:4}0.2     0.00  0.00  0.00  0.00 3  0.00--HHZ \n"\
     # hypoinverse format 2
     out.write("{:<5} {}  HHZ  {}{}{:4}\n"\
       .format(sta, net[-2:], lat, lon, ele))
