@@ -12,8 +12,6 @@ fsums = glob.glob('output/%s_*.sum'%net)
 out_csv = open('output/%s.csv'%net,'w')
 out_sum = open('output/%s.sum'%net,'w')
 out_bad = open('output/%s_bad.csv'%net,'w')
-#fmag = '../output/%s/catalog_%s.dat'%(net,net)
-#f=open(fmag); mags=f.readlines(); f.close()
 
 
 def write(out, line):
@@ -28,7 +26,6 @@ def write(out, line):
     lon = lon_deg + lon_min/60
     dep = float(line[38:44])
     mag = float(line[48:52]) - mag_corr
-#    mag = float(mags[evid].split(',')[-2])
     out.write('{},{:.4f},{:.4f},{:.1f},{:.1f}\n'.format(dtime, lat, lon, dep+grd_ele, mag))
 
 
