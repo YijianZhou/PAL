@@ -2,14 +2,17 @@
   change net to choose input phase file
 """
 from obspy import UTCDateTime
+import config
 
-net = 'zsy'
-fpha  = '../output/%s/phase_%s.dat'%(net,net)
-fout  = 'input/%s.phs'%net
-lat_code, lon_code = 'N', 'E'
+# i/o paths
+cfg = config.Config()
+fpha = cfg.fpha_in 
+fout = cfg.fpha_out
+lat_code = cfg.lat_code
+lon_code = cfg.lon_code
 f=open(fpha); lines =f.readlines(); f.close()
 out=open(fout,'w')
-mag_corr = 2. # hypoInv do not support neg mag
+mag_corr = cfg.mag_corr # hypoInv do not support neg mag
 
 def split_datetime(dtime):
     yr  = dtime.year

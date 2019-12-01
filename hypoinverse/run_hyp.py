@@ -2,9 +2,8 @@
   Usage:
     (1) modify template hyp control file to tune HypoInverse params
     (2) manually write velo mod (e.g., CRE file), include ref ele if necessary
-    (3) set fsta in mk_sta & main
-    (4) set net in mk_pha & main, which is the root dir & name code
-    (5) python run_hyp.py
+    (3) set i/o paths in config file
+    (4) python run_hyp.py
   Output:
     csv file: ot, lat, lon, dep, mag
     sum file (hyp)
@@ -13,24 +12,26 @@
 import os, glob
 import numpy as np
 import subprocess
+import config
 
 # i/o paths
-net='zsy'
-ztr_rng = np.arange(0,40,1)
-ref_ele = 2.7 # ref ele for CRE mod; be consistant with input .cre file
-fhyp_temp = 'temp.hyp'
-fhyp = 'input/%s.hyp'%net
+cfg = config.Config()
+net = cfg.net
+ztr_rng = cfg.ztr_rng
+ref_ele = cfg.ref_ele
+fhyp_temp = cfg.fhyp_temp
+fhyp = cfg.fhyp
 f=open(fhyp_temp); lines=f.readlines(); f.close()
-fsta = 'input/xj.sta'
-fpha = 'input/%s.phs'%net
+fsta = cfg.fsta_out
+fpha = cfg.fpha_out
 # if use CRE mod
-pmod = 'input/xj_p.cre'
-smod = 'input/xj_s.cre'
+pmod = cfg.pmod
+smod = cfg.smod
 
 # format input
 os.system('python mk_sta.py')
 os.system('python mk_phs.py')
-for fname in glob.glob('output/%s_*.sum'%net): os.unlink(fname)
+for fname in glob.glob(cfg.fsums): os.unlink(fname)
 
 # for all ztr
 for ztri in ztr_rng:

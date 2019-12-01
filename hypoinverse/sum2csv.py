@@ -2,16 +2,19 @@
 """
 import glob, os
 import numpy as np
+import config
 
 # i/o paths
-net = 'zsy'
-grd_ele = 2. # typical station elevation
-mag_corr = 2. # hypoInv do not support neg mag
-lat_code, lon_code = 'N', 'E'
-fsums = glob.glob('output/%s_*.sum'%net)
-out_csv = open('output/%s.csv'%net,'w')
-out_sum = open('output/%s.sum'%net,'w')
-out_bad = open('output/%s_bad.csv'%net,'w')
+cfg = config.Config()
+grd_ele = cfg.grd_ele # typical station elevation
+mag_corr = cfg.mag_corr # hypoInv do not support neg mag
+lat_code = cfg.lat_code
+lon_code = cfg.lon_code
+fsums = glob.glob(cfg.fsums)
+out_csv = open(cfg.out_csv,'w')
+out_sum = open(cfg.out_sum,'w')
+out_bad = open(cfg.out_bad,'w')
+out_good= open(cfg.out_good,'w')
 
 
 def write(out, line):
@@ -57,12 +60,15 @@ for evid, sum_lines in sum_dict.items():
   # if no reliable loc
   if num_loc==0: 
     sum_list_loc = sum_list
-    write(out_bad, sum_list[0]['line'])
-  # choose best loc
-  sum_list_loc = np.sort(sum_list_loc, order=['azm','npha','rms'])
+    write(out_bad, sum_list_loc[0]['line'])
+  else:
+    # choose best loc
+    sum_list_loc = np.sort(sum_list_loc, order=['azm','npha','rms'])
+    write(out_good, sum_list_loc[0]['line'])
   write(out_csv, sum_list_loc[0]['line'])
   out_sum.write(sum_list_loc[0]['line'])
 
 out_csv.close()
 out_sum.close()
 out_bad.close()
+out_good.close()
