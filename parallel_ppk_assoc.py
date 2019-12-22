@@ -4,14 +4,14 @@ from obspy import UTCDateTime
 # parallel params
 start_date = '20160901'
 end_date   = '20190201'
-num_thread = 20
+num_proc = 20
 out_root = 'zsy'
 
 # divide by time
 ts = UTCDateTime(start_date)
 te = UTCDateTime(end_date)
-dt = (te-ts) /num_thread
-for i in range(num_thread):
+dt = (te-ts) / num_proc
+for i in range(num_proc):
     t0 = str((ts + i*dt).date)
     t1 = str((ts + (i+1)*dt).date)
     os.system("python run_ppk_assoc.py \
@@ -22,4 +22,3 @@ for i in range(num_thread):
         --out_ctlg=./output/{}/catalog_{}_{}.dat \
         --out_ppk_root=./output/{}/picks &"\
         .format(t0,t1, out_root,t0,t1, out_root,t0,t1, out_root))
-
