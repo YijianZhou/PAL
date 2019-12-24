@@ -16,11 +16,10 @@ dt = (te-ts) / num_proc
 for i in range(num_proc):
     t0 = str((ts + i*dt).date)
     t1 = str((ts + (i+1)*dt).date)
-    os.system("python {}/run_ppk_assoc.py \
+    os.system("python {}/run_assoc.py \
         --time_range={},{} \
-        --data_dir=/data3/XLS_SAC/*/* \
+        --ppk_dir={}/picks \
         --out_pha={}/phase_{}_{}.dat \
-        --out_ctlg={}/catalog_{}_{}.dat \
-        --out_ppk_dir={}/picks &"
-        .format(pad_dir, t0,t1, out_root,t0,t1, out_root,t0,t1, out_root))
+        --out_ctlg={}/catalog_{}_{}.dat &"
+        .format(pad_dir, t0,t1, out_root, out_root,t0,t1, out_root))
 
