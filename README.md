@@ -10,7 +10,7 @@ Both procedures are implemented in seperate scripts, i.e. the 'pickers.py' and '
 <br>
   
 * phase pickers  
-*pickers.py* defines various picking algorithms as picker classes. 
+*pickers.py* defines various phase picking algorithms. 
 ```python
 # use picker
 # 1. waveform --> picks
