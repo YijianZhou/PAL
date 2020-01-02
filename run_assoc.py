@@ -45,18 +45,8 @@ for day_idx in range(num_day):
     date = start_date + day_idx*86400
     picks = get_picks(args.ppk_dir, date)
 
-    # 1. associate ot: picks --> events
-    event_picks = associator.pick2event(picks)
-
-    # 2. assocuate by locate evnets
-    for event_pick in event_picks:
-        event_loc, event_pick = associator.locate(event_pick)
-        if len(event_loc)==0: continue
-        # 4. estimate magnitude
-        event_loc_mag = associator.calc_mag(event_pick, event_loc)
-        # write catalog and phase
-        associator.write_catalog(event_loc_mag, out_ctlg)
-        associator.write_phase(event_loc_mag, event_pick, out_pha)
+    # 2. associate picks: picks --> event_picks & event_loc
+    associator.associate(picks, out_ctlg, out_pha)
 
 # finish making catalog
 out_pha.close()

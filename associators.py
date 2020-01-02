@@ -3,7 +3,7 @@ import numpy as np
 class TS_Assoc(object):
 
   """ Associate picks by searching ot (time, T) and ttp (space, S) cluster
-  Input
+  Inputs
     sta_dict: station location dict
     resp_dict: instrumental response dict for all networks (cnt/(m/s))
     side_width: ratio of sides relative to the station range
@@ -12,17 +12,11 @@ class TS_Assoc(object):
     ot_dev: time dev for ot assoc
     ttp_dev: time dev for ttp assoc
     assoc_num: min num to alert a detection
-    *lateral spatial range (x-y) in degree; depth in km; elevation in m
+    *note: lateral spatial range (x-y) in degree; depth in km; elevation in m
   Usage
     import associators
     associator = associators.TS_Assoc(sta_dict, resp_dict)
-    event_picks = associator.pick2event(picks)
-    for event_pick in event_picks:
-        event_loc, event_pick = associator.locate(event_pick)
-        if len(event_loc)==0: continue
-        event_loc_mag = associator.calc_mag(event_pick, event_loc)
-        associator.write_catalog(event_loc_mag, out_ctlg)
-        associator.write_phase(event_loc_mag, event_pick, out_pha)
+    associator.associate(picks, out_ctlg, out_pha)
   """
   
   def __init__(self,
@@ -48,11 +42,27 @@ class TS_Assoc(object):
     self.time_table = self.calc_tt()
 
 
-  # 1. temporal assoc: ot cluster
+  def associate(self, picks, out_ctlg=None, out_pha=None):
+
+    # 1. temporal assoc: picks --> event_picks
+    event_picks = self.pick2event(picks)
+
+    # 2. spatial assoc: event_pick --> event_loc
+    for event_pick in event_picks:
+        event_loc, event_pick = self.locate(event_pick)
+        if len(event_loc)==0: continue
+        # 3. estimate magnitude
+        event_loc_mag = self.calc_mag(event_pick, event_loc)
+        # write catalog and phase
+        self.write_catalog(event_loc_mag, out_ctlg)
+        self.write_phase(event_loc_mag, event_pick, out_pha)
+
+
+  # 1. temporal assoc by ot cluster: picks --> event_picks
   def pick2event(self, picks):
     event_picks = []
     num_picks = len(picks)
-    if num_picks==0: print('no events detected'); return event_picks
+    if num_picks==0: print('no event detected'); return event_picks
     picks = np.sort(picks, order='sta_ot')
 
     # calc num_nbr
@@ -76,14 +86,12 @@ class TS_Assoc(object):
         ots_todel = ots[to_assoc]
         nbr_todel = [sum(abs(ots_todel-oti) < self.ot_dev) for oti in ots[to_renew]]
         num_nbr[to_renew] -= nbr_todel
-
     print('associated {} events'.format(len(event_picks)))
     return event_picks
 
 
-  # 2. spatial assoc: locate --> drop large res sta
+  # 2. spatial assoc by locate event (sta res): event_pick --> event_loc
   def locate(self, event_pick):
-    # prep grid search: calc tp distr
     res_ttp = 0 # P travel time res
     tp_num = 0 # true positive
     tp_dict = {}
@@ -113,8 +121,8 @@ class TS_Assoc(object):
     lat = self.lat_rng[0] + y * self.xy_grid
 
     # find sta phase
-    event_pick = [pick for pick in event_pick\
-                  if tp_dict[pick['net']+'.'+pick['sta']][x][y] == 1.]
+    event_pick = [pick for pick in event_pick \
+               if tp_dict[pick['net'] +'.'+ pick['sta']][x][y] == 1.]
 
     # output
     print('locate event: ot {}, lon {:.2f}, lat {:.2f}, res {:.1f}'\
@@ -126,7 +134,7 @@ class TS_Assoc(object):
     return event_loc, event_pick
 
 
-  # init assoc
+  # calc time table (init assoc)
   def calc_tt(self):
     # set up
     print('making time table')
@@ -134,7 +142,7 @@ class TS_Assoc(object):
     time_table = {}
     dist_grid = 111 * self.xy_grid # in km
 
-    # 1. get x-y range: sta range + side width
+    # get x-y range: sta range + side width
     lon, lat = [], []
     for net_sta in sta_dict:
         lon.append(sta_dict[net_sta]['sta_lon'])
@@ -150,7 +158,7 @@ class TS_Assoc(object):
     x_rng = range(int((lon_rng[1] - lon_rng[0]) / self.xy_grid))
     y_rng = range(int((lat_rng[1] - lat_rng[0]) / self.xy_grid))
 
-    # 2. calc time table
+    # calc time table
     for net_sta in sta_dict:
         # convert to x-y axis
         lon = sta_dict[net_sta]['sta_lon']
@@ -158,7 +166,6 @@ class TS_Assoc(object):
         ele = sta_dict[net_sta]['sta_ele'] / 1000. # m to km
         sta_x = int((lon - lon_rng[0]) / self.xy_grid)
         sta_y = int((lat - lat_rng[0]) / self.xy_grid)
-
         # calc P travel time
         ttp = -np.ones([len(x_rng), len(y_rng)])
         for i,x in enumerate(x_rng):
@@ -167,15 +174,13 @@ class TS_Assoc(object):
             dep  = ele + 5 # init event depth 5km
             ttp[i,j] = np.sqrt(dep**2 + dist**2) / self.vp
         time_table[net_sta] = ttp
-
     self.lon_rng = lon_rng
     self.lat_rng = lat_rng
     return time_table
 
 
+  # calc mag with picks (s_amp)
   def calc_mag(self, event_pick, event_loc):
-    """ calc mag with picks (s_amp)
-    """
     sta_dict = self.sta_dict
     num_sta = len(event_pick)
     mag  = np.zeros(num_sta)
@@ -192,14 +197,13 @@ class TS_Assoc(object):
         dist[i] = np.sqrt(dist_lon**2 + dist_lat**2) # in km
         mag[i]  = np.log10(amp) + np.log10(dist[i])
     event_loc['mag'] = round(np.median(mag),2)
-    print('estimated mag: {:.1f} delta {:.1f}'.\
-          format(np.median(mag), np.std(mag)))
+    print('estimated magnitude: {:.1f} delta {:.1f}'\
+      .format(np.median(mag), np.std(mag)))
     return event_loc
 
 
+  # write event loc into catalog
   def write_catalog(self, event_loc, out_ctlg):
-    """ write event loc into catalog
-    """
     ot  = event_loc['evt_ot']
     lon = event_loc['evt_lon']
     lat = event_loc['evt_lat']
@@ -208,9 +212,8 @@ class TS_Assoc(object):
     out_ctlg.write('{},{},{},{},{}\n'.format(ot, lat, lon, mag, res))
 
 
+  # write sta phase into phase file
   def write_phase(self, event_loc, event_pick, out_pha):
-    """ write sta phase into phase file
-    """
     ot  = event_loc['evt_ot']
     lon = event_loc['evt_lon']
     lat = event_loc['evt_lat']

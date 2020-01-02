@@ -6,7 +6,7 @@ from obspy import read, UTCDateTime
 import multiprocessing as mp
 
 
-def get_data(data_dir, date, apply_mp=False):
+def get_data(data_dir, date, num_proc=1):
     """ get data dict
     Input
         data_dir (str): root dir, e.g. root/net/sta/yyyy/mm/dd/net.sta.yyyymmdd.chn.sac
@@ -30,8 +30,8 @@ def get_data(data_dir, date, apply_mp=False):
     for net_sta in todel: data_dict.pop(net_sta)
 
     # read data
-    if apply_mp:
-        pool = mp.Pool(processes=5)
+    if num_proc>1:
+        pool = mp.Pool(processes=num_proc)
         outputs = pool.starmap(read_st, data_dict.items())
         pool.close()
         pool.join()
@@ -101,6 +101,5 @@ def get_picks(ppk_dir, date):
     return np.array(picks, dtype=dtype)
 
 
-""" def customized func below
-    & set func in config
+""" customized data_pipelines
 """

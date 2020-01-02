@@ -42,27 +42,20 @@ class Trad_PS(object):
                fd_thres   = 2.5,
                amp_win    = 5.,
                det_gap    = 5.,
-               freq_band  = ['highpass',1.],
-               samp_rate  = 100.):
+               freq_band  = ['highpass',1.]):
 
-    # change sec to points for time params
-    self.samp_rate  = samp_rate
-    self.pick_win   = [int(self.samp_rate * pick_win[0]), 
-                       int(self.samp_rate * pick_win[1])] 
-    self.idx_shift  = self.pick_win
-    self.trig_thres = trig_thres
-    self.pick_thres = pick_thres
-    self.p_win      = [int(self.samp_rate * p_win[0]), 
-                       int(self.samp_rate * p_win[1])]
-    self.s_win      = [int(self.samp_rate * s_win[0]), 
-                       int(self.samp_rate * s_win[1])]
-    self.pca_win    =  int(self.samp_rate * pca_win)
-    self.pca_rng    = [int(self.samp_rate * pca_rng[0]),
-                       int(self.samp_rate * pca_rng[1])]
-    self.fd_thres   = fd_thres
-    self.amp_win    = int(self.samp_rate * amp_win)
-    self.det_gap    = int(self.samp_rate * det_gap)
-    self.freq_band  = freq_band
+    self.samp_rate    = 100
+    self.pick_win_sec = pick_win
+    self.trig_thres   = trig_thres
+    self.pick_thres   = pick_thres
+    self.p_win_sec    = p_win
+    self.s_win_sec    = s_win
+    self.pca_win_sec  = pca_win
+    self.pca_rng_sec  = pca_rng
+    self.fd_thres     = fd_thres
+    self.amp_win_sec  = amp_win
+    self.det_gap_sec  = det_gap
+    self.freq_band    = freq_band
 
 
   def pick(self, stream, out_file=None):
@@ -80,88 +73,99 @@ class Trad_PS(object):
 
     # time alignment
     start_time = max([trace.stats.starttime for trace in stream])
-    end_time   = min([trace.stats.endtime for trace in stream])
+    end_time = min([trace.stats.endtime for trace in stream])
     if start_time > end_time: return np.array([], dtype=dtype)
-    stream = stream.slice(start_time, end_time)
+    stream = stream.slice(start_time, end_time, nearest_sample=True)
     if len(stream)!=3: return np.array([], dtype=dtype)
 
     # get header
     head = stream[0].stats
     net  = head.network
     sta  = head.station
+    self.samp_rate = head.sampling_rate
+
+    # sec to points
+    self.pick_win = [int(self.samp_rate * win) for win in self.pick_win_sec]
+    self.p_win    = [int(self.samp_rate * win) for win in self.p_win_sec]
+    self.s_win    = [int(self.samp_rate * win) for win in self.s_win_sec]
+    self.pca_win  =  int(self.samp_rate * self.pca_win_sec)
+    self.pca_rng  = [int(self.samp_rate * win) for win in self.pca_rng_sec]
+    self.amp_win  =  int(self.samp_rate * self.amp_win_sec)
+    self.det_gap  =  int(self.samp_rate * self.det_gap_sec)
 
     # preprocess & extract data
     stream.detrend('demean').detrend('linear').taper(max_percentage=0.05, max_length=10.)
     flt_type = self.freq_band[0]
-    freqmin  = self.freq_band[1]
-    if len(self.freq_band)==2:
-        stream.filter(flt_type, freq=freqmin)
-    elif len(self.freq_band)==3: 
-        freqmax = self.freq_band[2]
-        stream.filter(flt_type, freqmin=freqmin, freqmax=freqmax)
-    data = np.array([trace.data for trace in stream])
+    freq_rng = self.freq_band[1]
+    if flt_type=='highpass':
+        stream.filter(flt_type, freq=freq_rng)
+    if flt_type=='bandpass':
+        stream.filter(flt_type, freqmin=freq_rng[0], freqmax=freq_rng[1])
+    min_npts = min([len(trace) for trace in stream])
+    data = np.array([trace.data[0:min_npts] for trace in stream])
 
     # pick P and S
     picks = []
     print('-'*40)
+
     # 1. trig picker
     print('1. triggering phase picker: {}.{}, {}'.format(net,sta, start_time))
     cf_trig = self.calc_cf(data[2], self.pick_win)
     trig_ppk = np.where(cf_trig > self.trig_thres)[0]
     slide_idx = 0
+
+    # 2. phase picking
     print('2. picking phase:')
     for _ in trig_ppk:
 
-        # 2. pick P around idx_trig
+        # 2.1 pick P around idx_trig
         idx_trig = trig_ppk[slide_idx]
-        if idx_trig < self.p_win[0] + self.idx_shift[0]: 
+        if idx_trig < self.p_win[0] + self.pick_win[0]: 
             slide_idx += 1; continue
-        data_p = data[2][idx_trig - self.p_win[0] - self.idx_shift[0]
-                        :idx_trig + self.p_win[1] + self.idx_shift[1]]
+        data_p = data[2][idx_trig - self.p_win[0] - self.pick_win[0]
+                        :idx_trig + self.p_win[1] + self.pick_win[1]]
         cf_p = self.calc_cf(data_p, self.pick_win)
-        idx_p = idx_trig - self.idx_shift[0] - self.p_win[0] +\
+        idx_p = idx_trig - self.pick_win[0] - self.p_win[0] +\
                 np.where(cf_p >= self.pick_thres * np.amax(cf_p))[0][0]
         tp = start_time + idx_p / self.samp_rate
 
-        # 3. pick S after P
+        # 2.2 pick S after P
         # calc cf on E&N
         if len(data[0]) < idx_p + self.s_win[1]: break
-        s_rng = [idx_p - self.s_win[0] - self.idx_shift[0],
-                 idx_p + self.s_win[1] + self.idx_shift[1]]
+        s_rng = [idx_p - self.s_win[0] - self.pick_win[0],
+                 idx_p + self.s_win[1] + self.pick_win[1]]
         data_s = np.sqrt(data[0][s_rng[0] : s_rng[1]]**2\
                        + data[1][s_rng[0] : s_rng[1]]**2)
         cf_s = self.calc_cf(data_s, self.pick_win)
-
         # trig S picker and pick
         pca_flt = self.calc_filter(data, idx_p)
-        data_s[self.idx_shift[0] : self.idx_shift[0] + len(pca_flt)] *= pca_flt
-        s_trig = np.argmax(data_s[self.idx_shift[0]:]) + self.idx_shift[0]
-        s_rng0 = min(s_trig, int(s_trig + self.idx_shift[0])//2)
-        s_rng1 = max(s_trig, int(s_trig + self.idx_shift[0])//2)
+        data_s[self.pick_win[0] : self.pick_win[0] + len(pca_flt)] *= pca_flt
+        s_trig = np.argmax(data_s[self.pick_win[0]:]) + self.pick_win[0]
+        s_rng0 = min(s_trig, int(s_trig + self.pick_win[0])//2)
+        s_rng1 = max(s_trig, int(s_trig + self.pick_win[0])//2)
         if s_rng0==s_rng1: s_rng1+=1
         cf_s = cf_s[s_rng0 : s_rng1]
-        idx_s = idx_p - self.idx_shift[0] - self.s_win[0]\
-              + s_rng0 + np.argmax(cf_s)
+        idx_s = idx_p - self.pick_win[0] - self.s_win[0] + s_rng0 + np.argmax(cf_s)
         ts = start_time + idx_s / self.samp_rate
 
-        # get related S amplitude
+        # 2.3 get related S amplitude
         amp_xyz = np.array([self.get_amp(di) for di in data[:, idx_s : idx_s + self.amp_win]])
         amp = np.sqrt(np.sum(amp_xyz**2))
 
-        # get p_anr and s_anr
+        # 2.4 get p_anr and s_anr
         p_snr = np.amax(cf_p)
         s_snr = np.amax(cf_s)
 
-        # calc dominant frequency
+        # 2.5 calc dominant frequency
         t0 = min(tp, ts)
         t1 = min(tp+(ts-tp)/2, head.endtime)
         st = stream.slice(t0,t1)
         fd = max([self.calc_freq_dmnt(tr.data, 1/self.samp_rate) for tr in st])
 
         # output
-        print('{}, {}, {}'.format(sta, tp, ts))
+        print('{}.{}, {}, {}'.format(net,sta, tp, ts))
         if tp<ts and fd>self.fd_thres:
-            ot0 = self.est_ot(tp, ts) # est. of ot for assoc
+            ot0 = self.est_ot(tp, ts) # est ot for assoc
             picks.append((net, sta, ot0, tp, ts, amp, p_snr, s_snr, fd))
             if out_file: 
                 pick_line = '{},{},{},{},{},{},{:.2f},{:.2f},{:.2f}\n'\
@@ -179,19 +183,20 @@ class Trad_PS(object):
 
 
   def calc_cf(self, data, win_len):
-    """  calc character func of STA/LTA for a single trace
+    """  calc energy-based character function (STA/LTA) for a single trace
     Inputs
-        data: input trace data, in np.array
-        win_len: win len for STA/LTA, [lwin, swin], in points
+        data (np.array): input trace data
+        win_len (points): win len for STA/LTA, [lwin, swin]
     Outputs
         cf: character function
     """
-    lwin, swin = [int(win) for win in win_len]
-    if len(data)<lwin+swin:
+    lwin, swin = win_len
+    npts = len(data)
+    if npts<lwin+swin:
         print('input data too short!')
         return np.zeros(1)
-    sta = np.zeros(len(data))
-    lta = np.ones(len(data))
+    sta = np.zeros(npts)
+    lta = np.ones(npts)
     # use energy
     data = np.cumsum(data**2)
     # Compute the STA and the LTA

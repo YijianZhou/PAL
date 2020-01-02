@@ -39,7 +39,9 @@ class Config(object):
 
     # 4. define func
     self.get_data = dp.get_data
-    sta_dict = dp.get_sta('/data3/XLS_SAC/header/station_XLS.dat')
+    self.get_picks = dp.get_picks
+    self.num_proc = 5
+    sta_dict = dp.get_sta('/data2/ZSY_SAC/header/station_ZSY.dat')
     self.picker = pickers.Trad_PS(\
                     trig_thres = self.trig_thres,
                     s_win = self.s_win)
