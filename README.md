@@ -16,17 +16,15 @@ Both procedures are implemented in seperate scripts, i.e. the 'pickers.py' and '
 # 1. waveform --> picks
 import pickers
 picker = pickers.Trad_PS()
-picks = picker.pick(stream) # input obspy.stream
+picks = picker.pick(stream, out_ppk) # input obspy.stream
 ```
   
 * phase associators  
 *associators.py* defines various phase associate methods.
 ```python
 # use associator
-# 2. associate by original time (ot) cluster: picks --> events
-event_picks = associator.pick2event(picks)
-# 3. associate by spatial seach: location of P travel time cluster
-event_loc, event_pick = associator.locate(event_pick)
-# 4. estimate magnitude
-event_loc_mag = associator.calc_mag(event_pick, event_loc)
+# 2. picks --> events
+import associators
+associator = associators.TS_Assoc(sta_dict, resp_dict)
+associator.associate(picks, out_ctlg, out_pha)
 ```
