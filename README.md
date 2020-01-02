@@ -1,6 +1,6 @@
 # PAD
 
-Package for detecting earthquakes from raw continuous waveform. <br>
+Earthquake detection from raw continuous waveform. <br>
 <br>
 procudures include: <br>
 (1) phase picking <br>
