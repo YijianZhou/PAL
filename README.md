@@ -6,7 +6,7 @@ procudures include: <br>
 (1) phase picking <br>
 (2) phase association <br>
 <br>
-Both procedures are implemented in seperate scripts: the 'pickers.py' and 'associators.py'. Main function for processing raw waveform is 'run_ppk_assoc.py'. 'parallel_ppk_assoc.py' are also provided for parallel computing. For tunning association parameters, use 'run_assoc.py' or 'parallel_assoc.py'
+Both procedures are implemented in seperate scripts: the 'pickers.py' and 'associators.py'. Main function for processing raw waveform is 'run_ppk_assoc.py'; for parallel computing, use 'parallel_ppk_assoc.py'. For tunning association parameters, use 'run_assoc.py' or 'parallel_assoc.py'
 <br>
   
 * phase pickers  
