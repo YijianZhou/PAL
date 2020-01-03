@@ -25,8 +25,8 @@ if __name__ == '__main__':
 
 # define func
 cfg = config.Config()
-get_data = cfg.get_data
-read_st = cfg.read_st
+get_data_dict = cfg.get_data_dict
+read_data = cfg.read_data
 picker = cfg.picker
 associator = cfg.associator
 
@@ -48,7 +48,7 @@ for day_idx in range(num_day):
 
     # get data
     date = start_date + day_idx*86400
-    data_dict = get_data(args.data_dir, date)
+    data_dict = get_data_dict(args.data_dir, date)
     if data_dict=={}: continue
 
     # 1. phase picking: waveform --> picks
@@ -57,7 +57,7 @@ for day_idx in range(num_day):
     for i,net_sta in enumerate(data_dict):
         print('-'*40)
         st_paths = data_dict[net_sta]
-        stream = read_st(st_paths, net_sta)
+        stream = read_data(st_paths, net_sta)
         picksi = picker.pick(stream, out_ppk)
         if i==0: picks = picksi
         else:    picks = np.append(picks, picksi)

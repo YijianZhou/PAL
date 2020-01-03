@@ -5,12 +5,12 @@ import numpy as np
 from obspy import read, UTCDateTime
 
 
-def get_data(data_dir, date):
+def get_data_dict(data_dir, date):
     """ get data dict
-    Input
+    Inputs
         data_dir (str): root dir, e.g. root/net/sta/yyyy/mm/dd/net.sta.yyyymmdd.chn.sac
         date (obspy.UTCDateTime): which day of data to get
-    Output
+    Outputs
         st_paths = data_dict[net_sta]
         (note: use net.sta to seperate sta from different net)
     """
@@ -29,7 +29,7 @@ def get_data(data_dir, date):
     return data_dict
 
 
-def read_st(st_paths, net_sta):
+def read_data(st_paths, net_sta):
     # read data
     print('reading stream: {}'.format(net_sta))
     st  = read(st_paths[0])
@@ -41,12 +41,12 @@ def read_st(st_paths, net_sta):
     return st
 
 
-def get_sta(sta_file):
+def get_sta_dict(sta_file):
     """ get station dict
-    Input
+    Inputs
         sta_file: path for sta file, e.g. net, sta, stla, stlo, stel
         (note: use net.sta to seperate sta from different net)
-    Output: sta_dict
+    Outputs
         stla, stlo, stel = sta_dict[net_sta]
     """
     sta_dict = {}
@@ -91,56 +91,3 @@ def get_picks(ppk_dir, date):
 
 """ customized data_pipelines
 """
-def get_xls(data_dir, datetime):
-
-    data_dict = {}
-    year  = str(datetime.year)
-    month = str(datetime.month).zfill(2)
-    day   = str(datetime.day).zfill(2)
-    data_paths = os.path.join(data_dir, year, month, day, '*')
-    data_paths = sorted(glob.glob(data_paths))
-    for data_path in data_paths:
-        file_name = os.path.split(data_path)[-1]
-        net_sta = '.'.join(file_name.split('.')[0:2])
-        if net_sta in data_dict: data_dict[net_sta].append(data_path)
-        else: data_dict[net_sta] = [data_path]
-    # drop bad sta
-    todel = [net_sta for net_sta in data_dict if len(data_dict[net_sta])!=3]
-    for net_sta in todel: data_dict.pop(net_sta)
-    return data_dict
-
-
-def get_rc(data_dir, datetime):
-    """ get data paths (in dict) from dir, for certain date
-    data paths for CI network:
-        net/sta/year/month/day/[net].[sta].[year].[jday].[chn].SAC
-    """
-    data_dict = {}
-    year  = str(datetime.year)
-    month = str(datetime.month).zfill(2)
-    day   = str(datetime.day).zfill(2)
-    data_paths = os.path.join(data_dir, year, month, day, '*')
-    data_paths = sorted(glob.glob(data_paths))
-    for data_path in data_paths:
-        file_name = os.path.split(data_path)[-1]
-        sta = file_name.split('.')[2]
-        if sta in data_dict: data_dict[sta].append(data_path)
-        else: data_dict[sta] = [data_path]
-    # drop bad sta
-    todel = [sta for sta in data_dict if len(data_dict[sta])!=3]
-    for sta in todel: data_dict.pop(sta)
-    return data_dict
-
-
-def get_rc_sta(sta_file):
-    """ get station dict, given sta file name (str)
-    """
-    sta_dict = {}
-    dtype = [('sta_lon','O'), ('sta_lat','O'), ('sta_ele','O')]
-    f = open(sta_file); lines = f.readlines(); f.close()
-    for line in lines:
-        net, sta, chn, lon, lat, ele = line.split(',')
-        if net not in sta_dict: sta_dict[net] = {}
-        sta_dict[net][sta] = np.array((float(lon),float(lat),float(ele)), dtype=dtype)
-    return sta_dict
-
