@@ -40,7 +40,7 @@ class Config(object):
     # 4. define func
     self.get_data = dp.get_data
     self.get_picks = dp.get_picks
-    self.num_proc = 5
+    self.read_st = dp.read_st
     sta_dict = dp.get_sta('/data2/ZSY_SAC/header/station_ZSY.dat')
     self.picker = pickers.Trad_PS(\
                     trig_thres = self.trig_thres,

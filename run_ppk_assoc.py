@@ -11,7 +11,7 @@ import config
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str,
-                        default='/data2/ZSY_SAC/*/KMI')
+                        default='/data2/ZSY_SAC/*/*')
     parser.add_argument('--time_range', type=str,
                         default='20170224,20170225')
     parser.add_argument('--out_ctlg', type=str,
@@ -26,7 +26,7 @@ if __name__ == '__main__':
 # define func
 cfg = config.Config()
 get_data = cfg.get_data
-num_proc = cfg.num_proc
+read_st = cfg.read_st
 picker = cfg.picker
 associator = cfg.associator
 
@@ -48,14 +48,16 @@ for day_idx in range(num_day):
 
     # get data
     date = start_date + day_idx*86400
-    data_dict = get_data(args.data_dir, date, num_proc)
+    data_dict = get_data(args.data_dir, date)
     if data_dict=={}: continue
 
     # 1. phase picking: waveform --> picks
     fpath = os.path.join(args.out_ppk_dir, str(date.date)+'.ppk')
     out_ppk = open(fpath,'w')
     for i,net_sta in enumerate(data_dict):
-        stream = data_dict[net_sta]
+        print('-'*40)
+        st_paths = data_dict[net_sta]
+        stream = read_st(st_paths, net_sta)
         picksi = picker.pick(stream, out_ppk)
         if i==0: picks = picksi
         else:    picks = np.append(picks, picksi)

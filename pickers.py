@@ -106,10 +106,9 @@ class Trad_PS(object):
 
     # pick P and S
     picks = []
-    print('-'*40)
 
     # 1. trig picker
-    print('1. triggering phase picker: {}.{}, {}'.format(net,sta, start_time))
+    print('1. triggering phase picker')
     cf_trig = self.calc_cf(data[2], self.pick_win)
     trig_ppk = np.where(cf_trig > self.trig_thres)[0]
     slide_idx = 0
