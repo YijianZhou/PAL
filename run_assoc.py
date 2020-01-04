@@ -32,7 +32,7 @@ out_pha = open(args.out_pha,'w')
 # get time range
 start_date, end_date = [UTCDateTime(date) for date in args.date_range.split('-')]
 print('run assoc: picks --> events')
-print('time range: {} to {}'.format(start_date, end_date))
+print('date range: {} to {}'.format(start_date, end_date))
 
 # for all days
 num_day = (end_date.date - start_date.date).days
