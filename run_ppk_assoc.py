@@ -4,8 +4,7 @@
 import os, glob
 import argparse
 import numpy as np
-import obspy
-from obspy import read, UTCDateTime
+from obspy import UTCDateTime
 import config
 
 if __name__ == '__main__':

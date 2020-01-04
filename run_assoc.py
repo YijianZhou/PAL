@@ -4,8 +4,7 @@
 import os, glob
 import argparse
 import numpy as np
-import obspy
-from obspy import read, UTCDateTime
+from obspy import UTCDateTime
 import config
 
 if __name__ == '__main__':
@@ -27,8 +26,6 @@ get_picks = cfg.get_picks
 associator = cfg.associator
 
 # i/o paths
-out_root = os.path.split(args.out_pha)[0]
-if not os.path.exists(out_root): os.makedirs(out_root)
 out_ctlg = open(args.out_ctlg,'w')
 out_pha = open(args.out_pha,'w')
 
@@ -41,7 +38,7 @@ print('time range: {} to {}'.format(start_date, end_date))
 num_day = (end_date.date - start_date.date).days
 for day_idx in range(num_day):
 
-    # get picks
+    # 1. get picks
     date = start_date + day_idx*86400
     picks = get_picks(args.ppk_dir, date)
 
