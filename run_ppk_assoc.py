@@ -31,11 +31,9 @@ picker = cfg.picker
 associator = cfg.associator
 
 # i/o paths
-out_root = os.path.split(args.out_pha)[0]
-if not os.path.exists(out_root): os.makedirs(out_root)
+if not os.path.exists(args.out_ppk_dir): os.makedirs(args.out_ppk_dir)
 out_ctlg = open(args.out_ctlg,'w')
 out_pha = open(args.out_pha,'w')
-if not os.path.exists(args.out_ppk_dir): os.makedirs(args.out_ppk_dir)
 
 # get time range
 start_date, end_date = [UTCDateTime(date) for date in args.time_range.split(',')]
@@ -46,7 +44,7 @@ print('time range: {} to {}'.format(start_date, end_date))
 num_day = (end_date.date - start_date.date).days
 for day_idx in range(num_day):
 
-    # get data
+    # get data paths
     date = start_date + day_idx*86400
     data_dict = get_data_dict(args.data_dir, date)
     if data_dict=={}: continue
@@ -54,10 +52,9 @@ for day_idx in range(num_day):
     # 1. phase picking: waveform --> picks
     fpath = os.path.join(args.out_ppk_dir, str(date.date)+'.ppk')
     out_ppk = open(fpath,'w')
-    for i,net_sta in enumerate(data_dict):
+    for i, st_paths in enumerate(data_dict.values()):
         print('-'*40)
-        st_paths = data_dict[net_sta]
-        stream = read_data(st_paths, net_sta)
+        stream = read_data(st_paths)
         picksi = picker.pick(stream, out_ppk)
         if i==0: picks = picksi
         else:    picks = np.append(picks, picksi)
