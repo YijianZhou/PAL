@@ -4,14 +4,13 @@ from obspy import UTCDateTime
 # parallel params
 pad_dir = '/home/zhouyj/software/PAD'
 shutil.copyfile('config.py', os.path.join(pad_dir, 'config.py'))
-start_date = '20150901'
-end_date   = '20190601'
+date_rng = ['20150901', '20190601']
 num_proc = 20
 out_root = './output/xls'
 
 # divide by time
-ts = UTCDateTime(start_date)
-te = UTCDateTime(end_date)
+ts = UTCDateTime(date_rng[0])
+te = UTCDateTime(date_rng[1])
 dt = (te-ts) / num_proc
 for i in range(num_proc):
     t0 = str((ts + i*dt).date)
