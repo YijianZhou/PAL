@@ -8,6 +8,9 @@ data_dir = '/data3/XLS_SAC/*/*'
 date_rng = '20150901-20190601'
 num_proc = 20
 out_root = './output/xls'
+out_pha = '{}/phase_{}.dat'.format(out_root, date_rng)
+out_ctlg = '{}/catalog_{}.dat'.format(out_root, date_rng)
+out_ppk_dir = '{}/picks'.format(out_root)
 
 # divide by time
 ts, te = [UTCDateTime(date) for date in date_rng.split('-')]
@@ -16,10 +19,7 @@ for i in range(num_proc):
     t0 = str((ts + i*dt).date)
     t1 = str((ts + (i+1)*dt).date)
     os.system("python {}/run_ppk_assoc.py \
-        --date_range={} \
-        --data_dir={} \
-        --out_pha={}/phase_{}.dat \
-        --out_ctlg={}/catalog_{}.dat \
-        --out_ppk_dir={}/picks &"
-        .format(pad_dir, date_rng, data_dir, out_root,date_rng, out_root,date_rng, out_root))
+        --date_range={} --data_dir={} \
+        --out_pha={} --out_ctlg={} --out_ppk_dir={} &"
+        .format(pad_dir, date_rng, data_dir, out_pha, out_ctlg, out_ppk_dir))
 
