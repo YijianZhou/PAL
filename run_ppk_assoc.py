@@ -11,8 +11,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str,
                         default='/data2/ZSY_SAC/*/*')
-    parser.add_argument('--time_range', type=str,
-                        default='20170224,20170225')
+    parser.add_argument('--date_range', type=str,
+                        default='20170224-20170225')
     parser.add_argument('--out_ctlg', type=str,
                         default='./output/catalog.tmp')
     parser.add_argument('--out_pha', type=str,
@@ -35,9 +35,9 @@ out_ctlg = open(args.out_ctlg,'w')
 out_pha = open(args.out_pha,'w')
 
 # get time range
-start_date, end_date = [UTCDateTime(date) for date in args.time_range.split(',')]
+start_date, end_date = [UTCDateTime(date) for date in args.date_range.split('-')]
 print('run ppk & assoc: raw_waveform --> picks --> events')
-print('time range: {} to {}'.format(start_date, end_date))
+print('date range: {} to {}'.format(start_date, end_date))
 
 # for all days
 num_day = (end_date.date - start_date.date).days

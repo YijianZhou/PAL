@@ -11,8 +11,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--ppk_dir', type=str,
                         default='./output/picks')
-    parser.add_argument('--time_range', type=str,
-                        default='20180206,20180207')
+    parser.add_argument('--date_range', type=str,
+                        default='20180206-20180207')
     parser.add_argument('--out_ctlg', type=str,
                         default='./output/catalog.tmp')
     parser.add_argument('--out_pha', type=str,
@@ -30,7 +30,7 @@ out_ctlg = open(args.out_ctlg,'w')
 out_pha = open(args.out_pha,'w')
 
 # get time range
-start_date, end_date = [UTCDateTime(date) for date in args.time_range.split(',')]
+start_date, end_date = [UTCDateTime(date) for date in args.date_range.split('-')]
 print('run assoc: picks --> events')
 print('time range: {} to {}'.format(start_date, end_date))
 
