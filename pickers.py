@@ -21,7 +21,7 @@ class Trad_PS(object):
     amp_win: time win to get S amplitude
     det_gap: time gap between detections
     freq_band: frequency band for phase picking
-    *all time related params are in sec
+    *note: all time-related params are in sec
   Outputs
     all picks in the stream, and header info
 
@@ -256,7 +256,7 @@ class Trad_PS(object):
   # estimate original time
   def est_ot(self, tp, ts):
     vp, vs = 5.9, 3.4
-    d = (ts-tp) /(1/vs - 1/vp)
+    d = (ts-tp) / (1/vs - 1/vp)
     tt_p = d / vp
     return tp - tt_p
 
@@ -268,7 +268,7 @@ class Trad_PS(object):
     for i in range(len(velo)-1):
         disp[i+1] = np.sum(velo[0:i])
     disp = disp / self.samp_rate
-    return (np.amax(disp) - np.amin(disp)) /2
+    return (np.amax(disp) - np.amin(disp)) / 2
 
 
   # calc dominant frequency
