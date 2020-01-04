@@ -140,7 +140,7 @@ class TS_Assoc(object):
 
     # get x-y range: sta range + side width
     lon, lat = [], []
-    for net_sta, sta_loc in self.sta_dict.items():
+    for sta_loc in self.sta_dict.values():
         lon.append(sta_loc['sta_lon'])
         lat.append(sta_loc['sta_lat'])
     lon, lat = np.array(lon), np.array(lat)
