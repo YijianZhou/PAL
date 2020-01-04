@@ -5,7 +5,6 @@ class TS_Assoc(object):
   """ Associate picks by searching ot (time, T) and ttp (space, S) cluster
   Inputs
     sta_dict: station location dict
-    resp_dict: instrumental response dict for all networks (cnt/(m/s))
     side_width: ratio of sides relative to the station range
     xy_grid: grid width for x-y axis (in degree)
     vp, vs: P&S velo of the uniform model
@@ -15,13 +14,12 @@ class TS_Assoc(object):
     *note: lateral spatial range (x-y) in degree; depth in km; elevation in m
   Usage
     import associators
-    associator = associators.TS_Assoc(sta_dict, resp_dict)
+    associator = associators.TS_Assoc(sta_dict)
     associator.associate(picks, out_ctlg, out_pha)
   """
   
   def __init__(self,
                sta_dict,
-               resp_dict,
                side_width = 0.2,
                xy_grid    = 0.02,
                vp         = 5.9,
@@ -31,7 +29,6 @@ class TS_Assoc(object):
                assoc_num  = 4):
 
     self.sta_dict   = sta_dict
-    self.resp_dict  = resp_dict
     self.side_width = side_width
     self.xy_grid    = xy_grid
     self.vp         = vp
@@ -138,15 +135,14 @@ class TS_Assoc(object):
   def calc_tt(self):
     # set up
     print('making time table')
-    sta_dict = self.sta_dict
     time_table = {}
     dist_grid = 111 * self.xy_grid # in km
 
     # get x-y range: sta range + side width
     lon, lat = [], []
-    for net_sta in sta_dict:
-        lon.append(sta_dict[net_sta]['sta_lon'])
-        lat.append(sta_dict[net_sta]['sta_lat'])
+    for net_sta, sta_loc in self.sta_dict.items():
+        lon.append(sta_loc['sta_lon'])
+        lat.append(sta_loc['sta_lat'])
     lon, lat = np.array(lon), np.array(lat)
     # calc side width
     lon_side = self.side_width * (np.amax(lon) - np.amin(lon))
@@ -159,11 +155,11 @@ class TS_Assoc(object):
     y_rng = range(int((lat_rng[1] - lat_rng[0]) / self.xy_grid))
 
     # calc time table
-    for net_sta in sta_dict:
+    for net_sta, sta_loc in self.sta_dict.items():
         # convert to x-y axis
-        lon = sta_dict[net_sta]['sta_lon']
-        lat = sta_dict[net_sta]['sta_lat']
-        ele = sta_dict[net_sta]['sta_ele'] / 1000. # m to km
+        lon = sta_loc['sta_lon']
+        lat = sta_loc['sta_lat']
+        ele = sta_loc['sta_ele'] / 1000. # m to km
         sta_x = int((lon - lon_rng[0]) / self.xy_grid)
         sta_y = int((lat - lat_rng[0]) / self.xy_grid)
         # calc P travel time
@@ -181,21 +177,20 @@ class TS_Assoc(object):
 
   # calc mag with picks (s_amp)
   def calc_mag(self, event_pick, event_loc):
-    sta_dict = self.sta_dict
     num_sta = len(event_pick)
-    mag  = np.zeros(num_sta)
+    mag = np.zeros(num_sta)
     dist = np.zeros(num_sta)
     for i,pick in enumerate(event_pick):
-        # get S amplitude
-        net, sta = pick['net'], pick['sta']
-        net_sta = '.'.join([net, sta])
-        resp = self.resp_dict[net]
-        amp = pick['s_amp'] / resp*1e6 # in miu m
-        # get epicentral distance
-        dist_lon = 111*(sta_dict[net_sta]['sta_lon'] - event_loc['evt_lon'])
-        dist_lat = 111*(sta_dict[net_sta]['sta_lat'] - event_loc['evt_lat'])
+        # get sta_loc
+        net_sta = '.'.join([pick['net'], pick['sta']])
+        sta_loc = self.sta_dict[net_sta]
+        # get S amp
+        amp = pick['s_amp'] * 1e6 # m to miu m
+        # calc epi dist
+        dist_lon = 111*(sta_loc['sta_lon'] - event_loc['evt_lon'])
+        dist_lat = 111*(sta_loc['sta_lat'] - event_loc['evt_lat'])
         dist[i] = np.sqrt(dist_lon**2 + dist_lat**2) # in km
-        mag[i]  = np.log10(amp) + np.log10(dist[i])
+        mag[i] = np.log10(amp) + np.log10(dist[i])
     event_loc['mag'] = round(np.median(mag),2)
     print('estimated magnitude: {:.1f} delta {:.1f}'\
       .format(np.median(mag), np.std(mag)))

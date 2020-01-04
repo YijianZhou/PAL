@@ -28,7 +28,7 @@ class Trad_PS(object):
   Usage
     import pickers
     picker = pickers.Trad_PS()
-    picks = picker.pick()
+    picks = picker.pick(stream)
   """
 
   def __init__(self, 
@@ -80,8 +80,9 @@ class Trad_PS(object):
 
     # get header
     head = stream[0].stats
-    net  = head.network
-    sta  = head.station
+    net = head.network
+    sta = head.station
+    gain = head.calib
     self.samp_rate = head.sampling_rate
 
     # sec to points
@@ -95,8 +96,7 @@ class Trad_PS(object):
 
     # preprocess & extract data
     stream.detrend('demean').detrend('linear').taper(max_percentage=0.05, max_length=10.)
-    flt_type = self.freq_band[0]
-    freq_rng = self.freq_band[1]
+    flt_type, freq_rng = self.freq_band
     if flt_type=='highpass':
         stream.filter(flt_type, freq=freq_rng)
     if flt_type=='bandpass':
@@ -124,7 +124,7 @@ class Trad_PS(object):
         data_p = data[2][idx_trig - self.p_win[0] - self.pick_win[0]
                         :idx_trig + self.p_win[1] + self.pick_win[1]]
         cf_p = self.calc_cf(data_p, self.pick_win)
-        idx_p = idx_trig - self.pick_win[0] - self.p_win[0] +\
+        idx_p = idx_trig - self.pick_win[0] - self.p_win[0] + \
                 np.where(cf_p >= self.pick_thres * np.amax(cf_p))[0][0]
         tp = start_time + idx_p / self.samp_rate
 
@@ -149,7 +149,7 @@ class Trad_PS(object):
 
         # 2.3 get related S amplitude
         amp_xyz = np.array([self.get_amp(di) for di in data[:, idx_s : idx_s + self.amp_win]])
-        amp = np.sqrt(np.sum(amp_xyz**2))
+        amp = np.sqrt(np.sum(amp_xyz**2)) / gain # in m/s
 
         # 2.4 get p_anr and s_anr
         p_snr = np.amax(cf_p)
@@ -172,7 +172,7 @@ class Trad_PS(object):
                 out_file.write(pick_line)
 
         # next detected phase
-        rest_det = np.where(trig_ppk >\
+        rest_det = np.where(trig_ppk > \
                    max(idx_trig, idx_s, idx_p) + self.det_gap)[0]
         if len(rest_det)==0: break
         slide_idx = rest_det[0]
@@ -184,10 +184,10 @@ class Trad_PS(object):
   def calc_cf(self, data, win_len):
     """  calc energy-based character function (STA/LTA) for a single trace
     Inputs
-        data (np.array): input trace data
-        win_len (points): win len for STA/LTA, [lwin, swin]
+      data (np.array): input trace data
+      win_len (points): win len for STA/LTA, [lwin, swin]
     Outputs
-        cf: character function
+      cf: character function
     """
     lwin, swin = win_len
     npts = len(data)
@@ -215,10 +215,10 @@ class Trad_PS(object):
   def calc_filter(self, data, idx_p):
     """ calc S filter by PCA
     Inputs:
-        data (np.array): input 3-chn data
-        idx_p (data points): idx for P in data
+      data (np.array): input 3-chn data
+      idx_p (data points): idx for P in data
     Outputs:
-        pca_flt (np.array): pca filter for P wave filtering
+      pca_flt (np.array): pca filter for P wave filtering
     """
     p_mat = data[:, idx_p : idx_p + self.pca_win]
     p_r, p_evec = self.calc_pol(p_mat)
@@ -237,10 +237,10 @@ class Trad_PS(object):
   def calc_pol(self, mat):
     """ calc polarization by PCA
     Inputs
-        mat: 3-chn time win (matrix)
+      mat: 3-chn time win (matrix)
     Outputs
-        r: polirization degree
-        vec: dominant eig-vector
+      r: polirization degree
+      vec: dominant eig-vector
     """
     cov = np.cov(mat)
     e_val, e_vec = np.linalg.eig(cov)
