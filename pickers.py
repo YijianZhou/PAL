@@ -159,7 +159,7 @@ class Trad_PS(object):
         t0 = min(tp, ts)
         t1 = min(tp+(ts-tp)/2, head.endtime)
         st = stream.slice(t0,t1)
-        fd = max([self.calc_freq_dmnt(tr.data, 1/self.samp_rate) for tr in st])
+        fd = max([self.calc_freq_dmnt(tr.data) for tr in st])
 
         # output
         print('{}.{}, {}, {}'.format(net,sta, tp, ts))
@@ -272,11 +272,11 @@ class Trad_PS(object):
 
 
   # calc dominant frequency
-  def calc_freq_dmnt(self, data, dt):
+  def calc_freq_dmnt(self, data):
     npts = len(data)
     if npts//2==0: return 0
-    data = data - np.mean(data)
+    data -= np.mean(data)
     psd = abs(np.fft.fft(data))**2
     psd = psd[:npts//2]
-    return np.argmax(psd) /dt/npts
+    return np.argmax(psd) * self.samp_rate / npts
 
