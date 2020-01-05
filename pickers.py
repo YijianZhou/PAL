@@ -42,9 +42,10 @@ class Trad_PS(object):
                fd_thres   = 2.5,
                amp_win    = 5.,
                det_gap    = 5.,
-               freq_band  = ['highpass',1.]):
+               freq_band  = ['highpass',1.],
+               samp_rate  = 1.):
 
-    self.samp_rate    = 100
+    self.samp_rate    = samp_rate
     self.pick_win_sec = pick_win
     self.trig_thres   = trig_thres
     self.pick_thres   = pick_thres
@@ -173,7 +174,7 @@ class Trad_PS(object):
 
         # next detected phase
         rest_det = np.where(trig_ppk > \
-                   max(idx_trig, idx_s, idx_p) + self.det_gap)[0]
+                     max(idx_trig, idx_s, idx_p) + self.det_gap)[0]
         if len(rest_det)==0: break
         slide_idx = rest_det[0]
 
@@ -267,7 +268,7 @@ class Trad_PS(object):
     disp = np.zeros(len(velo))
     for i in range(len(velo)-1):
         disp[i+1] = np.sum(velo[0:i])
-    disp = disp / self.samp_rate
+    disp /= self.samp_rate
     return (np.amax(disp) - np.amin(disp)) / 2
 
 
