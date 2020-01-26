@@ -32,8 +32,7 @@ for line in lines:
     tp, ts = [UTCDateTime(code) for code in codes[2:4]]
     ttp = tp - ot
     tts = ts - ot
-    wp = 1.
-    ws = 1.
+    wp, ws = 1., 1.
     out.write('{:<5}{}{:6.3f}  {:6.3f}   P\n'.format(sta, ' '*6, ttp, wp))
     out.write('{:<5}{}{:6.3f}  {:6.3f}   S\n'.format(sta, ' '*6, tts, ws))
 
