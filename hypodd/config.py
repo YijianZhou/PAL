@@ -1,6 +1,7 @@
 """
 configure file for Hypoinverse input maker
 """
+import os
 import numpy as np
 
 class Config(object):
@@ -18,4 +19,5 @@ class Config(object):
 
     # 3. reloc2csv
     self.out_csv = 'output/%s_reloc.csv'%net
-
+    if not os.path.exists('input'): os.makedirs('input')
+    if not os.path.exists('output'): os.makedirs('output')
