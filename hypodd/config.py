@@ -1,5 +1,4 @@
-"""
-configure file for Hypoinverse input maker
+""" Configure file for hypoDD interface
 """
 import os
 import numpy as np
