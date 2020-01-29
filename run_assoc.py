@@ -12,7 +12,7 @@ if __name__ == '__main__':
     parser.add_argument('--ppk_dir', type=str,
                         default='./output/picks')
     parser.add_argument('--date_range', type=str,
-                        default='20180206-20180207')
+                        default='20170224-20170225')
     parser.add_argument('--out_ctlg', type=str,
                         default='./output/catalog.tmp')
     parser.add_argument('--out_pha', type=str,
@@ -29,7 +29,7 @@ associator = cfg.associator
 out_ctlg = open(args.out_ctlg,'w')
 out_pha = open(args.out_pha,'w')
 
-# get time range
+# get date range
 start_date, end_date = [UTCDateTime(date) for date in args.date_range.split('-')]
 print('run assoc: picks --> events')
 print('date range: {} to {}'.format(start_date, end_date))
@@ -37,11 +37,9 @@ print('date range: {} to {}'.format(start_date, end_date))
 # for all days
 num_day = (end_date.date - start_date.date).days
 for day_idx in range(num_day):
-
     # 1. get picks
     date = start_date + day_idx*86400
-    picks = get_picks(args.ppk_dir, date)
-
+    picks = get_picks(date, args.ppk_dir)
     # 2. associate picks: picks --> event_picks & event_loc
     associator.associate(picks, out_ctlg, out_pha)
 

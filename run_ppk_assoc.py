@@ -34,7 +34,7 @@ if not os.path.exists(args.out_ppk_dir): os.makedirs(args.out_ppk_dir)
 out_ctlg = open(args.out_ctlg,'w')
 out_pha = open(args.out_pha,'w')
 
-# get time range
+# get date range
 start_date, end_date = [UTCDateTime(date) for date in args.date_range.split('-')]
 print('run ppk & assoc: raw_waveform --> picks --> events')
 print('date range: {} to {}'.format(start_date, end_date))
@@ -42,15 +42,14 @@ print('date range: {} to {}'.format(start_date, end_date))
 # for all days
 num_day = (end_date.date - start_date.date).days
 for day_idx in range(num_day):
-
     # get data paths
     date = start_date + day_idx*86400
-    data_dict = get_data_dict(args.data_dir, date)
+    data_dict = get_data_dict(date, args.data_dir)
     if data_dict=={}: continue
 
     # 1. phase picking: waveform --> picks
-    fpath = os.path.join(args.out_ppk_dir, str(date.date)+'.ppk')
-    out_ppk = open(fpath,'w')
+    fppk = os.path.join(args.out_ppk_dir, str(date.date)+'.ppk')
+    out_ppk = open(fppk,'w')
     for i, st_paths in enumerate(data_dict.values()):
         print('-'*40)
         stream = read_data(st_paths)
@@ -58,7 +57,6 @@ for day_idx in range(num_day):
         if i==0: picks = picksi
         else:    picks = np.append(picks, picksi)
     out_ppk.close()
-
     # 2. associate picks: picks --> event_picks & event_loc
     associator.associate(picks, out_ctlg, out_pha)
 

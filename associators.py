@@ -36,14 +36,12 @@ class TS_Assoc(object):
     self.ot_dev     = ot_dev
     self.ttp_dev    = ttp_dev
     self.assoc_num  = assoc_num
-    self.time_table = self.calc_tt()
+    self.tt_dict    = self.calc_tt()
 
 
   def associate(self, picks, out_ctlg=None, out_pha=None):
-
     # 1. temporal assoc: picks --> event_picks
     event_picks = self.pick2event(picks)
-
     # 2. spatial assoc: event_pick --> event_loc
     for event_pick in event_picks:
         event_loc, event_pick = self.locate(event_pick)
@@ -51,8 +49,9 @@ class TS_Assoc(object):
         # 3. estimate magnitude
         event_loc_mag = self.calc_mag(event_pick, event_loc)
         # write catalog and phase
-        self.write_catalog(event_loc_mag, out_ctlg)
-        self.write_phase(event_loc_mag, event_pick, out_pha)
+        if out_ctlg: self.write_catalog(event_loc_mag, out_ctlg)
+        if out_pha: self.write_phase(event_loc_mag, event_pick, out_pha)
+        if not out_ctlg or not out_pha: return event_loc_mag
 
 
   # 1. temporal assoc by ot cluster: picks --> event_picks
@@ -95,11 +94,9 @@ class TS_Assoc(object):
     num_sta = len(event_pick)
     ot = event_pick['sta_ot'][num_sta//2]
     for pick in event_pick:
-        net = pick['net']
-        sta = pick['sta']
-        net_sta = '.'.join([net, sta])
+        net_sta = pick['net_sta']
         ttp_obs = pick['p_arr'] - ot # to travel time
-        ttp_pred = self.time_table[net_sta]
+        ttp_pred = self.tt_dict[net_sta]
         resi = abs(ttp_pred - ttp_obs)
         resi[resi > self.ttp_dev] = 0.
         res_ttp += resi
@@ -118,12 +115,11 @@ class TS_Assoc(object):
     lat = self.lat_rng[0] + y * self.xy_grid
 
     # find sta phase
-    event_pick = [pick for pick in event_pick \
-               if tp_dict[pick['net'] +'.'+ pick['sta']][x][y] == 1.]
+    event_pick = [pick for pick in event_pick if tp_dict[pick['net_sta']][x][y] == 1.]
 
     # output
-    print('locate event: ot {}, lon {:.2f}, lat {:.2f}, res {:.1f}'\
-      .format(ot, lon, lat, min_res))
+    print('locate event: ot {}, lat {:.2f}, lon {:.2f}, res {:.1f}'\
+        .format(ot, lat, lon, min_res))
     event_loc = {'evt_ot' : ot, 
                  'evt_lon': round(lon,2), 
                  'evt_lat': round(lat,2),
@@ -135,15 +131,12 @@ class TS_Assoc(object):
   def calc_tt(self):
     # set up
     print('making time table')
-    time_table = {}
+    tt_dict = {}
     dist_grid = 111 * self.xy_grid # in km
 
     # get x-y range: sta range + side width
-    lon, lat = [], []
-    for sta_loc in self.sta_dict.values():
-        lon.append(sta_loc['sta_lon'])
-        lat.append(sta_loc['sta_lat'])
-    lon, lat = np.array(lon), np.array(lat)
+    sta_loc = np.array(list(self.sta_dict.values()))
+    lat, lon = sta_loc['sta_lat'], sta_loc['sta_lon']
     # calc side width
     lon_side = self.side_width * (np.amax(lon) - np.amin(lon))
     lat_side = self.side_width * (np.amax(lat) - np.amin(lat))
@@ -169,10 +162,10 @@ class TS_Assoc(object):
             dist = dist_grid * np.sqrt((x-sta_x)**2 + (y-sta_y)**2)
             dep  = ele + 5 # init event depth 5km
             ttp[i,j] = np.sqrt(dep**2 + dist**2) / self.vp
-        time_table[net_sta] = ttp
+        tt_dict[net_sta] = ttp
     self.lon_rng = lon_rng
     self.lat_rng = lat_rng
-    return time_table
+    return tt_dict
 
 
   # calc mag with picks (s_amp)
@@ -182,18 +175,17 @@ class TS_Assoc(object):
     dist = np.zeros(num_sta)
     for i,pick in enumerate(event_pick):
         # get sta_loc
-        net_sta = '.'.join([pick['net'], pick['sta']])
-        sta_loc = self.sta_dict[net_sta]
+        sta_loc = self.sta_dict[pick['net_sta']]
         # get S amp
         amp = pick['s_amp'] * 1e6 # m to miu m
         # calc epi dist
-        dist_lon = 111*(sta_loc['sta_lon'] - event_loc['evt_lon'])
         dist_lat = 111*(sta_loc['sta_lat'] - event_loc['evt_lat'])
+        dist_lon = 111*(sta_loc['sta_lon'] - event_loc['evt_lon'])
         dist[i] = np.sqrt(dist_lon**2 + dist_lat**2) # in km
         mag[i] = np.log10(amp) + np.log10(dist[i])
     event_loc['mag'] = round(np.median(mag),2)
     print('estimated magnitude: {:.1f} delta {:.1f}'\
-      .format(np.median(mag), np.std(mag)))
+        .format(np.median(mag), np.std(mag)))
     return event_loc
 
 
@@ -216,13 +208,13 @@ class TS_Assoc(object):
     res = event_loc['res']
     out_pha.write('{},{},{},{},{}\n'.format(ot, lat, lon, mag, res))
     for pick in event_pick:
-        net   = pick['net']
-        sta   = pick['sta']
+        net_sta = pick['net_sta']
+        net, sta = net_sta.split('.')
         p_arr = pick['p_arr']
         s_arr = pick['s_arr']
         s_amp = pick['s_amp']
         p_snr = pick['p_snr']
         s_snr = pick['s_snr']
         out_pha.write('{},{},{},{},{},{:.1f},{:.1f}\n'\
-          .format(net, sta, p_arr, s_arr, s_amp, p_snr, s_snr))
+            .format(net, sta, p_arr, s_arr, s_amp, p_snr, s_snr))
 

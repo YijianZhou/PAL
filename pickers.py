@@ -62,8 +62,7 @@ class Trad_PS(object):
   def pick(self, stream, out_file=None):
 
     # set output format
-    dtype = [('net','O'),
-             ('sta','O'),
+    dtype = [('net_sta','O'),
              ('sta_ot','O'),
              ('p_arr','O'),
              ('s_arr','O'),
@@ -83,6 +82,7 @@ class Trad_PS(object):
     head = stream[0].stats
     net = head.network
     sta = head.station
+    net_sta = '.'.join([net,sta])
     gain = head.calib
     self.samp_rate = head.sampling_rate
 
@@ -163,10 +163,10 @@ class Trad_PS(object):
         fd = max([self.calc_freq_dmnt(tr.data) for tr in st])
 
         # output
-        print('{}.{}, {}, {}'.format(net,sta, tp, ts))
+        print('{}, {}, {}'.format(net_sta, tp, ts))
         if tp<ts and fd>self.fd_thres:
             ot0 = self.est_ot(tp, ts) # est ot for assoc
-            picks.append((net, sta, ot0, tp, ts, amp, p_snr, s_snr, fd))
+            picks.append((net_sta, ot0, tp, ts, amp, p_snr, s_snr, fd))
             if out_file: 
                 pick_line = '{},{},{},{},{},{},{:.2f},{:.2f},{:.2f}\n'\
                               .format(net, sta, ot0, tp, ts, amp, p_snr, s_snr, fd)
