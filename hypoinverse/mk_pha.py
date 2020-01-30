@@ -1,5 +1,4 @@
-""" make phase input file for HypoInverse (COP 3 format)
-  change net to choose input phase file
+""" Make phase input file for hypoInverse (COP 3 format)
 """
 from obspy import UTCDateTime
 import config
@@ -15,18 +14,11 @@ out=open(fout,'w')
 mag_corr = cfg.mag_corr # hypoInv do not support neg mag
 
 def split_datetime(dtime):
-    yr  = dtime.year
-    mon = dtime.month
-    day = dtime.day
-    date = '{}{:0>2}{:0>2}'.format(yr, mon, day)
-    hr  = dtime.hour
-    mi  = dtime.minute
-    sec = dtime.second
-    msc = int(dtime.microsecond/1e4)
-    time = '{:0>2}{:0>2}{:0>2}{:0>2}'.format(hr, mi, sec, msc)
+    date = '{:0>4}{:0>2}{:0>2}'.format(dtime.year, dtime.month, dtime.day)
+    time = '{:0>2}{:0>2}{:0>2}{:0>2}'.format(dtime.hour, dtime.minute, dtime.second, int(dtime.microsecond/1e4))
     return date, time
 
-idx=0
+evid = 0
 for line in lines:
   codes = line.split(',')
   if len(codes)==5:
@@ -45,8 +37,8 @@ for line in lines:
     lon = '{:0>3}{}{:0>4}'.format(lon_deg, lon_code, lon_min)
     if idx!=0: out.write('\n')
     out.write('{}{}{} {}L{:3.2f}{}{:>10}L\n'\
-      .format(date+time, lat, lon, ' '*90, mag, ' '*9, idx))
-    idx+=1
+      .format(date+time, lat, lon, ' '*90, mag, ' '*9, evid))
+    evid += 1
   else:
     # write sta line
     net, sta, tp, ts  = codes[0:4]
