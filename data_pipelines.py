@@ -83,15 +83,10 @@ class Data(object):
     ppk_path = os.path.join(ppk_dir, fname)
     f=open(ppk_path); lines=f.readlines(); f.close()
     for line in lines:
-        net, sta, sta_ot, tp, ts, amp, p_snr, s_snr, fd = line.split(',')
-        net_sta = '.'.join([net, sta])
-        sta_ot = UTCDateTime(sta_ot)
-        tp = UTCDateTime(tp)
-        ts = UTCDateTime(ts)
-        amp = float(amp)
-        p_snr = float(p_snr)
-        s_snr = float(s_snr)
-        fd = float(fd)
+        codes = line.split(',')
+        net_sta = '.'.join(codes[0:2])
+        sta_ot, tp, ts = [UTCDateTime(t) for t in codes[2:5]]
+        amp, p_snr, s_snr, fd = [float(x) for x in codes[5:9]]
         picks.append((net_sta, sta_ot, tp, ts, amp, p_snr, s_snr, fd))
     return np.array(picks, dtype=dtype)
 
