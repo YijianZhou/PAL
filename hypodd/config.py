@@ -17,6 +17,8 @@ class Config(object):
     self.dep_corr = 5. # avoid air quake
 
     # 3. reloc2csv
-    self.out_csv = 'output/%s_reloc.csv'%net
+    self.out_ctlg = 'output/%s_reloc.ctlg'%net
+    self.out_pha = 'output/%s_reloc.pha'%net
     if not os.path.exists('input'): os.makedirs('input')
     if not os.path.exists('output'): os.makedirs('output')
+
