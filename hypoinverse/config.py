@@ -1,4 +1,4 @@
-""" Configure file for hypoInv interface
+""" Configure file for hypoInverse interface
 """
 import numpy as np
 
