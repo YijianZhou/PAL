@@ -83,7 +83,6 @@ class Trad_PS(object):
     net = head.network
     sta = head.station
     net_sta = '.'.join([net,sta])
-    gain = head.calib
     self.samp_rate = head.sampling_rate
 
     # sec to points
@@ -150,7 +149,7 @@ class Trad_PS(object):
 
         # 2.3 get related S amplitude
         amp_xyz = np.array([self.get_amp(di) for di in data[:, idx_s : idx_s + self.amp_win]])
-        amp = np.sqrt(np.sum(amp_xyz**2)) / gain # in m/s
+        amp = np.sqrt(np.sum(amp_xyz**2))
 
         # 2.4 get p_anr and s_anr
         p_snr = np.amax(cf_p)
