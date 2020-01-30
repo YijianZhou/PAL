@@ -1,4 +1,4 @@
-""" run HypoInverse (main function)
+""" run hypoInverse (main function)
   Usage:
     (1) modify template hyp control file to tune HypoInverse params
     (2) manually write velo mod (e.g., CRE file), include ref ele if necessary
@@ -35,7 +35,6 @@ for fname in glob.glob(cfg.fsums): os.unlink(fname)
 
 # for all ztr
 for ztri in ztr_rng:
-
     # 1. set control file
     out=open(fhyp,'w')
     for line in lines:
@@ -58,4 +57,3 @@ for ztri in ztr_rng:
 # format output
 os.system('python sum2csv.py')
 for fname in glob.glob('fort.*'): os.unlink(fname)
-

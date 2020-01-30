@@ -1,4 +1,4 @@
-""" change HypoInverse output sum file (Hyp71 format) to csv format
+""" Format hypoInverse output: sum file (Hyp71 format) to csv
 """
 import glob, os
 import numpy as np
@@ -27,46 +27,46 @@ def write(out, line):
     lon_deg = float(line[29:32])
     lon_min = float(line[33:38])
     lon = lon_deg + lon_min/60
-    dep = float(line[38:44])
+    dep = float(line[38:44]) + grd_ele
     mag = float(line[48:52]) - mag_corr
-    out.write('{},{:.4f},{:.4f},{:.1f},{:.1f}\n'.format(dtime, lat, lon, dep+grd_ele, mag))
+    out.write('{},{:.4f},{:.4f},{:.1f},{:.1f}\n'.format(dtime, lat, lon, dep, mag))
 
 
 # read sum files
 sum_dict = {}
 for fsum in fsums:
-  f=open(fsum); lines=f.readlines(); f.close()
-  for line in lines:
-    evid = line.split()[-1]
-    if evid not in sum_dict: sum_dict[evid] = [line]
-    else: sum_dict[evid].append(line)
+    f=open(fsum); lines=f.readlines(); f.close()
+    for line in lines:
+        evid = line.split()[-1]
+        if evid not in sum_dict: sum_dict[evid] = [line]
+        else: sum_dict[evid].append(line)
 
 
 for evid, sum_lines in sum_dict.items():
-  # merge sum lines
-  sum_list = []
-  dtype = [('line','O'),('is_loc','O'),('azm','O'),('npha','O'),('rms','O')]
-  for sum_line in sum_lines:
-    codes = sum_line.split()
-    is_loc = 1 # whether loc reliable
-    if '-' in codes or '#' in codes: is_loc = 0
-    npha = float(sum_line[52:55])
-    azm  = float(sum_line[56:59])
-    rms  = float(sum_line[64:69])
-    sum_list.append((sum_line, is_loc, azm, npha, rms))
-  sum_list = np.array(sum_list, dtype=dtype)
-  sum_list_loc = sum_list[sum_list['is_loc']==1]
-  num_loc = len(sum_list_loc)
-  # if no reliable loc
-  if num_loc==0: 
-    sum_list_loc = sum_list
-    write(out_bad, sum_list_loc[0]['line'])
-  else:
-    # choose best loc
-    sum_list_loc = np.sort(sum_list_loc, order=['azm','npha','rms'])
-    write(out_good, sum_list_loc[0]['line'])
-  write(out_csv, sum_list_loc[0]['line'])
-  out_sum.write(sum_list_loc[0]['line'])
+    # merge sum lines
+    sum_list = []
+    dtype = [('line','O'),('is_loc','O'),('azm','O'),('npha','O'),('rms','O')]
+    for sum_line in sum_lines:
+        codes = sum_line.split()
+        is_loc = 1 # whether loc reliable
+        if '-' in codes or '#' in codes: is_loc = 0
+        npha = float(sum_line[52:55])
+        azm  = float(sum_line[56:59])
+        rms  = float(sum_line[64:69])
+        sum_list.append((sum_line, is_loc, azm, npha, rms))
+    sum_list = np.array(sum_list, dtype=dtype)
+    sum_list_loc = sum_list[sum_list['is_loc']==1]
+    num_loc = len(sum_list_loc)
+    # if no reliable loc
+    if num_loc==0: 
+        sum_list_loc = sum_list
+        write(out_bad, sum_list_loc[0]['line'])
+    else:
+        # choose best loc
+        sum_list_loc = np.sort(sum_list_loc, order=['azm','npha','rms'])
+        write(out_good, sum_list_loc[0]['line'])
+    write(out_csv, sum_list_loc[0]['line'])
+    out_sum.write(sum_list_loc[0]['line'])
 
 out_csv.close()
 out_sum.close()
