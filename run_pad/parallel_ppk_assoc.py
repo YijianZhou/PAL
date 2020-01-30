@@ -21,6 +21,6 @@ for i in range(num_proc):
     out_ctlg = '{}/catalog_{}.dat'.format(out_root, date_rng)
     os.system("python {}/run_ppk_assoc.py \
         --date_range={} --data_dir={} \
-        --out_pha={} --out_ctlg={} --out_ppk_dir={} &"
+        --out_pha={} --out_ctlg={} --out_ppk_dir={} &" \
         .format(pad_dir, date_rng, data_dir, out_pha, out_ctlg, out_ppk_dir))
 
