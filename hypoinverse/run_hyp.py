@@ -30,7 +30,7 @@ smod = cfg.smod
 
 # format input
 os.system('python mk_sta.py')
-os.system('python mk_phs.py')
+os.system('python mk_pha.py')
 for fname in glob.glob(cfg.fsums): os.unlink(fname)
 
 # for all ztr
