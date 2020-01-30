@@ -14,7 +14,7 @@ out=open(fout,'w')
 mag_corr = cfg.mag_corr # hypoInv do not support neg mag
 
 def split_datetime(dtime):
-    date = '{}{:0>2}{:0>2}'.format(dtime.year, dtime.month, dtime.day)
+    date = '{:0>4}{:0>2}{:0>2}'.format(dtime.year, dtime.month, dtime.day)
     time = '{:0>2}{:0>2}{:0>2}{:0>2}'.format(dtime.hour, dtime.minute, dtime.second, int(dtime.microsecond/1e4))
     return date, time
 
