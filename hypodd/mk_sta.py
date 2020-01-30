@@ -11,7 +11,5 @@ out=open(fout,'w')
 
 for line in lines:
     net, sta, lon, lat, ele = line.split('\t')
-    lon = float(lon)
-    lat = float(lat)
     out.write('{} {} {}\n'.format(sta, lat, lon))
 out.close()
