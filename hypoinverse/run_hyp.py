@@ -1,11 +1,11 @@
-""" run hypoInverse (main function)
+""" Run hypoInverse (main function)
   Usage:
     (1) modify template hyp control file to tune HypoInverse params
     (2) manually write velo mod (e.g., CRE file), include ref ele if necessary
     (3) set i/o paths in config file
     (4) python run_hyp.py
   Output:
-    csv file: ot, lat, lon, dep, mag
+    csv catalog & phase
     sum file (hyp)
     arc file (hyp)
 """

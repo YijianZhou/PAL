@@ -11,13 +11,15 @@ mag_corr = cfg.mag_corr # hypoInv do not support neg mag
 lat_code = cfg.lat_code
 lon_code = cfg.lon_code
 fsums = glob.glob(cfg.fsums)
+fpha = cfg.fpha_in
+f=open(fpha); pha_lines=f.readlines(); f.close()
 out_csv = open(cfg.out_csv,'w')
 out_sum = open(cfg.out_sum,'w')
 out_bad = open(cfg.out_bad,'w')
-out_good= open(cfg.out_good,'w')
+out_good = open(cfg.out_good,'w')
+out_pha = open(cfg.out_pha,'w')
 
-
-def write(out, line):
+def write_csv(out, line):
     codes = line.split()
     date, hrmn, sec = codes[0:3]
     dtime = date + hrmn + sec.zfill(5)
@@ -27,19 +29,27 @@ def write(out, line):
     lon_deg = float(line[29:32])
     lon_min = float(line[33:38])
     lon = lon_deg + lon_min/60
-    dep = float(line[38:44]) + grd_ele
+    dep = float(line[38:44])
     mag = float(line[48:52]) - mag_corr
-    out.write('{},{:.4f},{:.4f},{:.1f},{:.1f}\n'.format(dtime, lat, lon, dep, mag))
+    out.write('{},{:.4f},{:.4f},{:.1f},{:.1f}\n'.format(dtime, lat, lon, dep+grd_ele, mag))
 
 
 # read sum files
 sum_dict = {}
 for fsum in fsums:
-    f=open(fsum); lines=f.readlines(); f.close()
-    for line in lines:
-        evid = line.split()[-1]
-        if evid not in sum_dict: sum_dict[evid] = [line]
-        else: sum_dict[evid].append(line)
+  f=open(fsum); sum_lines=f.readlines(); f.close()
+  for sum_line in sum_lines:
+    evid = sum_line.split()[-1]
+    if evid not in sum_dict: sum_dict[evid] = [sum_line]
+    else: sum_dict[evid].append(sum_line)
+
+# read PAD pha
+pha_dict = {}
+evid=0
+for pha_line in pha_lines:
+    codes = pha_line.split(',')
+    if len(codes)==5: pha_dict[str(evid)] = []; evid+=1
+    else: pha_dict[str(evid-1)].append(pha_line)
 
 
 for evid, sum_lines in sum_dict.items():
@@ -60,15 +70,19 @@ for evid, sum_lines in sum_dict.items():
     # if no reliable loc
     if num_loc==0: 
         sum_list_loc = sum_list
-        write(out_bad, sum_list_loc[0]['line'])
+        write_csv(out_bad, sum_list_loc[0]['line'])
     else:
         # choose best loc
         sum_list_loc = np.sort(sum_list_loc, order=['azm','npha','rms'])
-        write(out_good, sum_list_loc[0]['line'])
-    write(out_csv, sum_list_loc[0]['line'])
+        write_csv(out_good, sum_list_loc[0]['line'])
+    write_csv(out_csv, sum_list_loc[0]['line'])
     out_sum.write(sum_list_loc[0]['line'])
+    write_csv(out_pha, sum_list_loc[0]['line'])
+    pha_lines = pha_dict[evid]
+    for pha_line in pha_lines: out_pha.write(pha_line)
 
 out_csv.close()
 out_sum.close()
 out_bad.close()
 out_good.close()
+out_pha.close()
