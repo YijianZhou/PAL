@@ -9,7 +9,8 @@ fout = cfg.fsta_out
 lat_code = cfg.lat_code
 lon_code = cfg.lon_code
 f=open(fsta); lines=f.readlines(); f.close()
-out=open(fout,'w')
+out = open(fout,'w')
+
 for line in lines:
     net, sta, lon, lat, ele = line.split('\t')
     lon = abs(float(lon))

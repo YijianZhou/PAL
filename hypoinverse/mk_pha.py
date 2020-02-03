@@ -14,12 +14,12 @@ out=open(fout,'w')
 mag_corr = cfg.mag_corr # hypoInv do not support neg mag
 
 def split_datetime(dtime):
-    date = '{:0>4}{:0>2}{:0>2}'.format(dtime.year, dtime.month, dtime.day)
+    date = '{}{:0>2}{:0>2}'.format(dtime.year, dtime.month, dtime.day)
     time = '{:0>2}{:0>2}{:0>2}{:0>2}'.format(dtime.hour, dtime.minute, dtime.second, int(dtime.microsecond/1e4))
     return date, time
 
 evid = 0
-for line in lines:
+for i,line in enumerate(lines):
     codes = line.split(',')
     if len(codes)==5:
         # write head line
@@ -35,7 +35,7 @@ for line in lines:
         lat_min = int(100*60*(lat-int(lat)))
         lat = '{:0>2}{}{:0>4}'.format(lat_deg, lat_code, lat_min)
         lon = '{:0>3}{}{:0>4}'.format(lon_deg, lon_code, lon_min)
-        if idx!=0: out.write('\n')
+        if i!=0: out.write('\n')
         out.write('{}{}{} {}L{:3.2f}{}{:>10}L\n'\
             .format(date+time, lat, lon, ' '*90, mag, ' '*9, evid))
         evid += 1
