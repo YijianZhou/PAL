@@ -13,8 +13,8 @@ ppk_dir = '{}/picks'.format(out_root)
 start_date, end_date = [UTCDateTime(date) for date in date_rng.split('-')]
 dt = (end_date - start_date) / num_proc
 for i in range(num_proc):
-    t0 = ''.join(str((ts + i*dt).date).split('-'))
-    t1 = ''.join(str((ts + (i+1)*dt).date).split('-'))
+    t0 = ''.join(str((start_date + i*dt).date).split('-'))
+    t1 = ''.join(str((start_date + (i+1)*dt).date).split('-'))
     date_rng = '{}-{}'.format(t0, t1)
     out_pha = '{}/phase_{}.dat'.format(out_root, date_rng)
     out_ctlg = '{}/catalog_{}.dat'.format(out_root, date_rng)
