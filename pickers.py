@@ -125,7 +125,7 @@ class Trad_PS(object):
                         :idx_trig + self.p_win[1] + self.pick_win[1]]
         cf_p = self.calc_cf(data_p, self.pick_win)
         idx_p = idx_trig - self.pick_win[0] - self.p_win[0] + \
-                np.where(cf_p >= self.pick_thres * np.amax(cf_p))[0][0]
+             np.where(cf_p >= self.pick_thres * np.amax(cf_p))[0][0]
         tp = start_time + idx_p / self.samp_rate
 
         # 2.2 pick S after P
@@ -133,7 +133,7 @@ class Trad_PS(object):
         if len(data[0]) < idx_p + self.s_win[1]: break
         s_rng = [idx_p - self.s_win[0] - self.pick_win[0],
                  idx_p + self.s_win[1] + self.pick_win[1]]
-        data_s = np.sqrt(data[0][s_rng[0] : s_rng[1]]**2\
+        data_s = np.sqrt(data[0][s_rng[0] : s_rng[1]]**2 \
                        + data[1][s_rng[0] : s_rng[1]]**2)
         cf_s = self.calc_cf(data_s, self.pick_win)
         # trig S picker and pick
@@ -149,7 +149,7 @@ class Trad_PS(object):
 
         # 2.3 get related S amplitude
         amp_xyz = np.array([self.get_amp(di) for di in data[:, idx_s : idx_s + self.amp_win]])
-        amp = np.sqrt(np.sum(amp_xyz**2))
+        amp = np.linalg.norm(amp_xyz)
 
         # 2.4 get p_anr and s_anr
         p_snr = np.amax(cf_p)
@@ -168,12 +168,12 @@ class Trad_PS(object):
             picks.append((net_sta, ot0, tp, ts, amp, p_snr, s_snr, fd))
             if out_file: 
                 pick_line = '{},{},{},{},{},{},{:.2f},{:.2f},{:.2f}\n'\
-                              .format(net, sta, ot0, tp, ts, amp, p_snr, s_snr, fd)
+                    .format(net, sta, ot0, tp, ts, amp, p_snr, s_snr, fd)
                 out_file.write(pick_line)
 
         # next detected phase
         rest_det = np.where(trig_ppk > \
-                     max(idx_trig, idx_s, idx_p) + self.det_gap)[0]
+            max(idx_trig, idx_s, idx_p) + self.det_gap)[0]
         if len(rest_det)==0: break
         slide_idx = rest_det[0]
 
