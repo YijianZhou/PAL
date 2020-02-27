@@ -1,3 +1,3 @@
 hypoDD hypoDD.inp
 python reloc2csv.py
-rm hypoDD.log
+mv hypoDD.log output
