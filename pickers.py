@@ -266,8 +266,8 @@ class Trad_PS(object):
     for i in range(velo.shape[0]-1): velo[i] -= np.mean(velo[i])
     # velocity to displacement
     disp = np.zeros_like(velo)
-    for i in range(velo.shape[0]):
-      for j in range(velo.shape[1]-1):
+    for i in range(disp.shape[0]):
+      for j in range(disp.shape[1]-1):
         disp[i,j+1] = np.sum(velo[i,0:j])
     disp /= self.samp_rate
     return np.amax(np.sum(disp**2, axis=0))**0.5
