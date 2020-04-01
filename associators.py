@@ -111,8 +111,8 @@ class TS_Assoc(object):
     res_ttp[tp_num != num_sta] = np.inf
     min_res = np.amin(res_ttp)
     x, y = np.unravel_index(np.argmin(res_ttp), res_ttp.shape)
-    lon = self.lon_rng[0] + x * self.xy_grid
-    lat = self.lat_rng[0] + y * self.xy_grid
+    lon = self.lon_rng[0] + x * self.x_grid
+    lat = self.lat_rng[0] + y * self.y_grid
 
     # find sta phase
     event_pick = [pick for pick in event_pick if tp_dict[pick['net_sta']][x][y] == 1.]
@@ -144,8 +144,9 @@ class TS_Assoc(object):
     lon_rng = [np.amin(lon) - lon_side, np.amax(lon) + lon_side]
     lat_rng = [np.amin(lat) - lat_side, np.amax(lat) + lat_side]
     # set x-y axis
-    x_rng = range(int((lon_rng[1] - lon_rng[0]) / self.xy_grid))
-    y_rng = range(int((lat_rng[1] - lat_rng[0]) / self.xy_grid))
+    cos_lat = np.cos(np.mean(lat_rng) * np.pi/180)
+    x_rng = range(int((lon_rng[1]-lon_rng[0])*cos_lat / self.xy_grid))
+    y_rng = range(int((lat_rng[1]-lat_rng[0]) / self.xy_grid))
 
     # calc time table
     for net_sta, sta_loc in self.sta_dict.items():
@@ -153,8 +154,8 @@ class TS_Assoc(object):
         lon = sta_loc['sta_lon']
         lat = sta_loc['sta_lat']
         ele = sta_loc['sta_ele'] / 1000. # m to km
-        sta_x = int((lon - lon_rng[0]) / self.xy_grid)
-        sta_y = int((lat - lat_rng[0]) / self.xy_grid)
+        sta_x = int((lon-lon_rng[0])*cos_lat / self.xy_grid)
+        sta_y = int((lat-lat_rng[0]) / self.xy_grid)
         # calc P travel time
         ttp = -np.ones([len(x_rng), len(y_rng)])
         for i,x in enumerate(x_rng):
@@ -165,6 +166,8 @@ class TS_Assoc(object):
         tt_dict[net_sta] = ttp
     self.lon_rng = lon_rng
     self.lat_rng = lat_rng
+    self.x_grid = self.xy_grid * cos_lat
+    self.y_grid = self.xy_grid
     return tt_dict
 
 
@@ -180,7 +183,8 @@ class TS_Assoc(object):
         amp = pick['s_amp'] * 1e6 # m to miu m
         # calc epi dist
         dist_lat = 111*(sta_loc['sta_lat'] - event_loc['evt_lat'])
-        dist_lon = 111*(sta_loc['sta_lon'] - event_loc['evt_lon'])
+        dist_lon = 111*(sta_loc['sta_lon'] - event_loc['evt_lon']) \
+                   * np.cos(sta_loc['sta_lat'] * np.pi/180)
         dist[i] = np.sqrt(dist_lon**2 + dist_lat**2) # in km
         mag[i] = np.log10(amp) + np.log10(dist[i])
     event_loc['mag'] = round(np.median(mag),2)
