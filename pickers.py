@@ -263,7 +263,7 @@ class Trad_PS(object):
   # get S amplitide
   def get_amp(self, velo):
     # rmean
-    for i in range(velo.shape[0]-1): velo[i] -= np.mean(velo[i])
+    for i in range(velo.shape[0]): velo[i] -= np.mean(velo[i])
     # velocity to displacement
     disp = np.zeros_like(velo)
     for i in range(disp.shape[0]):
