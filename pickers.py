@@ -229,7 +229,7 @@ class Trad_PS(object):
         s_mat = data[:, idx : idx + self.pca_win]
         s_r, s_evec = self.calc_pol(s_mat)
         u11 = abs(np.dot(p_evec, s_evec))
-        pca_flt[i] = s_r * (1-u11) #TODO
+        pca_flt[i] = 1 - s_r * u11
     return pca_flt
 
 
