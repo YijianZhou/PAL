@@ -1,13 +1,12 @@
 """ Run hypoInverse (main function)
   Usage:
-    1. modify template hyp control file to tune HypoInverse params
+    1. modify template hyp control file (if necessary)
     2. manually write velo mod (e.g., CRE file), include ref ele if necessary
-    3. set i/o paths in config file
+    3. set i/o paths & weighting params in config file
     4. python run_hyp.py
   Output:
     csv catalog & phase
     sum file (hyp)
-    arc file (hyp)
 """
 import os, glob
 import numpy as np
@@ -24,6 +23,8 @@ fhyp_temp = cfg.fhyp_temp
 f=open(fhyp_temp); lines=f.readlines(); f.close()
 fsta = cfg.fsta_out
 fpha = cfg.fpha_out
+fsums = cfg.fsums
+keep_fsums = cfg.keep_fsums
 pmod = cfg.pmod
 smod = cfg.smod
 pos = cfg.pos
@@ -40,7 +41,7 @@ print('formatting input station file')
 os.system('python mk_sta.py')
 print('formatting input phase file')
 os.system('python mk_pha.py')
-for fname in glob.glob(cfg.fsums): os.unlink(fname)
+for fname in glob.glob(fsums): os.unlink(fname)
 
 def run_hyp(ztr):
     # 1. set control file
@@ -83,3 +84,6 @@ os.system('python sum2csv.py')
 # remove intermidiate files
 for fname in glob.glob('fort.*'): os.unlink(fname)
 for fname in glob.glob('input/%s-*.hyp'%ctlg_code): os.unlink(fname)
+if not keep_fsums:
+    for fname in glob.glob(cfg.fsums): os.unlink(fname)
+

@@ -19,7 +19,7 @@ class Config(object):
     # 3. sum2csv: format output files
     self.ref_ele = 3. # ref ele for CRE mod (max sta ele)
     self.grd_ele = 2. # typical station elevation
-    self.fsums = 'output/sm_ai*.sum'
+    self.fsums = 'output/sm_ai-*.sum'
     self.out_ctlg = 'output/sm_ai_hyp.ctlg'
     self.out_pha = 'output/sm_ai_hyp.pha'
     self.out_sum = 'output/sm_ai.sum'
@@ -42,4 +42,5 @@ class Config(object):
     self.get_prt = False
     self.get_arc = False
     self.ctlg_code = 'sm_ai'
+    self.keep_fsums = False
 
