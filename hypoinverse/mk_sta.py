@@ -1,4 +1,4 @@
-""" Make station input file for hypoInverse
+""" Make input station file for hypoInverse
 """
 import config
 
