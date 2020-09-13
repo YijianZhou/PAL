@@ -1,0 +1,30 @@
+* 1. set input & output format
+LET 5 2 3 2 2                           /Use new, longer SEED station codes
+ERF T                                   /Send error messages to terminal
+TOP F                                   /No page ejects
+LST 2 0 1                               /station list or models in printfile
+KPR 2                                   /Medium print output each event
+H71 2 1 3                               /Use hypo71 summary format
+PRE 1, 3 0 0 9
+REP T F                                 /Log events to terminal; don't print unweighted stations
+* 2. set location parameters
+MIN 4                                   /Min number of stations
+JUN T
+ZTR 39
+RMS 4 .3 1 2                            /Residual weighting
+DI1 1 50 2 3                            /Initial Distance weighting
+DIS 4 40 1 2                            /Main Distance weighting
+WET 1. .8 .5 .2                         /Weights for P&S weight codes 0-3
+* 3. input velocity model & station & phase file
+CRE 1 'input/xj_p.cre' 2.7 T            /T to use station elevation
+POS 1.83
+STA 'input/xj.sta'                      /Read ASCII file of all stations.
+PHS 'input/zsy.phs'
+FIL                                     /Examine phase file and set its format
+* 4. output prt & sum & arc fname
+PRT 'output/zsy.prt'
+SUM 'output/zsy_39.sum'
+ARC 'output/zsy.arc'
+* 5. run location
+LOC
+STO
