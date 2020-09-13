@@ -15,8 +15,6 @@ class Config(object):
     self.fpha_in = 'input/phase_ai.csv'
     self.fpha_out = 'input/sm_ai.phs'
     self.mag_corr = 2. # hypoInv do not support neg mag
-    self.p_wht = 0 # weight code
-    self.s_wht = 1
 
     # 3. sum2csv: format output files
     self.ref_ele = 3. # ref ele for CRE mod (max sta ele)
@@ -31,6 +29,12 @@ class Config(object):
     # 4. run_hyp
     self.num_workers = 10
     self.ztr_rng = np.arange(0,30,1)
+    self.p_wht = 0 # weight code
+    self.s_wht = 1
+    self.rms_wht = '4 0.3 1 2'
+    self.dist_init = '1 40 2 4'
+    self.dist_wht = '4 50 1 2'
+    self.wht_code = '1 0.5 0.5 0.2'
     self.fhyp_temp = 'temp_hyp/temp_vp-pos.hyp'
     self.pmod = 'input/sm_p_wang.cre'
     self.pos = 1.83

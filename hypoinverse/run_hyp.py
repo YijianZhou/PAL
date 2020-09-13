@@ -30,12 +30,16 @@ pos = cfg.pos
 get_prt = cfg.get_prt
 get_arc = cfg.get_arc
 num_workers = cfg.num_workers
+rms_wht = cfg.rms_wht
+dist_init = cfg.dist_init
+dist_wht = cfg.dist_wht
+wht_code = cfg.wht_code
 
 # format input
 print('formatting input station file')
-#os.system('python mk_sta.py')
+os.system('python mk_sta.py')
 print('formatting input phase file')
-#os.system('python mk_pha.py')
+os.system('python mk_pha.py')
 for fname in glob.glob(cfg.fsums): os.unlink(fname)
 
 def run_hyp(ztr):
@@ -43,7 +47,13 @@ def run_hyp(ztr):
     fhyp = 'input/%s-%s.hyp'%(ctlg_code, ztr)
     fout=open(fhyp,'w')
     for line in lines:
+        # loc params
         if line[0:3]=='ZTR': line = "ZTR %s \n"%ztr
+        if line[0:3]=='RMS': line = "RMS %s \n"%rms_wht
+        if line[0:3]=='DI1': line = "DI1 %s \n"%dist_init
+        if line[0:3]=='DIS': line = "DIS %s \n"%dist_wht
+        if line[0:3]=='WET': line = "WET %s \n"%wht_code
+        # i/o paths
         if line[0:3]=='STA': line = "STA '%s' \n"%fsta
         if line[0:3]=='PHS': line = "PHS '%s' \n"%fpha
         if line[0:5]=='CRE 1': line = "CRE 1 '%s' %s T \n"%(pmod, ref_ele)
@@ -70,5 +80,6 @@ pool.join()
 # format output
 print('converting output sum files')
 os.system('python sum2csv.py')
+# remove intermidiate files
 for fname in glob.glob('fort.*'): os.unlink(fname)
 for fname in glob.glob('input/%s-*.hyp'%ctlg_code): os.unlink(fname)
