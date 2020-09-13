@@ -5,14 +5,14 @@ import config
 # i/o paths
 cfg = config.Config()
 fsta = cfg.fsta_in 
-fout = cfg.fsta_out
+fout = open(cfg.fsta_out,'w')
 lat_code = cfg.lat_code
 lon_code = cfg.lon_code
 f=open(fsta); lines=f.readlines(); f.close()
-out = open(fout,'w')
 
 for line in lines:
-    net, sta, lon, lat, ele = line.split('\t')
+    net_sta, lat, lon, ele = line.split(',')
+    net, sta = net_sta.split('.')
     lon = abs(float(lon))
     lat = abs(float(lat))
     ele = int(ele)
@@ -23,5 +23,5 @@ for line in lines:
     lat = '{} {:7.4f}{}'.format(lat_deg, lat_min, lat_code)
     lon = '{} {:7.4f}{}'.format(lon_deg, lon_min, lon_code)
     # hypoinverse format 2
-    out.write("{:<5} {}  HHZ  {}{}{:4}\n".format(sta, net[-2:], lat, lon, ele))
-out.close()
+    fout.write("{:<5} {}  HHZ  {}{}{:4}\n".format(sta, net, lat, lon, ele))
+fout.close()

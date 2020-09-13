@@ -1,4 +1,4 @@
-""" Format hypoInverse output: sum file (Hyp71 format) to csv
+""" Format hypoInverse output: sum file to csv files
 """
 import glob, os
 import numpy as np
@@ -13,13 +13,13 @@ lon_code = cfg.lon_code
 fsums = glob.glob(cfg.fsums)
 fpha = cfg.fpha_in
 f=open(fpha); pha_lines=f.readlines(); f.close()
-out_csv = open(cfg.out_csv,'w')
+out_ctlg = open(cfg.out_ctlg,'w')
 out_sum = open(cfg.out_sum,'w')
 out_bad = open(cfg.out_bad,'w')
 out_good = open(cfg.out_good,'w')
 out_pha = open(cfg.out_pha,'w')
 
-def write_csv(out, line):
+def write_csv(fout, line):
     codes = line.split()
     date, hrmn, sec = codes[0:3]
     dtime = date + hrmn + sec.zfill(5)
@@ -31,7 +31,7 @@ def write_csv(out, line):
     lon = lon_deg + lon_min/60
     dep = float(line[38:44])
     mag = float(line[48:52]) - mag_corr
-    out.write('{},{:.4f},{:.4f},{:.1f},{:.1f}\n'.format(dtime, lat, lon, dep+grd_ele, mag))
+    fout.write('{},{:.4f},{:.4f},{:.1f},{:.1f}\n'.format(dtime, lat, lon, dep+grd_ele, mag))
 
 
 # read sum files
@@ -75,13 +75,13 @@ for evid, sum_lines in sum_dict.items():
         # choose best loc
         sum_list_loc = np.sort(sum_list_loc, order=['azm','npha','rms'])
         write_csv(out_good, sum_list_loc[0]['line'])
-    write_csv(out_csv, sum_list_loc[0]['line'])
+    write_csv(out_ctlg, sum_list_loc[0]['line'])
     out_sum.write(sum_list_loc[0]['line'])
     write_csv(out_pha, sum_list_loc[0]['line'])
     pha_lines = pha_dict[evid]
     for pha_line in pha_lines: out_pha.write(pha_line)
 
-out_csv.close()
+out_ctlg.close()
 out_sum.close()
 out_bad.close()
 out_good.close()
