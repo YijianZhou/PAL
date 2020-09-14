@@ -29,7 +29,7 @@ output/hypoDD.src
 * IPHA: 1 = P; 2 = S; 3 = P&S
 * DIST: max dist [km] between cluster centroid and station 
 * IDAT   IPHA   DIST
-    2     3     200
+    2     3     80
 *
 *--- event clustering:
 * OBSCC:    min # of obs/pair for crosstime data (0= no clustering)
@@ -42,7 +42,7 @@ output/hypoDD.src
 * ISOLV:	1 = SVD, 2=lsqr
 * NSET:      	number of sets of iteration with specifications following
 *  ISTART  ISOLV  NSET
-    2        2      2 
+    2        2      1
 *
 *--- data weighting and re-weighting: 
 * NITER: 		last iteration to used the following weights
@@ -53,9 +53,7 @@ output/hypoDD.src
 * DAMP:    		damping (for lsqr only) 
 *       ---  CROSS DATA ----- ----CATALOG DATA ----
 * NITER WTCCP WTCCS WRCC WDCC WTCTP WTCTS WRCT WDCT DAMP
-  4     -9      -9   -9   -9   1.0   0.5   6    15  80
-*  4     -9      -9   -9   -9   1.0   0.5   6    10  80
-  4     -9      -9   -9   -9   1.0   0.5   6    8   80
+  4     -9      -9   -9   -9   1.0   0.5   6    4   80
 *
 *--- 1D model:
 * NLAY:		number of model layers  
@@ -63,14 +61,10 @@ output/hypoDD.src
 * TOP:		depths of top of layer (km) 
 * VEL: 		layer velocities (km/s)
 * NLAY  RATIO 
-   11     1.73
-* TOP & VEL
-* 0.0 1.0 3.0 6.0 14.0 25.0
-* 3.77   4.64   5.34   5.75   6.22  7.98
-* 0.0   1.8   3.8   5.3   6.8   17.3  24.3  31.3  32.8  34.3  36.8
-* 5.26  5.45  5.65  5.85  6.25  6.55  6.75  6.95  7.3   7.6   7.8
- 0.0   6.8   8.8   10.3  11.8  22.3  29.3  36.3  37.8  39.3  41.8
- 5.26  5.45  5.65  5.85  6.25  6.55  6.75  6.95  7.3   7.6   7.8
+   5     1.83
+* TOP & VEL (add dep_corr here)
+ 0.0   17.0  28.0  39.0  45.0
+ 5.3   6.05  6.35  6.75  7.00
 *
 *--- event selection:
 * CID: 	cluster to be relocated (0 = all)
