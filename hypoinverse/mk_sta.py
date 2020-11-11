@@ -20,8 +20,8 @@ for line in lines:
     lat_min = 60*(lat-int(lat))
     lon_deg = int(lon)
     lon_min = 60*(lon-int(lon))
-    lat = '{} {:7.4f}{}'.format(lat_deg, lat_min, lat_code)
-    lon = '{} {:7.4f}{}'.format(lon_deg, lon_min, lon_code)
+    lat = '{:2} {:7.4f}{}'.format(lat_deg, lat_min, lat_code)
+    lon = '{:3} {:7.4f}{}'.format(lon_deg, lon_min, lon_code)
     # hypoinverse format 2
     fout.write("{:<5} {}  HHZ  {}{}{:4}\n".format(sta, net, lat, lon, ele))
 fout.close()
