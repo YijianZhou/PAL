@@ -15,8 +15,8 @@ Both procedures are implemented in seperate scripts: the 'pickers.py' and 'assoc
 # use picker
 # 1. waveform --> picks
 import pickers
-picker = pickers.Trad_PS()
-picks = picker.pick(stream, out_ppk) # input obspy.stream
+picker = pickers.STA_LTA_PCA()
+picks = picker.pick(stream, out_pick) # input obspy.stream
 ```
   
 * phase associators  
@@ -25,6 +25,6 @@ picks = picker.pick(stream, out_ppk) # input obspy.stream
 # use associator
 # 2. picks --> events
 import associators
-associator = associators.TS_Assoc(sta_dict, resp_dict)
+associator = associators.TS_Assoc(sta_dict)
 associator.associate(picks, out_ctlg, out_pha)
 ```
