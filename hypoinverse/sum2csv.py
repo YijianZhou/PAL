@@ -18,8 +18,10 @@ out_sum = open(cfg.out_sum,'w')
 out_bad = open(cfg.out_bad,'w')
 out_good = open(cfg.out_good,'w')
 out_pha = open(cfg.out_pha,'w')
+out_pha_all = open(cfg.out_pha_all,'w')
 
-def write_csv(fout, line):
+
+def write_csv(fout, line, evid=None):
     codes = line.split()
     date, hrmn, sec = codes[0:3]
     dtime = date + hrmn + sec.zfill(5)
@@ -31,7 +33,8 @@ def write_csv(fout, line):
     lon = lon_deg + lon_min/60
     dep = float(line[38:44])
     mag = float(line[48:52]) - mag_corr
-    fout.write('{},{:.4f},{:.4f},{:.1f},{:.1f}\n'.format(dtime, lat, lon, dep+grd_ele, mag))
+    if evid: fout.write('{},{:.4f},{:.4f},{:.1f},{:.1f},{}\n'.format(dtime, lat, lon, dep+grd_ele, mag, evid))
+    else: fout.write('{},{:.4f},{:.4f},{:.1f},{:.1f}\n'.format(dtime, lat, lon, dep+grd_ele, mag))
 
 
 # read sum files
@@ -78,11 +81,15 @@ for evid, sum_lines in sum_dict.items():
     write_csv(out_ctlg, sum_list_loc[0]['line'])
     out_sum.write(sum_list_loc[0]['line'])
     write_csv(out_pha, sum_list_loc[0]['line'])
+    write_csv(out_pha_all, sum_list_loc[0]['line'], evid)
     pha_lines = pha_dict[evid]
-    for pha_line in pha_lines: out_pha.write(pha_line)
+    for pha_line in pha_lines: 
+        out_pha.write(pha_line)
+        out_pha_all.write(pha_line)
 
 out_ctlg.close()
 out_sum.close()
 out_bad.close()
 out_good.close()
 out_pha.close()
+out_pha_all.close()

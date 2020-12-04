@@ -5,14 +5,19 @@ import os, glob
 import argparse
 import numpy as np
 from obspy import UTCDateTime
+import associators
 import config
+import warnings
+warnings.filterwarnings("ignore")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--ppk_dir', type=str,
                         default='./output/picks')
-    parser.add_argument('--date_range', type=str,
-                        default='20170224-20170225')
+    parser.add_argument('--time_range', type=str,
+                        default='20171003-20171004')
+    parser.add_argument('--sta_file', type=str,
+                        default='input/station.dat')
     parser.add_argument('--out_ctlg', type=str,
                         default='./output/catalog.tmp')
     parser.add_argument('--out_pha', type=str,
@@ -23,16 +28,22 @@ if __name__ == '__main__':
 # define func
 cfg = config.Config()
 get_picks = cfg.get_picks
-associator = cfg.associator
-
+sta_dict = cfg.get_sta_dict(args.sta_file)
+associator = associators.TS_Assoc(\
+    sta_dict,
+    assoc_num = cfg.assoc_num,
+    ot_dev = cfg.ot_dev,
+    max_res = cfg.max_res)
 # i/o paths
+out_root = os.path.split(args.out_ctlg)[0]
+if not os.path.exists(out_root): os.makedirs(out_root)
 out_ctlg = open(args.out_ctlg,'w')
 out_pha = open(args.out_pha,'w')
 
 # get date range
-start_date, end_date = [UTCDateTime(date) for date in args.date_range.split('-')]
+start_date, end_date = [UTCDateTime(date) for date in args.time_range.split('-')]
 print('run assoc: picks --> events')
-print('date range: {} to {}'.format(start_date.date, end_date.date))
+print('time range: {} to {}'.format(start_date.date, end_date.date))
 
 # for all days
 num_day = (end_date.date - start_date.date).days

@@ -6,16 +6,15 @@ import numpy as np
 class Config(object):
   def __init__(self):
 
-    # 1. mk_sta
-    self.fsta_in = 'input/sm_station.csv'
+    # 1. format input
+    self.fsta_in = 'input/example.sta'
     self.fsta_out = 'input/station.dat'
-
-    # 2. mk_phs
-    self.fpha_in = 'input/sm_ai_hyp.pha'
+    self.fpha_in = 'input/example_pad_hyp_all.pha'
     self.fpha_out = 'input/phase.dat'
-    self.dep_corr = 0. # avoid air quake
+    self.dep_corr = 5 # avoid air quake
 
-    # 3. reloc2csv
-    self.out_ctlg = 'output/sm_ai_reloc.ctlg'
-    self.out_pha = 'output/sm_ai_reloc.pha'
+    # 2. format output
+    self.out_ctlg = 'output/example_pad_hyp-ct.ctlg'
+    self.out_pha = 'output/example_pad_hyp-ct.pha'
+    self.out_pha_all = 'output/example_pad_hyp-ct_all.pha'
 

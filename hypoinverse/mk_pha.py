@@ -1,5 +1,6 @@
 """ Make input phase file for hypoInverse (COP 3 format)
 """
+import numpy as np
 from obspy import UTCDateTime
 import config
 
@@ -24,10 +25,10 @@ for i,line in enumerate(lines):
   codes = line.split(',')
   if len(codes)==5:
     # write head line
-    ot, lat, lon, dep, mag = codes
+    ot, lat, lon, mag, _ = codes
     ot = UTCDateTime(ot)
     date, time = split_datetime(ot)
-    mag = max(float(mag) + mag_corr, 0.)
+    mag = max(float(mag) + mag_corr, 0.) if not np.isnan(float(mag)) else 0
     lat = abs(float(lat))
     lon = abs(float(lon))
     lon_deg = int(lon)
@@ -42,7 +43,7 @@ for i,line in enumerate(lines):
     evid += 1
   else:
     # write sta line
-    net_sta, tp, ts = codes
+    net_sta, tp, ts = codes[0:3]
     net, sta = net_sta.split('.')
     tp = UTCDateTime(tp) if tp!='-1' else -1
     ts = UTCDateTime(ts) if ts[:-1]!='-1' else -1

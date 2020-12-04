@@ -11,11 +11,11 @@ lon_code = cfg.lon_code
 f=open(fsta); lines=f.readlines(); f.close()
 
 for line in lines:
-    net_sta, lon, lat, ele = line.split(',')
+    net_sta, lat, lon, ele, _ = line.split(',')
     net, sta = net_sta.split('.')
     lon = abs(float(lon))
     lat = abs(float(lat))
-    ele = int(ele)
+    ele = int(float(ele))
     lat_deg = int(lat)
     lat_min = 60*(lat-int(lat))
     lon_deg = int(lon)

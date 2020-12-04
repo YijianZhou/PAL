@@ -20,7 +20,6 @@ ctlg_code = cfg.ctlg_code
 ztr_rng = cfg.ztr_rng
 ref_ele = cfg.ref_ele
 fhyp_temp = cfg.fhyp_temp
-f=open(fhyp_temp); lines=f.readlines(); f.close()
 fsta = cfg.fsta_out
 fpha = cfg.fpha_out
 fsums = cfg.fsums
@@ -38,18 +37,19 @@ wht_code = cfg.wht_code
 
 # format input
 print('formatting input station file')
-os.system('python mk_sta.py')
+#os.system('python mk_sta.py')
 print('formatting input phase file')
-os.system('python mk_pha.py')
+#os.system('python mk_pha.py')
 for fname in glob.glob(fsums): os.unlink(fname)
 
 def run_hyp(ztr):
     # 1. set control file
     fhyp = 'input/%s-%s.hyp'%(ctlg_code, ztr)
     fout=open(fhyp,'w')
+    f=open(fhyp_temp); lines=f.readlines(); f.close()
     for line in lines:
         # loc params
-        if line[0:3]=='ZTR': line = "ZTR %s \n"%ztr
+        if line[0:3]=='ZTR': line = "ZTR %s F \n"%ztr
         if line[0:3]=='RMS': line = "RMS %s \n"%rms_wht
         if line[0:3]=='DI1': line = "DI1 %s \n"%dist_init
         if line[0:3]=='DIS': line = "DIS %s \n"%dist_wht
@@ -73,6 +73,7 @@ def run_hyp(ztr):
     p.communicate(s.encode())
 
 # for all ztr
+#for ztr in ztr_rng[0:1]: run_hyp(ztr)
 pool = mp.Pool(num_workers)
 pool.map_async(run_hyp, ztr_rng)
 pool.close()
