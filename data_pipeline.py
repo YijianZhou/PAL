@@ -95,32 +95,6 @@ def get_picks(date, pick_dir):
 """ customized data_pipelines
 """
 
-#TODO
-def get_zsy_data(date, data_dir):
-    """ get data path dict
-    Inputs
-      data_dir (str): root dir, e.g. root/net/sta/yyyy/mm/dd/net.sta.yyyymmdd.chn.sac
-      date (obspy.UTCDateTime): which day of data to get
-    Outputs
-      st_paths = data_dict[net_sta]
-      *note: use net.sta to seperate sta from different net
-    """
-    # get data paths
-    data_dict = {}
-    date_dir = '{:0>4}/{:0>2}/{:0>2}'.format(date.year, date.month, date.day)
-    st_paths = sorted(glob.glob(os.path.join(data_dir, date_dir, '*')))
-    for st_path in st_paths:
-        fname = os.path.split(st_path)[-1]
-        net, sta = fname.split('.')[0:2]
-        net_sta = '.'.join([net, sta[0:3]])
-        if net_sta in data_dict: data_dict[net_sta].append(st_path)
-        else: data_dict[net_sta] = [st_path]
-    # drop bad sta
-    todel = [net_sta for net_sta in data_dict if len(data_dict[net_sta])!=3]
-    for net_sta in todel: data_dict.pop(net_sta)
-    return data_dict
-
-
 def get_xc_sta(sta_file):
     sta_dict = {}
     dtype = [('sta_lon','O'), ('sta_lat','O'), ('sta_ele','O')]
