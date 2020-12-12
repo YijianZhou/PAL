@@ -33,8 +33,6 @@ def read_data(st_paths, sta_dict):
         st += read(st_paths[1])
         st += read(st_paths[2])
     except: 
-#        obspy.io.segy.segy.SEGYTraceReadingError
-        obspy.io.sac.util.SacIOError
         print('bad data!'); return []
     # change header
     net, sta = os.path.basename(st_paths[0]).split('.')[0:2]
@@ -178,7 +176,6 @@ def read_rc_data(st_paths, sta_dict):
         st += read(st_paths[1])
         st += read(st_paths[2])
     except:
-        obspy.io.sac.util.SacIOError
         print('bad data'); return []
     # change header
     net, sta = os.path.basename(st_paths[0]).split('.')[1:3]
