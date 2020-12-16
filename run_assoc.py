@@ -13,15 +13,15 @@ warnings.filterwarnings("ignore")
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--ppk_dir', type=str,
-                        default='./output/picks')
+                        default='output/picks')
     parser.add_argument('--time_range', type=str,
                         default='20171003-20171004')
     parser.add_argument('--sta_file', type=str,
                         default='input/station.dat')
     parser.add_argument('--out_ctlg', type=str,
-                        default='./output/catalog.tmp')
+                        default='output/catalog.tmp')
     parser.add_argument('--out_pha', type=str,
-                        default='./output/phase.tmp')
+                        default='output/phase.tmp')
     args = parser.parse_args()
 
 
@@ -53,7 +53,5 @@ for day_idx in range(num_day):
     picks = get_picks(date, args.ppk_dir)
     # 2. associate picks: picks --> event_picks & event_loc
     associator.associate(picks, out_ctlg, out_pha)
-
-# finish making catalog
 out_pha.close()
 out_ctlg.close()

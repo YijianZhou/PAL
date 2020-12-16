@@ -20,11 +20,11 @@ if __name__ == '__main__':
     parser.add_argument('--sta_file', type=str,
                         default='input/station.dat')
     parser.add_argument('--out_ctlg', type=str,
-                        default='./output/tmp.ctlg')
+                        default='output/catalog.tmp')
     parser.add_argument('--out_pha', type=str,
-                        default='./output/tmp.pha')
+                        default='output/phase.tmp')
     parser.add_argument('--out_pick_dir', type=str,
-                        default='./output/picks')
+                        default='output/picks')
     args = parser.parse_args()
 
 
@@ -74,7 +74,5 @@ for day_idx in range(num_days):
     out_pick.close()
     # 2. associate picks: picks --> event_picks & event_loc
     associator.associate(picks, out_ctlg, out_pha)
-
-# finish making catalog
 out_pha.close()
 out_ctlg.close()
