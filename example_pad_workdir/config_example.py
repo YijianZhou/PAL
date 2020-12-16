@@ -28,9 +28,9 @@ class Config(object):
     self.xy_grid     = 0.02           # lateral grid width, in degree
 
     # 3. data interface
-    self.get_data_dict = dp.get_rc_data
+    self.get_data_dict = dp.get_data_dict
     self.get_sta_dict = dp.get_sta_dict
     self.get_picks = dp.get_picks
-    self.read_data = dp.read_rc_data
+    self.read_data = dp.read_data
     self.preprocess = dp.preprocess
 

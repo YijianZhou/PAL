@@ -6,7 +6,7 @@ pad_dir = '/home/zhouyj/software/PAD'
 shutil.copyfile('config_temp.py', os.path.join(pad_dir, 'config.py'))
 data_dir = '/data' # root dir of data
 time_range = '20190704-20190717'
-sta_file = 'input/example.sta'
+sta_file = 'input/example_pad.sta'
 num_workers = 13
 out_root = 'output'
 out_pick_dir = 'output/picks'

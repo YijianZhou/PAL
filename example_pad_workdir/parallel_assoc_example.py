@@ -6,9 +6,9 @@ pad_dir = '/home/zhouyj/software/PAD'
 shutil.copyfile('config_temp.py', os.path.join(pad_dir, 'config.py'))
 time_range = '20180515-20180702'
 num_workers = 10
-out_root = 'output/test'
+out_root = 'output/example'
 pick_dir = 'input/picks'
-sta_file = 'input/example.sta'
+sta_file = 'input/example_pad.sta'
 
 # divide by time
 start_date, end_date = [UTCDateTime(date) for date in time_range.split('-')]
