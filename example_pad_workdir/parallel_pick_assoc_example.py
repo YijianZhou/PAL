@@ -18,8 +18,8 @@ for proc_idx in range(num_workers):
     t0 = ''.join(str((start_date + proc_idx*dt).date).split('-'))
     t1 = ''.join(str((start_date + (proc_idx+1)*dt).date).split('-'))
     time_range = '{}-{}'.format(t0, t1)
-    out_pha = '{}/phase_{}.dat'.format(out_root, t0)
-    out_ctlg = '{}/catalog_{}.dat'.format(out_root, t0)
+    out_pha = '{}/phase_{}.dat'.format(out_root, time_range)
+    out_ctlg = '{}/catalog_{}.dat'.format(out_root, time_range)
     os.system("python {}/run_pick_assoc.py \
         --time_range={} --data_dir={} --sta_file={} \
         --out_pick_dir={} --out_ctlg={} --out_pha={} & " \
