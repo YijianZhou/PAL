@@ -240,13 +240,10 @@ class STA_LTA_PCA(object):
   # get S amplitide
   def get_amp(self, velo, samp_rate=None):
     samp_rate = samp_rate if samp_rate else self.samp_rate
-    # rmean
-    for i in range(velo.shape[0]): velo[i] -= np.mean(velo[i])
+    # remove mean
+    velo -= np.reshape(np.mean(velo, axis=1), [velo.shape[0],1])
     # velocity to displacement
-    disp = np.zeros_like(velo)
-    for i in range(disp.shape[0]):
-      for j in range(disp.shape[1]-1):
-        disp[i,j+1] = np.sum(velo[i,0:j])
+    disp = np.cumsum(velo, axis=1)
     disp /= samp_rate
     return np.amax(np.sum(disp**2, axis=0))**0.5
 
