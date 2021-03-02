@@ -51,6 +51,7 @@ for day_idx in range(num_day):
     # 1. get picks
     date = start_date + day_idx*86400
     picks = get_picks(date, args.ppk_dir)
+    picks = picks[[net_sta in sta_dict for net_sta in picks['net_sta']]]
     # 2. associate picks: picks --> event_picks & event_loc
     associator.associate(picks, out_ctlg, out_pha)
 out_pha.close()
