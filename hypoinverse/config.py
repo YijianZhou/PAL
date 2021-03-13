@@ -5,7 +5,7 @@ import numpy as np
 class Config(object):
   def __init__(self):
 
-    self.ctlg_code = 'example_pad_hyp'
+    self.ctlg_code = 'example_pal_hyp'
     # 1. mk_sta: format station file
     self.fsta_in = 'input/example.sta'
     self.fsta_out = 'input/example_hyp.sta'
@@ -13,8 +13,8 @@ class Config(object):
     self.lon_code = 'W'
 
     # 2. mk_phs: format phase file
-    self.fpha_in = 'input/example_pad.pha'
-    self.fpha_out = 'input/example_pad_hyp.phs'
+    self.fpha_in = 'input/example_pal.pha'
+    self.fpha_out = 'input/example_pal_hyp.phs'
     self.mag_corr = 2. # hypoInv do not support neg mag
 
     # 3. sum2csv: format output files
