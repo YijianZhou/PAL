@@ -7,8 +7,7 @@ The workflow can be described as: <br>
 (2) phase **A**ssociation <br>
 (3) earthquake **L**ocation <br>
 <br>
-  
-* phase pickers  
+* phase Pickers  
 *pickers.py* defines phase picking algorithms. 
 ```python
 # use picker
@@ -18,7 +17,7 @@ picker = pickers.STA_LTA_PCA()
 picks = picker.pick(stream, out_pick) # input obspy.stream
 ```
   
-* phase associators  
+* phase Associators  
 *associators.py* defines phase associate methods.
 ```python
 # use associator
@@ -28,5 +27,5 @@ associator = associators.TS_Assoc(sta_dict)
 associator.associate(picks, out_ctlg, out_pha)
 ```
 
-* earthquake location 
+* earthquake Location 
 HypoInverse and HypoDD interfaces are provided for location purpose
