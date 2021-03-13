@@ -2,11 +2,11 @@ import os, shutil
 from obspy import UTCDateTime
 
 # parallel params
-pad_dir = '/home/zhouyj/software/PAD'
-shutil.copyfile('config_temp.py', os.path.join(pad_dir, 'config.py'))
+pal_dir = '/home/zhouyj/software/PAL'
+shutil.copyfile('config_temp.py', os.path.join(pal_dir, 'config.py'))
 data_dir = '/data' # root dir of data
 time_range = '20190704-20190717'
-sta_file = 'input/example_pad.sta'
+sta_file = 'input/example_pal.sta'
 num_workers = 13
 out_root = 'output'
 out_pick_dir = 'output/picks'
@@ -23,5 +23,5 @@ for proc_idx in range(num_workers):
     os.system("python {}/run_pick_assoc.py \
         --time_range={} --data_dir={} --sta_file={} \
         --out_pick_dir={} --out_ctlg={} --out_pha={} & " \
-        .format(pad_dir, time_range, data_dir, sta_file, out_pick_dir, out_ctlg, out_pha))
+        .format(pal_dir, time_range, data_dir, sta_file, out_pick_dir, out_ctlg, out_pha))
 
