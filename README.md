@@ -1,6 +1,6 @@
 # PAL
 
-PAL is an earthquake detection architecture. <br>
+PAL is an earthquake detection and location architecture. <br>
 <br>
 The workflow can be described as: <br>
 (1) phase **P**icking <br>
