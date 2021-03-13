@@ -1,10 +1,11 @@
-# PAD
+# PAL
 
-Earthquake detection from raw continuous waveform. <br>
+PAL is an earthquake detection architecture. <br>
 <br>
-procudures include: <br>
-(1) phase picking <br>
-(2) phase association <br>
+The workflow can be described as: <br>
+(1) phase **P**icking <br>
+(2) phase **A**ssociation <br>
+(3) earthquake **L**ocation <br>
 <br>
 Both procedures are implemented in seperate scripts: the *pickers.py* and *associators.py*. Main function for processing raw waveform is *run_pick_assoc.py*; for parallel computing, use *parallel_pick_assoc.py*. For tunning association parameters, use *run_assoc.py* or *parallel_assoc.py*
 <br>
