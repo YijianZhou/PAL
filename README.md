@@ -8,22 +8,22 @@ The workflow can be described as: <br>
 (3) earthquake **L**ocation <br>
 <br>
 * phase **P**ickers  
-*pickers.py* defines phase picking algorithms. 
+*picker_pal.py* defines the default PAL phase picker. 
 ```python
 # use picker
 # 1. waveform --> picks
-import pickers
-picker = pickers.STA_LTA_PCA()
+import picker_pal
+picker = picker_pal.STA_LTA_PCA()
 picks = picker.pick(stream, out_pick) # input obspy.stream
 ```
   
 * phase **A**ssociators  
-*associators.py* defines phase associate methods.
+*associator_pal.py* defines the default PAL phase associator.
 ```python
 # use associator
 # 2. picks --> events
-import associators
-associator = associators.TS_Assoc(sta_dict)
+import associator_pal
+associator = associator_pal.TS_Assoc(sta_dict)
 associator.associate(picks, out_ctlg, out_pha)
 ```
 
