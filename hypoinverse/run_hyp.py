@@ -39,7 +39,7 @@ wht_code = cfg.wht_code
 print('formatting input station file')
 #os.system('python mk_sta.py')
 print('formatting input phase file')
-#os.system('python mk_pha.py')
+os.system('python mk_pha.py')
 for fname in glob.glob(fsums): os.unlink(fname)
 
 def run_hyp(ztr):

@@ -23,7 +23,7 @@ def split_datetime(dtime):
 evid = 0
 for i,line in enumerate(lines):
   codes = line.split(',')
-  if len(codes)==5:
+  if len(codes[0])>10:
     # write head line
     ot, lat, lon, mag, _ = codes
     ot = UTCDateTime(ot)
