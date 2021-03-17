@@ -5,8 +5,8 @@ import os, glob
 import argparse
 import numpy as np
 from obspy import UTCDateTime
-import pickers
-import associators
+import picker_pal
+import associator_pal
 import config
 import warnings
 warnings.filterwarnings("ignore")
@@ -14,32 +14,44 @@ warnings.filterwarnings("ignore")
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str,
-                        default='/data2/ZSY_SAC')
+                        default='/data/Example_Data')
     parser.add_argument('--time_range', type=str,
                         default='20171003-20171004')
     parser.add_argument('--sta_file', type=str,
                         default='input/station.dat')
     parser.add_argument('--out_ctlg', type=str,
-                        default='output/catalog.tmp')
+                        default='./output/tmp.ctlg')
     parser.add_argument('--out_pha', type=str,
-                        default='output/phase.tmp')
+                        default='./output/tmp.pha')
     parser.add_argument('--out_pick_dir', type=str,
-                        default='output/picks')
+                        default='./output/picks')
     args = parser.parse_args()
 
 
-# PAD config
+# PAL config
 cfg = config.Config()
 get_data_dict = cfg.get_data_dict
 read_data = cfg.read_data
 sta_dict = cfg.get_sta_dict(args.sta_file)
-picker = pickers.STA_LTA_PCA(\
-    pick_win = cfg.pick_win,
+picker = picker_pal.STA_LTA_PCA(\
+    win_sta = cfg.win_sta,
+    win_lta = cfg.win_lta,
     trig_thres = cfg.trig_thres,
     p_win = cfg.p_win,
-    s_win = cfg.s_win)
-associator = associators.TS_Assoc(\
+    s_win = cfg.s_win,
+    pca_win = cfg.pca_win, 
+    pca_range = cfg.pca_range,
+    fd_thres = cfg.fd_thres,
+    amp_win = cfg.amp_win,
+    win_kurt = cfg.win_kurt,
+    amp_thres = cfg.amp_thres,
+    peak_gap = cfg.peak_gap,
+    det_gap = cfg.det_gap,
+    freq_band = cfg.freq_band)
+associator = associator_pal.TS_Assoc(\
     sta_dict,
+    edge_width = cfg.edge_width,
+    xy_grid = cfg.xy_grid, 
     assoc_num = cfg.assoc_num,
     ot_dev = cfg.ot_dev,
     max_res = cfg.max_res)
@@ -74,5 +86,7 @@ for day_idx in range(num_days):
     out_pick.close()
     # 2. associate picks: picks --> event_picks & event_loc
     associator.associate(picks, out_ctlg, out_pha)
+
+# finish making catalog
 out_pha.close()
 out_ctlg.close()

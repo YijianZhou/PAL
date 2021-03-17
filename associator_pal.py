@@ -7,14 +7,13 @@ class TS_Assoc(object):
     sta_dict: station location dict
     edge_width: ratio of edges relative to the station range
     xy_grid: grid width for x-y axis (in degree)
-    vp, vs: P&S velo of the uniform model
     ot_dev: time dev for ot assoc
     max_res: threshold for P travel time res
     assoc_num: min num to alert a detection
     *note: lateral spatial range (x-y) in degree; depth in km; elevation in m
   Usage
-    import associators
-    associator = associators.TS_Assoc(sta_dict)
+    import associator_pal
+    associator = associator_pal.TS_Assoc(sta_dict)
     associator.associate(picks, out_ctlg, out_pha)
   """
   
@@ -23,7 +22,6 @@ class TS_Assoc(object):
                edge_width = 0.2,
                xy_grid    = 0.02,
                vp         = 5.9,
-               vs         = 3.4,
                ot_dev     = 3.,
                max_res    = 2.,
                assoc_num  = 4):
@@ -32,7 +30,6 @@ class TS_Assoc(object):
     self.edge_width = edge_width
     self.xy_grid    = xy_grid
     self.vp         = vp
-    self.vs         = vs
     self.ot_dev     = ot_dev
     self.max_res    = max_res
     self.assoc_num  = assoc_num
@@ -209,7 +206,5 @@ class TS_Assoc(object):
         ts = pick['ts']
         s_amp = pick['s_amp'] if 's_amp' in pick.dtype.names else -1
         p_snr = pick['p_snr'] if 'p_snr' in pick.dtype.names else -1
-        s_snr = pick['s_snr'] if 's_snr' in pick.dtype.names else -1
-        out_pha.write('{},{},{},{},{:.1f},{:.1f}\n'\
-            .format(net_sta, tp, ts, s_amp, p_snr, s_snr))
+        out_pha.write('{},{},{},{},{:.1f}\n'.format(net_sta, tp, ts, s_amp, p_snr))
 

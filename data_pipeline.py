@@ -43,25 +43,10 @@ def read_data(st_paths, sta_dict):
     return st
 
 
-def preprocess(stream, freq_band):
-    # time alignment
-    start_time = max([trace.stats.starttime for trace in stream])
-    end_time = min([trace.stats.endtime for trace in stream])
-    if start_time > end_time: return []
-    stream = stream.slice(start_time, end_time, nearest_sample=True)
-    # filter
-    stream.detrend('demean').detrend('linear').taper(max_percentage=0.05, max_length=10.)
-    filter_type, freq_range = freq_band
-    if filter_type=='highpass':
-        return stream.filter('highpass', freq=freq_range)
-    if filter_type=='bandpass':
-        return stream.filter('bandpass', freqmin=freq_range[0], freqmax=freq_range[1])
-
-
 # get station loc & gain dict
 def get_sta_dict(sta_file):
     sta_dict = {}
-    dtype = [('sta_lat','O'), ('sta_lon','O'), ('sta_ele','O'),('gain','O')]
+    dtype = [('sta_lat','O'),('sta_lon','O'),('sta_ele','O'),('gain','O')]
     f = open(sta_file); lines = f.readlines(); f.close()
     for line in lines:
         net_sta, lat, lon, ele, gain = line.split(',')
@@ -69,7 +54,7 @@ def get_sta_dict(sta_file):
     return sta_dict
 
 
-# get PAD picks (for assoc)
+# get PAL picks (for assoc)
 def get_picks(date, pick_dir):
     picks = []
     dtype = [('net_sta','O'),
@@ -78,7 +63,6 @@ def get_picks(date, pick_dir):
              ('ts','O'),
              ('s_amp','O'),
              ('p_snr','O'),
-             ('s_snr','O'),
              ('freq_dom','O')]
     fname = str(date.date) + '.pick'
     pick_path = os.path.join(pick_dir, fname)
@@ -87,8 +71,8 @@ def get_picks(date, pick_dir):
         codes = line.split(',')
         net_sta = codes[0]
         sta_ot, tp, ts = [UTCDateTime(t) for t in codes[1:4]]
-        amp, p_snr, s_snr, fd = [float(x) for x in codes[4:8]]
-        picks.append((net_sta, sta_ot, tp, ts, amp, p_snr, s_snr, fd))
+        amp, p_snr, fd = [float(x) for x in codes[4:7]]
+        picks.append((net_sta, sta_ot, tp, ts, amp, p_snr, fd))
     return np.array(picks, dtype=dtype)
 
 
