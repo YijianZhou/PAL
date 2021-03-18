@@ -108,7 +108,7 @@ class TS_Assoc(object):
     lon = self.lon_range[0] + x * self.x_grid
     lat = self.lat_range[0] + y * self.y_grid
     # find associated phase
-    event_pick = [pick for pick in event_pick if det_dict[pick['net_sta']][x][y] == 1.]
+    event_pick = [pick for pick in event_pick if pick['net_sta'] in det_dict and det_dict[pick['net_sta']][x][y] == 1.]
     # output
     print('locate event: {} {:.2f} {:.2f} | res {:.1f}s'.format(ot, lat, lon, res))
     event_loc = {'evt_ot' : ot, 
