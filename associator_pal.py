@@ -95,7 +95,8 @@ class TS_Assoc(object):
         is_det = (res_i <= self.max_res).astype(float)
         res_i[res_i > self.max_res] = 0.
         # update res_mat, det_dict, and num_sta_mat
-        if np.amax(is_det)==0: bad_idx.append(i)
+        if np.amax(is_det)==0: bad_idx.append(i); continue
+        if net_sta in det_dict: bad_idx.append(i); continue
         res_ttp_mat += res_i
         det_dict[net_sta] = is_det
         num_sta_mat += is_det
@@ -104,7 +105,7 @@ class TS_Assoc(object):
     num_sta = np.amax(num_sta_mat)
     if num_sta < self.assoc_num: return [],[]
     res_ttp_mat /= num_sta
-    res_ttp_mat[num_sta_mat != num_sta] = np.inf
+    res_ttp_mat [num_sta_mat != num_sta] = np.inf
     res = np.amin(res_ttp_mat)
     x, y = np.unravel_index(np.argmin(res_ttp_mat), res_ttp_mat.shape)
     lon = self.lon_range[0] + x * self.x_grid
