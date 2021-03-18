@@ -94,6 +94,7 @@ class TS_Assoc(object):
         is_det = (res_i <= self.max_res).astype(float)
         res_i[res_i > self.max_res] = 0.
         # update res_mat, det_dict, and num_sta_mat
+        if net_sta in det_dict and np.amax(det_dict[net_sta])>0: continue 
         res_ttp_mat += res_i
         det_dict[net_sta] = is_det
         num_sta_mat += is_det
