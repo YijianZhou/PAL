@@ -86,7 +86,8 @@ class TS_Assoc(object):
     num_sta_mat = 0 # number of associated stations
     det_dict = {} # potential det loc for each sta
     ot = event_pick['sta_ot'][len(event_pick)//2]
-    for pick in event_pick:
+    bad_idx = []
+    for i, pick in enumerate(event_pick):
         net_sta = pick['net_sta']
         ttp_obs = pick['tp'] - ot # pick time to travel time
         ttp_pred = self.tt_dict[net_sta]
@@ -94,10 +95,11 @@ class TS_Assoc(object):
         is_det = (res_i <= self.max_res).astype(float)
         res_i[res_i > self.max_res] = 0.
         # update res_mat, det_dict, and num_sta_mat
-        if np.amax(is_det)==0: continue
+        if np.amax(is_det)==0: bad_idx.append(i)
         res_ttp_mat += res_i
         det_dict[net_sta] = is_det
         num_sta_mat += is_det
+    event_pick = np.delete(event_pick, bad_idx)
     # find loc of min res (grid search location)
     num_sta = np.amax(num_sta_mat)
     if num_sta < self.assoc_num: return [],[]
@@ -108,7 +110,7 @@ class TS_Assoc(object):
     lon = self.lon_range[0] + x * self.x_grid
     lat = self.lat_range[0] + y * self.y_grid
     # find associated phase
-    event_pick = [pick for pick in event_pick if pick['net_sta'] in det_dict and det_dict[pick['net_sta']][x][y] == 1.]
+    event_pick = [pick for pick in event_pick if det_dict[pick['net_sta']][x][y]==1.]
     # output
     print('locate event: {} {:.2f} {:.2f} | res {:.1f}s'.format(ot, lat, lon, res))
     event_loc = {'evt_ot' : ot, 
