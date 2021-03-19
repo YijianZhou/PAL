@@ -39,6 +39,7 @@ class TS_Assoc(object):
   def associate(self, picks, out_ctlg=None, out_pha=None):
     # 1. temporal assoc: picks --> event_picks
     event_picks = self.assoc_ot(picks)
+    events, picks = [], []
     # 2. spatial assoc: event_pick --> event_loc
     for event_pick in event_picks:
         event_loc, event_pick = self.assoc_loc(event_pick)
@@ -48,7 +49,9 @@ class TS_Assoc(object):
         # write catalog and phase
         if out_ctlg: self.write_catalog(event_loc_mag, out_ctlg)
         if out_pha: self.write_phase(event_loc_mag, event_pick, out_pha)
-        if not out_ctlg and not out_pha: return event_loc_mag
+        events.append(event_loc_mag)
+        picks.append(event_pick)
+    if not out_ctlg and not out_pha: return events, picks
 
 
   # 1. temporal assoc by ot clustering: picks --> event_picks
