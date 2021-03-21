@@ -73,7 +73,6 @@ def run_hyp(ztr):
     p.communicate(s.encode())
 
 # for all ztr
-#for ztr in ztr_rng[0:1]: run_hyp(ztr)
 pool = mp.Pool(num_workers)
 pool.map_async(run_hyp, ztr_rng)
 pool.close()
