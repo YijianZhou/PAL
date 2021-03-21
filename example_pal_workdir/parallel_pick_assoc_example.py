@@ -3,13 +3,13 @@ from obspy import UTCDateTime
 
 # parallel params
 pal_dir = '/home/zhouyj/software/PAL'
-shutil.copyfile('config_rc.py', os.path.join(pal_dir, 'config.py'))
-data_dir = '/data2/Ridgecrest'
+shutil.copyfile('config_example.py', os.path.join(pal_dir, 'config.py'))
+data_dir = '/data/Example_data'
 time_range = '20190704-20190725'
-sta_file = 'input/rc_scsn_pal.sta'
+sta_file = 'input/example.sta'
 num_workers = 21
-out_root = 'output/rc_kurt'
-out_pick_dir = 'output/rc_kurt/picks'
+out_root = 'output/example'
+out_pick_dir = 'output/example/picks'
 
 # divide by time
 start_date, end_date = [UTCDateTime(date) for date in time_range.split('-')]
