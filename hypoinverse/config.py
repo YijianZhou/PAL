@@ -13,7 +13,7 @@ class Config(object):
     self.lon_code = 'W'
 
     # 2. mk_phs: format phase file
-    self.fpha_in = 'input/example.pha'
+    self.fpha_in = 'input/example_pal.pha'
     self.fpha_out = 'input/example_hyp.phs'
     self.mag_corr = 2. # hypoInv do not support neg mag
 
