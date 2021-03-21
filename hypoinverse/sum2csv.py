@@ -45,7 +45,7 @@ for fsum in fsums:
     if evid not in sum_dict: sum_dict[evid] = [sum_line]
     else: sum_dict[evid].append(sum_line)
 
-# read PAD pha
+# read PAL pha
 pha_dict = {}
 evid=0
 f=open(fpha); lines=f.readlines(); f.close()
