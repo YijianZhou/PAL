@@ -16,7 +16,7 @@ class Config(object):
     self.fd_thres    = 2.5         # min value of dominant frequency
     self.amp_win     = [1.,4.]     # time win to get S amplitude
     self.det_gap     = 5.          # time gap between detections
-    self.freq_band   = [2,None]    # frequency band for ppk
+    self.freq_band   = [2,None]    # frequency band for picking
     self.win_kurt    = 1.          # win for kurtosis calc
     self.amp_thres   = [3, 5]      # kurt backward and forward criteria
     self.peak_gap    = 0.1         # sec, for kurt tail
