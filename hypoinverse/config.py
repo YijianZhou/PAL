@@ -5,16 +5,16 @@ import numpy as np
 class Config(object):
   def __init__(self):
 
-    self.ctlg_code = 'rc_pal_hyp'
+    self.ctlg_code = 'example'
     # 1. mk_sta: format station file
-    self.fsta_in = 'input/rc_scsn_pal.sta'
-    self.fsta_out = 'input/rc.sta'
+    self.fsta_in = 'input/example.sta'
+    self.fsta_out = 'input/example_hyp.sta'
     self.lat_code = 'N'
     self.lon_code = 'W'
 
     # 2. mk_phs: format phase file
-    self.fpha_in = 'input/rc_pal.pha'
-    self.fpha_out = 'input/rc_pal_hyp.phs'
+    self.fpha_in = 'input/example.pha'
+    self.fpha_out = 'input/example_hyp.phs'
     self.mag_corr = 2. # hypoInv do not support neg mag
 
     # 3. sum2csv: format output files
