@@ -5,7 +5,7 @@ import numpy as np
 class Config(object):
   def __init__(self):
 
-    self.ctlg_code = 'example'
+    self.ctlg_code = 'example_pal_hyp'
     # 1. mk_sta: format station file
     self.fsta_in = 'input/example.sta'
     self.fsta_out = 'input/example_hyp.sta'
