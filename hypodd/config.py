@@ -16,5 +16,5 @@ class Config(object):
     # 2. format output
     self.out_ctlg = 'output/example_pal_hyp-ct.ctlg'
     self.out_pha = 'output/example_pal_hyp-ct.pha'
-    self.out_pha_all = 'output/example_pal_hyp-ct_full.pha'
+    self.out_pha_full = 'output/example_pal_hyp-ct_full.pha'
 

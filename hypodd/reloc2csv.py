@@ -21,7 +21,7 @@ cfg = config.Config()
 dep_corr = cfg.dep_corr
 out_ctlg = open(cfg.out_ctlg,'w')
 out_pha = open(cfg.out_pha,'w')
-out_pha_all = open(cfg.out_pha_all,'w')
+out_pha_full = open(cfg.out_pha_full,'w')
 pha_dict = read_pha(cfg.fpha_in)
 freloc = 'output/hypoDD.reloc'
 f=open(freloc); lines=f.readlines(); f.close()
@@ -43,8 +43,8 @@ for line in lines:
     out_pha_all.write('{},{},{},{},{},{}\n'.format(ot, lat, lon, dep, mag, evid))
     for pha_line in pha_lines: 
         out_pha.write(pha_line)
-        out_pha_all.write(pha_line)
+        out_pha_full.write(pha_line)
 
 out_ctlg.close()
 out_pha.close()
-out_pha_all.close()
+out_pha_full.close()
