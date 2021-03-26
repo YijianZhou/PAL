@@ -42,7 +42,7 @@ output/hypoDD.src
 * ISOLV:	1 = SVD, 2=lsqr
 * NSET:      	number of sets of iteration with specifications following
 *  ISTART  ISOLV  NSET
-    2        2      2
+    2        2      1
 *
 *--- data weighting and re-weighting: 
 * NITER: 		last iteration to used the following weights
@@ -53,8 +53,7 @@ output/hypoDD.src
 * DAMP:    		damping (for lsqr only) 
 *       ---  CROSS DATA ----- ----CATALOG DATA ----
 * NITER WTCCP WTCCS WRCC WDCC WTCTP WTCTS WRCT WDCT DAMP
-  4     -9    -9    -9   -9     1.0   0.5   6   12  120
-  4     -9    -9    -9   -9     1.0   0.5   6    8  120
+  4     -9    -9    -9   -9     1.0   0.5   6   5  80
 *
 *--- 1D model:
 * NLAY:		number of model layers  

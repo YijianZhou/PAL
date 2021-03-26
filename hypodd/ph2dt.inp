@@ -11,5 +11,5 @@ input/phase.dat
 *MINOBS: min. number of links per pair saved [8]
 *MAXOBS: max. number of links per pair saved [20]
 *MINWGHT MAXDIST MAXSEP MAXNGH MINLNK MINOBS MAXOBS
-   0      100      15     10      8      8     20
+   0      100      5     10      8      8     20
 
