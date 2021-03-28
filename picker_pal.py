@@ -134,7 +134,7 @@ class STA_LTA_PCA(object):
         ts = start_time + s_idx / self.samp_rate
         # 2.3 get related S amplitude
         s_amp = self.get_s_amp(st_data[:, p_idx-amp_win_npts[0] : s_idx+amp_win_npts[1]])
-        # 2.4 get p_anr
+        # 2.4 get p_snr
         p_snr = np.amax(cf_trig[p_idx0:p_idx1])
         # 2.5 calc dominant frequency
         t0 = min(tp, ts)
