@@ -6,16 +6,16 @@ class STA_LTA_Kurtosis(object):
 
   """ STA/LTA based P&S Picker
     trigger picker: Z chn STA/LTA reach trig_thres
-    --> pick P: find STA/LTA peak within p_win
-    --> pick S: find kurtosis peak winthin s_win
+    --> pick P: find kurtosis peak within p_win
+    --> pick S: PCA filter & find kurtosis peak winthin s_win
   Inputs
     stream: obspy.stream obj (3 chn, [e, n, z])
-    win_sta, win_lta: win for sta/lta (det, p, s)
+    pick_win: win len for STA/LTA ([lwin, swin])
     trig_thres: threshold to trig picker
-    p_win, s_win: win len for searching P & S
+    p_win: win len for pick detected P
+    s_win: win len for S arrivla searching
     pca_win: time win for calc pca filter
     pca_range: time range for pca filter
-    win_kurt: win for calc kurtosis
     fd_trhes: minimum value of dominant frequency
     amp_win: time win to get S amplitude
     det_gap: time gap between detections
@@ -107,10 +107,10 @@ class STA_LTA_Kurtosis(object):
         # 2.1 pick P with STA/LTA
         p_idx0 = trig_idx - p_win_npts[0] - win_lta_npts[1]
         p_idx1 = trig_idx + p_win_npts[1] + win_sta_npts[1]
-        data_p = st_data[2,p_idx0:p_idx1].copy()
+        data_p = st_data[2,p_idx0:p_idx1]**2
         cf_p = self.calc_sta_lta(data_p, win_lta_npts[1], win_sta_npts[1])
         tp0_idx = np.argmax(cf_p) + p_idx0
-        dt_idx = self.find_first_peak(data_p[0:tp0_idx-p_idx0][::-1])
+        dt_idx = self.find_second_peak(data_p[0:tp0_idx-p_idx0][::-1])
         tp_idx = tp0_idx - dt_idx
         tp = start_time + tp_idx / samp_rate
         # 2.2 pick S 
