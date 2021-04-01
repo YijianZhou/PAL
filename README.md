@@ -13,7 +13,7 @@ The workflow can be described as: <br>
 # use picker
 # 1. waveform --> picks
 import picker_pal
-picker = picker_pal.STA_LTA_PCA()
+picker = picker_pal.STA_LTA_Kurtosis()
 picks = picker.pick(stream, out_pick) # input obspy.stream
 ```
   
