@@ -14,7 +14,7 @@ warnings.filterwarnings("ignore")
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str,
-                        default='/data/Example_Data')
+                        default='/data2/ZSY_SAC')
     parser.add_argument('--time_range', type=str,
                         default='20171003-20171004')
     parser.add_argument('--sta_file', type=str,
@@ -33,7 +33,7 @@ cfg = config.Config()
 get_data_dict = cfg.get_data_dict
 read_data = cfg.read_data
 sta_dict = cfg.get_sta_dict(args.sta_file)
-picker = picker_pal.STA_LTA_PCA(\
+picker = picker_pal.STA_LTA_Kurtosis(\
     win_sta = cfg.win_sta,
     win_lta = cfg.win_lta,
     trig_thres = cfg.trig_thres,
@@ -44,9 +44,8 @@ picker = picker_pal.STA_LTA_PCA(\
     fd_thres = cfg.fd_thres,
     amp_win = cfg.amp_win,
     win_kurt = cfg.win_kurt,
-    amp_thres = cfg.amp_thres,
-    peak_gap = cfg.peak_gap,
     det_gap = cfg.det_gap,
+    to_prep = cfg.to_prep,
     freq_band = cfg.freq_band)
 associator = associator_pal.TS_Assoc(\
     sta_dict,
