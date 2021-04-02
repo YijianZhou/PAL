@@ -23,7 +23,7 @@ class STA_LTA_Kurtosis(object):
     freq_band: frequency band for phase picking
     *note: all time-related params are in sec
   Outputs
-    all picks in the stream, and header info
+    output to file or picks (struct np.array)
   Usage
     import picker_pal
     picker = picker_pal.STA_LTA_Kurtosis()
