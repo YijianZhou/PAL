@@ -6,16 +6,16 @@ class STA_LTA_Kurtosis(object):
 
   """ STA/LTA based P&S Picker
     trigger picker: Z chn STA/LTA reach trig_thres
-    --> pick P: find kurtosis peak within p_win
-    --> pick S: PCA filter & find kurtosis peak winthin s_win
+    --> pick P: find STA/LTA peak within p_win
+    --> pick S: find kurtosis peak winthin s_win
   Inputs
     stream: obspy.stream obj (3 chn, [e, n, z])
-    pick_win: win len for STA/LTA ([lwin, swin])
+    win_sta, win_lta: win for sta/lta (det, p, s)
     trig_thres: threshold to trig picker
-    p_win: win len for pick detected P
-    s_win: win len for S arrivla searching
+    p_win, s_win: win len for searching P & S
     pca_win: time win for calc pca filter
     pca_range: time range for pca filter
+    win_kurt: win for calc kurtosis
     fd_trhes: minimum value of dominant frequency
     amp_win: time win to get S amplitude
     det_gap: time gap between detections
