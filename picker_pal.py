@@ -118,7 +118,7 @@ class STA_LTA_Kurtosis(object):
         if len(st_data[0]) < tp_idx + s_win_npts: break
         s_idx0 = tp_idx - pca_range_npts[0]
         s_idx1 = max(tp_idx + s_win_npts, tp_idx + pca_range_npts[1])
-        data_s = np.sum(st_data[0:2, s_idx0:s_idx1]**2, axis=0)
+        data_s = np.sum(st_data[0:2, s_idx0:s_idx1]**2, axis=0)**0.5
         pca_filter = self.calc_pca_filter(st_data, tp_idx, pca_range_npts, pca_win_npts)
         data_s[0:len(pca_filter)] *= pca_filter
         dt_peak = max(np.argmax(data_s)+1, pca_win_npts+1)
