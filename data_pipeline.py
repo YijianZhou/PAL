@@ -39,7 +39,7 @@ def read_data(st_paths, sta_dict):
     net_sta = '%s.%s'%(net,sta)
     for i in range(3): 
         st[i].stats.network, st[i].stats.station = net, sta
-        st[i].data /= float(sta_dict[net_sta]['gain'])
+        st[i].data = st[i].data / float(sta_dict[net_sta]['gain'])
     return st
 
 
