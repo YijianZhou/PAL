@@ -280,7 +280,7 @@ class STA_LTA_Kurtosis(object):
     if min(delta_d)>=0 or max(delta_d)<=0: return 0
     neg_idx = np.where(delta_d<0)[0]
     pos_idx = np.where(delta_d>=0)[0]
-    if len(neg_idx)==0 or len(pos_idx))==0: return 0
+    if len(neg_idx)==0 or len(pos_idx)==0: return 0
     first_peak = max(neg_idx[0], pos_idx[0])
     neg_peak = neg_idx[neg_idx>first_peak]
     pos_peak = pos_idx[pos_idx>first_peak]
