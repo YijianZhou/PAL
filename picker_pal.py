@@ -217,7 +217,7 @@ class STA_LTA_Kurtosis(object):
 
   # calc pol_rate & pol_vec
   def calc_pol(self, mat):
-    cov = np.cov(mat / np.amax(abs(mat)))
+    cov = np.cov(mat)
     eig_val, eig_vec = np.linalg.eig(cov)
     lam1  = abs(np.amax(eig_val))
     lam23 = abs(np.sum(eig_val) - lam1)
