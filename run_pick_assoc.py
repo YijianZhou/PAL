@@ -49,12 +49,13 @@ picker = picker_pal.STA_LTA_Kurtosis(\
     freq_band = cfg.freq_band)
 associator = associator_pal.TS_Assoc(\
     sta_dict,
-    edge_width = cfg.edge_width,
+    xy_margin = cfg.xy_margin,
     xy_grid = cfg.xy_grid, 
-    assoc_num = cfg.assoc_num,
+    z_grids = cfg.z_grids,
+    min_sta = cfg.min_sta,
     ot_dev = cfg.ot_dev,
-    max_res = cfg.max_res)
-# i/o paths
+    max_res = cfg.max_res,
+    vp = cfg.vp)
 out_root = os.path.split(args.out_ctlg)[0]
 if not os.path.exists(out_root): os.makedirs(out_root)
 if not os.path.exists(args.out_pick_dir): os.makedirs(args.out_pick_dir)
