@@ -21,22 +21,22 @@ class TS_Assoc(object):
   def __init__(self,
                sta_dict,
                xy_margin = 0.2,
-               xy_grid    = 0.02,
-               z_grids  = [5],
-               vp         = 5.9,
-               ot_dev     = 3.,
-               max_res    = 2.,
-               min_sta  = 4):
+               xy_grid   = 0.02,
+               z_grids   = [5],
+               vp        = 5.9,
+               ot_dev    = 2.5,
+               max_res   = 1.5,
+               min_sta   = 4):
 
-    self.sta_dict   = sta_dict
+    self.sta_dict  = sta_dict
     self.xy_margin = xy_margin
-    self.xy_grid    = xy_grid
-    self.z_grids  = z_grids
-    self.vp         = vp
-    self.ot_dev     = ot_dev
-    self.max_res    = max_res
-    self.min_sta  = min_sta
-    self.tt_dict    = self.calc_tt()
+    self.xy_grid   = xy_grid
+    self.z_grids   = z_grids
+    self.vp        = vp
+    self.ot_dev    = ot_dev
+    self.max_res   = max_res
+    self.min_sta   = min_sta
+    self.tt_dict   = self.calc_tt()
 
 
   def associate(self, picks, out_ctlg=None, out_pha=None):
