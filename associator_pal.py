@@ -5,7 +5,7 @@ class TS_Assoc(object):
   """ Associate picks by searching ot (time, T) and loc (space, S) clustering
   Inputs
     sta_dict: station location dict
-    xy_margin: ratio of edges relative to the station range
+    xy_margin: ratio of lateral (x-y) margin relative to the station range
     xy_grid: grid width for x-y axis (in degree)
     z_grids: grids for z axis (in km)
     ot_dev: max time dev for ot assoc
