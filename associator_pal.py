@@ -176,7 +176,7 @@ class TS_Assoc(object):
 
 
   # calc mag with picks (s_amp)
-  def calc_mag(self, event_pick, event_loc, event_dep=5):
+  def calc_mag(self, event_pick, event_loc):
     num_sta = len(event_pick)
     mag = -np.ones(num_sta)
     for i,pick in enumerate(event_pick):
@@ -189,7 +189,8 @@ class TS_Assoc(object):
         dist_lat = 111*(sta_loc['sta_lat'] - event_loc['evt_lat'])
         dist_lon = 111*(sta_loc['sta_lon'] - event_loc['evt_lon']) \
                    * np.cos(sta_loc['sta_lat'] * np.pi/180)
-        dist = np.sqrt(dist_lon**2 + dist_lat**2 + event_dep**2)
+        dist_dep = event_loc['evt_dep']
+        dist = np.sqrt(dist_lon**2 + dist_lat**2 + dist_dep**2)
         mag[i] = np.log10(amp) + np.log10(dist)
     # remove one outlier
     mag_dev = abs(mag - np.median(mag))
