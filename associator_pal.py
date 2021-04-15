@@ -2,7 +2,7 @@ import numpy as np
 
 class TS_Assoc(object):
 
-  """ Associate picks by searching ot (time, T) and loc (space, S) cluster
+  """ Associate picks by searching ot (time, T) and loc (space, S) clustering
   Inputs
     sta_dict: station location dict
     xy_margin: ratio of edges relative to the station range
