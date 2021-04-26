@@ -65,7 +65,7 @@ def get_picks(date, pick_dir):
              ('p_snr','O'),
              ('freq_dom','O')]
     fname = str(date.date) + '.pick'
-    pick_path = os.path.join(pick_dir, fname)、
+    pick_path = os.path.join(pick_dir, fname)
     if not os.path.exists(pick_path): return np.array([], dtype=dtype)
     f=open(pick_path); lines=f.readlines(); f.close()
     for line in lines:
