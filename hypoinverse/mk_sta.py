@@ -11,7 +11,7 @@ lon_code = cfg.lon_code
 f=open(fsta); lines=f.readlines(); f.close()
 
 for line in lines:
-    net_sta, lat, lon, ele, _ = line.split(',')
+    net_sta, lat, lon, ele = line.split(',')[0:4]
     net, sta = net_sta.split('.')
     lon = abs(float(lon))
     lat = abs(float(lat))

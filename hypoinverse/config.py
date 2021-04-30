@@ -38,8 +38,8 @@ class Config(object):
     self.dist_wht = '4 20 1 3'
     self.wht_code = '1 0.6 0.3 0.2'
     self.fhyp_temp = 'temp_hyp/temp_vp-pos.hyp'
-    self.pmod = 'input/scsn_p.cre'
-    self.smod = [None, 'input/cvms_s.cre'][0]
+    self.pmod = 'input/example_p.cre'
+    self.smod = [None, 'input/example_s.cre'][0]
     self.pos = 1.73 # provide smod or pos
     self.get_prt = False
     self.get_arc = False
