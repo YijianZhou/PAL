@@ -58,7 +58,7 @@ class TS_Assoc(object):
         dep = event_loc_mag['evt_dep']
         mag = event_loc_mag['mag']
         res = event_loc_mag['res']
-        print('{} {} {} {} {} | res {}s'.format(ot, lat, lon, dep, mag, res))
+        print('{} {} {} {:>2} {} | res {}s'.format(ot, lat, lon, dep, mag, res))
         # write catalog and phase
         if out_ctlg: self.write_catalog(event_loc_mag, out_ctlg)
         if out_pha: self.write_phase(event_loc_mag, event_pick, out_pha)
