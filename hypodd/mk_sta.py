@@ -11,7 +11,7 @@ f=open(fsta); lines=f.readlines(); f.close()
 fout=open(fout,'w')
 
 for line in lines:
-    net_sta, lat, lon, ele, _ = line.split(',')
+    net_sta, lat, lon, ele = line.split(',')[0:4]
     net, sta = net_sta.split('.')
     lon = float(lon)
     lat = float(lat)
