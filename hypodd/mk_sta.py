@@ -5,8 +5,8 @@ import config
 
 # i/o paths
 cfg = config.Config()
-fsta = cfg.fsta_in
-fout = cfg.fsta_out
+fsta = cfg.fsta
+fout = 'input/station.dat'
 f=open(fsta); lines=f.readlines(); f.close()
 fout=open(fout,'w')
 

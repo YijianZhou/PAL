@@ -8,9 +8,8 @@ class Config(object):
   def __init__(self):
 
     self.ctlg_code = 'example_pal_hyp-ct'
-    self.fsta_in = 'input/example_pal.sta'
-    self.fsta_out = 'input/station.dat'
-    self.fpha_in = 'input/example_pal_hyp_full.pha'
+    self.fsta = 'input/example_pal.sta'
+    self.fpha = 'input/example_pal_hyp_full.pha'
     self.dep_corr = 5 # avoid air quake
     self.ot_range = '20190704-20190725'
     self.lat_range = [35.4,36.1]
