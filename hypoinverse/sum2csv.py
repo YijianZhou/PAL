@@ -32,8 +32,8 @@ def write_csv(fout, line, evid=None):
     lon = lon_deg + lon_min/60 if lon_code=='E' else -lon_deg - lon_min/60
     dep = float(line[38:44])
     mag = float(line[48:52]) - mag_corr
-    if evid: fout.write('{},{:.4f},{:.4f},{:.1f},{:.1f},{}\n'.format(dtime, lat, lon, dep+grd_ele, mag, evid))
-    else: fout.write('{},{:.4f},{:.4f},{:.1f},{:.1f}\n'.format(dtime, lat, lon, dep+grd_ele, mag))
+    if evid: fout.write('{},{:.4f},{:.4f},{:.1f},{:.2f},{}\n'.format(dtime, lat, lon, dep+grd_ele, mag, evid))
+    else: fout.write('{},{:.4f},{:.4f},{:.1f},{:.2f}\n'.format(dtime, lat, lon, dep+grd_ele, mag))
 
 
 # read sum files
