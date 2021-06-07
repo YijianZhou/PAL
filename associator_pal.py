@@ -191,7 +191,7 @@ class TS_Assoc(object):
                    * np.cos(sta_loc['sta_lat'] * np.pi/180)
         dist_dep = event_loc['evt_dep']
         dist = np.sqrt(dist_lon**2 + dist_lat**2 + dist_dep**2)
-        mag[i] = np.log10(amp) + np.log10(dist)
+        mag[i] = np.log10(amp) + np.log10(dist) + 1
     # remove one outlier
     mag_dev = abs(mag - np.median(mag))
     mag = np.delete(mag, np.argmax(mag_dev))
