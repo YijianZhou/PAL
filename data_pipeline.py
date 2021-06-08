@@ -10,9 +10,8 @@ from obspy import read, UTCDateTime
 def get_data_dict(date, data_dir):
     # get data paths
     data_dict = {}
-    net_sta_code = '*/*'
-    date_code = '{:0>4}/{:0>2}/{:0>2}'.format(date.year, date.month, date.day)
-    st_paths = sorted(glob.glob(os.path.join(data_dir, net_sta_code, date_code, '*')))
+    date_code = '{:0>4}{:0>2}{:0>2}'.format(date.year, date.month, date.day)
+    st_paths = sorted(glob.glob(os.path.join(data_dir, date_code, '*')))
     for st_path in st_paths:
         fname = os.path.basename(st_path)
         net_sta = '.'.join(fname.split('.')[0:2])
