@@ -31,6 +31,5 @@ associator.associate(picks, out_ctlg, out_pha)
 HypoInverse and HypoDD interfaces are provided for location purpose. <br>
 
 ***
-
 ## Installation <br>
 PAL is a set of codes. All you need is to setup proper Python environment. This can be accomplished easily by installing [Anaconda](https://www.anaconda.com/products/individual#Downloads) and [Obspy](https://github.com/obspy/obspy/wiki/Installation-via-Anaconda) sequentially. Or you can use the *env/pal.yml* file with conda. 
