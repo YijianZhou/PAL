@@ -11,12 +11,10 @@ class Config(object):
     self.fsta_out = 'input/example_hyp.sta'
     self.lat_code = 'N'
     self.lon_code = 'W'
-
     # 2. mk_phs: format phase file
     self.fpha_in = 'input/example_pal.pha'
     self.fpha_out = 'input/example_hyp.phs'
     self.mag_corr = 2. # hypoInv do not support neg mag
-
     # 3. sum2csv: format output files
     self.ref_ele = 3. # ref ele for CRE mod (max sta ele)
     self.grd_ele = 1.5 # typical station elevation
@@ -27,7 +25,6 @@ class Config(object):
     self.out_sum = 'output/%s.sum'%self.ctlg_code
     self.out_bad = 'output/%s_bad.csv'%self.ctlg_code
     self.out_good = 'output/%s_good.csv'%self.ctlg_code
-
     # 4. run_hyp
     self.num_workers = 10
     self.ztr_rng = np.arange(0,20,1)

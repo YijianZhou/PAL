@@ -13,6 +13,7 @@ fpha = cfg.fpha
 num_grids = cfg.num_grids
 num_workers = cfg.num_workers
 keep_grids = cfg.keep_grids
+hypo_root = cfg.hypo_root
 
 
 # read fpha with evid
@@ -45,7 +46,7 @@ def run_ph2dt():
       for j in range(num_grids[1]):
         print('run ph2dt: grid %s-%s'%(i,j))
         shutil.copy('input/phase_%s-%s.dat'%(i,j), 'input/phase.dat')
-        os.system('ph2dt ph2dt.inp > output/%s-%s.ph2dt'%(i,j))
+        os.system('%s/ph2dt ph2dt.inp > output/%s-%s.ph2dt'%(hypo_root,i,j))
         os.system('mv event.sel event.dat dt.ct input')
         os.rename('input/dt.ct','input/dt_%s-%s.ct'%(i,j))
         os.rename('input/event.dat','input/event_%s-%s.dat'%(i,j))
@@ -67,7 +68,7 @@ class Run_HypoDD(Dataset):
     out_pha_full = open('output/%s_%s-%s_full.pha'%(ctlg_code, i,j),'w')
     write_fin(i,j)
     # run hypoDD
-    os.system('hypoDD input/hypoDD_%s-%s.inp > output/%s-%s.hypoDD'%(i,j,i,j))
+    os.system('%s/hypoDD input/hypoDD_%s-%s.inp > output/%s-%s.hypoDD'%(hypo_root,i,j,i,j))
     # format output
     freloc = 'output/hypoDD_%s-%s.reloc'%(i,j)
     if not os.path.exists(freloc): return

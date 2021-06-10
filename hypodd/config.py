@@ -7,6 +7,7 @@ import numpy as np
 class Config(object):
   def __init__(self):
 
+    self.hypo_root = '/home/zhouyj/bin'
     self.ctlg_code = 'example_pal_hyp-ct'
     self.fsta = 'input/example_pal.sta'
     self.fpha = 'input/example_pal_hyp_full.pha'
