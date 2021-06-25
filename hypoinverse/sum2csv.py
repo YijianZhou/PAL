@@ -63,7 +63,7 @@ for evid, sum_lines in sum_dict.items():
         codes = sum_line.split()
         is_loc = 1 # whether loc reliable
         if '-' in codes or '#' in codes: is_loc = 0
-        npha = float(sum_line[52:55])
+        npha = 1 / float(sum_line[52:55])
         azm  = float(sum_line[56:59])
         rms  = float(sum_line[64:69])
         sum_list.append((sum_line, is_loc, azm, npha, rms))
