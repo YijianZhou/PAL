@@ -58,15 +58,16 @@ for line in lines:
 for evid, sum_lines in sum_dict.items():
     # merge sum lines
     sum_list = []
-    dtype = [('line','O'),('is_loc','O'),('azm','O'),('npha','O'),('rms','O')]
+    dtype = [('line','O'),('is_loc','O'),('qua','O'),('azm','O'),('npha','O'),('rms','O')]
     for sum_line in sum_lines:
         codes = sum_line.split()
         is_loc = 1 # whether loc reliable
         if '-' in codes or '#' in codes: is_loc = 0
+        qua = sum_line[80:81]
         npha = 1 / float(sum_line[52:55])
         azm  = float(sum_line[56:59])
         rms  = float(sum_line[64:69])
-        sum_list.append((sum_line, is_loc, azm, npha, rms))
+        sum_list.append((sum_line, is_loc, qua, azm, npha, rms))
     sum_list = np.array(sum_list, dtype=dtype)
     sum_list_loc = sum_list[sum_list['is_loc']==1]
     num_loc = len(sum_list_loc)
@@ -76,7 +77,7 @@ for evid, sum_lines in sum_dict.items():
         write_csv(out_bad, sum_list_loc[0]['line'])
     else:
         # choose best loc
-        sum_list_loc = np.sort(sum_list_loc, order=['azm','npha','rms'])
+        sum_list_loc = np.sort(sum_list_loc, order=['qua','azm','npha','rms'])
         write_csv(out_good, sum_list_loc[0]['line'])
     write_csv(out_ctlg, sum_list_loc[0]['line'])
     out_sum.write(sum_list_loc[0]['line'])
