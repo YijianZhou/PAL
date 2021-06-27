@@ -69,6 +69,7 @@ for evid, sum_lines in sum_dict.items():
         rms  = float(sum_line[64:69])
         sum_list.append((sum_line, is_loc, qua, azm, npha, rms))
     sum_list = np.array(sum_list, dtype=dtype)
+    sum_list = np.sort(sum_list, order=['qua','azm','npha','rms'])
     sum_list_loc = sum_list[sum_list['is_loc']==1]
     num_loc = len(sum_list_loc)
     # if no reliable loc
@@ -76,8 +77,6 @@ for evid, sum_lines in sum_dict.items():
         sum_list_loc = sum_list
         write_csv(out_bad, sum_list_loc[0]['line'])
     else:
-        # choose best loc
-        sum_list_loc = np.sort(sum_list_loc, order=['qua','azm','npha','rms'])
         write_csv(out_good, sum_list_loc[0]['line'])
     write_csv(out_ctlg, sum_list_loc[0]['line'])
     out_sum.write(sum_list_loc[0]['line'])
