@@ -54,4 +54,5 @@ for i,line in enumerate(lines):
     tp_code = 'IP {}{} {}'.format(p_wht, date+hhmm, tp_sec)
     ts_code = '{:4}ES {}'.format(ts_sec, s_wht)
     fout.write('{:<5}{}  HHZ {}{} {} \n'.format(sta, net, tp_code,' '*7, ts_code))
+fout.write('\n')
 fout.close()
