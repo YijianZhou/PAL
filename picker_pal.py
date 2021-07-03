@@ -241,7 +241,7 @@ class STA_LTA_Kurtosis(object):
     # velocity to displacement
     disp = np.cumsum(velo, axis=1)
     disp /= samp_rate
-    return np.amax(np.sum(disp**2, axis=0))**0.5
+    return np.amax(abs(np.sum(disp**2, axis=0)))**0.5
 
 
   # calc dominant frequency
