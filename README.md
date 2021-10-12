@@ -27,7 +27,7 @@ associator = associator_pal.TS_Assoc(sta_dict)
 associator.associate(picks, out_ctlg, out_pha)
 ```
 
-* earthquake **L**ocation <br>
+* event **L**ocation <br>
 HypoInverse and HypoDD interfaces are provided for location purpose. <br>
 
 ***
