@@ -4,11 +4,11 @@ from obspy import UTCDateTime
 # parallel params
 pal_dir = '/home/zhouyj/software/PAL'
 shutil.copyfile('config_example.py', os.path.join(pal_dir, 'config.py'))
-time_range = '20190704-20190725'
-num_workers = 21
+time_range = '20190704-20190707'
+num_workers = 3
 out_root = 'output/example'
 pick_dir = 'output/example/picks'
-sta_file = 'input/example.sta'
+sta_file = 'input/example_pal.sta'
 
 # divide by time
 start_date, end_date = [UTCDateTime(date) for date in time_range.split('-')]

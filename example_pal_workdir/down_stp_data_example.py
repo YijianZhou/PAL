@@ -10,7 +10,7 @@ import multiprocessing as mp
 num_workers = 10
 fsta = 'input/example_pal.sta'
 time_range = '20190704-20190707'
-out_root = 'input/example_data'
+out_root = '/data/Example_data'
 if not os.path.exists(out_root): os.makedirs(out_root)
 start_time, end_time = [UTCDateTime(date) for date in time_range.split('-')]
 num_days = (end_time.date - start_time.date).days
