@@ -4,9 +4,11 @@ STP can be downloaded from https://scedc.caltech.edu/data/stp/index.html
 import os, shutil, glob
 from obspy import UTCDateTime
 import subprocess
+import multiprocessing as mp
 
 # i/o files
-time_range = '20190704-20190705'
+time_range = '20190704-20190707'
+num_workers = 10
 fsta = 'input/example_pal.sta'
 out_root = 'input/example_data'
 if not os.path.exists(out_root): os.makedirs(out_root)
@@ -39,9 +41,12 @@ def down_stp_data(net, sta, date):
         shutil.move(fname_new, out_dir)
 
 # download data
+pool = mp.Pool(num_workers)
 f=open(fsta); lines=f.readlines(); f.close()
 for line in lines:
     net, sta = line.split(',')[0].split('.')
     for i in range(num_days):
         date = start_time + i*86400
-        down_stp_data(net, sta, date)
+        pool.apply_async(down_stp_data, args=(net, sta, date,))
+pool.close()
+pool.join()
