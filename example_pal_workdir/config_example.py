@@ -23,11 +23,11 @@ class Config(object):
     # 2. assoc params
     self.min_sta    = 4             # min num of stations to assoc
     self.ot_dev     = 2.            # max time deviation for ot assoc
+    self.max_res    = 1.5           # max P res for loc assoc
     self.xy_margin  = 0.1           # ratio of lateral margin, relative to sta range
     self.xy_grid    = 0.02          # lateral grid width, in degree
     self.z_grids    = [5]           # z (dep) grids
-    self.max_res    = 1.5           # max P res for loc assoc
-    self.vp         = 5.9
+    self.vp         = 5.9           # averaged P velocity
 
     # 3. data interface
     self.get_data_dict = dp.get_data_dict
