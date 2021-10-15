@@ -20,8 +20,6 @@ ctlg_code = cfg.ctlg_code
 ztr_rng = cfg.ztr_rng
 ref_ele = cfg.ref_ele
 fhyp_temp = cfg.fhyp_temp
-fsta = cfg.fsta_out
-fpha = cfg.fpha_out
 fsums = cfg.fsums
 keep_fsums = cfg.keep_fsums
 pmod = cfg.pmod
@@ -55,8 +53,6 @@ def run_hyp(ztr):
         if line[0:3]=='DIS': line = "DIS %s \n"%dist_wht
         if line[0:3]=='WET': line = "WET %s \n"%wht_code
         # i/o paths
-        if line[0:3]=='STA': line = "STA '%s' \n"%fsta
-        if line[0:3]=='PHS': line = "PHS '%s' \n"%fpha
         if line[0:5]=='CRE 1': line = "CRE 1 '%s' %s T \n"%(pmod, ref_ele)
         if line[0:5]=='CRE 2': line = "CRE 2 '%s' %s T \n"%(smod, ref_ele)
         if line[0:3]=='POS': line = "POS %s \n"%(pos)

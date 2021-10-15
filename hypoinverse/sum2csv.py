@@ -11,7 +11,6 @@ mag_corr = cfg.mag_corr # hypoInv do not support neg mag
 lat_code = cfg.lat_code
 lon_code = cfg.lon_code
 fsums = glob.glob(cfg.fsums)
-fpha = cfg.fpha_in
 out_ctlg = open(cfg.out_ctlg,'w')
 out_sum = open(cfg.out_sum,'w')
 out_bad = open(cfg.out_bad,'w')
@@ -48,7 +47,7 @@ for fsum in fsums:
 # read PAL pha
 pha_dict = {}
 evid=0
-f=open(fpha); lines=f.readlines(); f.close()
+f=open(cfg.fpha); lines=f.readlines(); f.close()
 for line in lines:
     codes = line.split(',')
     if len(codes[0])>14: pha_dict[str(evid)] = []; evid+=1

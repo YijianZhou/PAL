@@ -6,9 +6,7 @@ import config
 
 # i/o paths
 cfg = config.Config()
-fpha = cfg.fpha_in 
-f=open(fpha); lines =f.readlines(); f.close()
-fout = open(cfg.fpha_out,'w')
+fout = open('input/phase.dat','w')
 lat_code = cfg.lat_code
 lon_code = cfg.lon_code
 mag_corr = cfg.mag_corr # hypoInv do not support neg mag
@@ -21,6 +19,7 @@ def split_datetime(dtime):
     return date, time
 
 evid = 0
+f=open(cfg.fpha); lines=f.readlines(); f.close()
 for i,line in enumerate(lines):
   codes = line.split(',')
   if len(codes[0])>10:

@@ -4,18 +4,17 @@ import config
 
 # i/o paths
 cfg = config.Config()
-fsta = cfg.fsta_in 
-fout = open(cfg.fsta_out,'w')
+fsta = cfg.fsta
+fout = open('input/station.dat','w')
 lat_code = cfg.lat_code
 lon_code = cfg.lon_code
 f=open(fsta); lines=f.readlines(); f.close()
 
 for line in lines:
-    net_sta, lat, lon, ele = line.split(',')[0:4]
-    net, sta = net_sta.split('.')
-    lon = abs(float(lon))
-    lat = abs(float(lat))
-    ele = int(float(ele))
+    codes = line.split(',')
+    net, sta = codes[0].split('.')
+    lat, lon, ele = [float(code) for code in codes[1:4]]
+    lat, lon, ele = abs(lat), abs(lon), int(ele)
     lat_deg = int(lat)
     lat_min = 60*(lat-int(lat))
     lon_deg = int(lon)
