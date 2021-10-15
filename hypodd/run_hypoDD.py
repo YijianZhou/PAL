@@ -9,7 +9,6 @@ import config
 cfg = config.Config()
 ctlg_code = cfg.ctlg_code
 dep_corr = cfg.dep_corr
-fpha = cfg.fpha
 num_grids = cfg.num_grids
 num_workers = cfg.num_workers
 keep_grids = cfg.keep_grids
@@ -17,9 +16,9 @@ hypo_root = cfg.hypo_root
 
 
 # read fpha with evid
-def read_pha(fpha):
+def read_fpha():
     pha_dict = {}
-    f=open(fpha); lines=f.readlines(); f.close()
+    f=open(cfg.fpha); lines=f.readlines(); f.close()
     for line in lines:
         codes = line.split(',')
         if len(codes[0])>=14:
@@ -103,7 +102,7 @@ class Run_HypoDD(Dataset):
 if __name__ == '__main__':
     # 1. format fpha & fsta
     print('format input files')
-    pha_dict = read_pha(fpha)
+    pha_dict = read_fpha()
     os.system('python mk_sta.py')
     os.system('python mk_pha.py')
     evid_lists = np.load('input/evid_lists.npy', allow_pickle=True)

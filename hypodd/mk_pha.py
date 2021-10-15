@@ -9,7 +9,6 @@ warnings.filterwarnings("ignore")
 
 # i/o paths
 cfg = config.Config()
-fpha = cfg.fpha
 dep_corr = cfg.dep_corr
 ot_min, ot_max = [UTCDateTime(date) for date in cfg.ot_range.split('-')]
 lat_min, lat_max = cfg.lat_range
@@ -41,7 +40,7 @@ def get_fout_idx(lat, lon):
             evid_idx = [i,j]
     return evid_idx, fout_idx
 
-f=open(fpha); lines=f.readlines(); f.close()
+f=open(cfg.fpha); lines=f.readlines(); f.close()
 for line in lines:
   codes = line.split(',')
   if len(codes[0])>=14:
