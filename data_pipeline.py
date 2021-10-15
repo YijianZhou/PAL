@@ -46,10 +46,12 @@ def read_data(st_paths, sta_dict):
 def get_sta_dict(sta_file):
     sta_dict = {}
     dtype = [('sta_lat','O'),('sta_lon','O'),('sta_ele','O'),('gain','O')]
-    f = open(sta_file); lines = f.readlines(); f.close()
+    f=open(sta_file); lines=f.readlines(); f.close()
     for line in lines:
-        net_sta, lat, lon, ele, gain = line.split(',')
-        sta_dict[net_sta] = np.array((float(lat),float(lon),float(ele),float(gain)), dtype=dtype)
+        codes = line.split(',')
+        net_sta = codes[0]
+        lat, lon, ele, gain = [float(code) for code in codes[1:5]]
+        sta_dict[net_sta] = np.array((lat,lon,ele,gain), dtype=dtype)
     return sta_dict
 
 
