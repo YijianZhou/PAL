@@ -16,15 +16,15 @@ DI1 1 50 2 3                            /Initial Distance weighting
 DIS 4 40 1 2                            /Main Distance weighting
 WET 1. .8 .5 .2                         /Weights for P&S weight codes 0-3
 * 3. input velocity model & station & phase file
-CRE 1 'input/xj_p.cre' 2.7 T            /T to use station elevation
+CRE 1 'input/example_p.cre' 2.7 T       /T to use station elevation
 POS 1.83
-STA 'input/xj.sta'                      /Read ASCII file of all stations.
-PHS 'input/zsy.phs'
+STA 'input/station.dat'                 /Read ASCII file of all stations.
+PHS 'input/phase.dat'
 FIL                                     /Examine phase file and set its format
 * 4. output prt & sum & arc fname
-PRT 'output/zsy.prt'
-SUM 'output/zsy_39.sum'
-ARC 'output/zsy.arc'
+PRT 'output/eg_hyp.prt'
+SUM 'output/eg_hyp_0.sum'
+ARC 'output/eg_hyp.arc'
 * 5. run location
 LOC
 STO
