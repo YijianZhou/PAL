@@ -47,6 +47,7 @@ for line in lines:
     net, sta = line.split(',')[0].split('.')
     for i in range(num_days):
         date = start_time + i*86400
+        #down_stp_data(net, sta, date) # use single process for debugging
         pool.apply_async(down_stp_data, args=(net, sta, date,))
 pool.close()
 pool.join()
