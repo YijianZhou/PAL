@@ -24,7 +24,7 @@ def down_stp_data(net, sta, date):
     out_dir = os.path.join(out_root, date) 
     if not os.path.exists(out_dir): os.makedirs(out_dir)
     # check download
-    out_paths = glob.glob(os.path.join(out_dir, '%s%s%s*.%s.%s.*'%(year, mon, day, net, sta)))
+    out_paths = glob.glob(os.path.join(out_dir, '%s.%s.*'%(net, sta)))
     if len(out_paths)==3: return
     # download & move
     p = subprocess.Popen(['stp'], stdin=subprocess.PIPE)
