@@ -47,7 +47,7 @@ def read_data(st_paths, sta_dict):
     # if format 2: different gain for 3-chn & time invariant
     elif type(gain[0])==float:
         for ii in range(3): st[ii].data = st[ii].data / gain[ii]
-    # format 3: different gain for 3-chn & time variant
+    # if format 3: different gain for 3-chn & time variant
     elif type(gain[0])==list:
         for [ge,gn,gz,t0,t1] in gain:
             if t0<st_time<t1: break
