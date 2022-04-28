@@ -6,7 +6,7 @@ pal_dir = '/home/zhouyj/software/PAL'
 shutil.copyfile('config_eg.py', os.path.join(pal_dir, 'config.py'))
 data_dir = '/data/Example_data'
 time_range = '20190704-20190707'
-sta_file = 'input/example_pal.sta'
+sta_file = 'input/example_pal_format1.sta'
 num_workers = 3
 out_root = 'output/eg'
 out_pick_dir = 'output/eg/picks'

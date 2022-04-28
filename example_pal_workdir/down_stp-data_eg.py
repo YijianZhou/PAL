@@ -8,7 +8,7 @@ import multiprocessing as mp
 
 # i/o files
 num_workers = 10
-fsta = 'input/example_pal.sta'
+fsta = 'input/example_pal_format1.sta'
 time_range = '20190704-20190707'
 out_root = '/data/Example_data'
 if not os.path.exists(out_root): os.makedirs(out_root)
