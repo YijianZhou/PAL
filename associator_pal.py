@@ -142,8 +142,9 @@ class TS_Assoc(object):
     print('making time table')
     tt_dict = {}
     # get x-y range: sta range + margin
-    sta_loc = np.array(list(self.sta_dict.values()))
-    lat, lon = sta_loc['sta_lat'], sta_loc['sta_lon']
+    sta_loc = self.sta_dict.values()
+    lat = [sta_loc[0] for sta_loc in self.sta_dict.values()]
+    lon = [sta_loc[1] for sta_loc in self.sta_dict.values()]
     lon_margin = self.xy_margin * (np.amax(lon) - np.amin(lon))
     lat_margin = self.xy_margin * (np.amax(lat) - np.amin(lat))
     lon_range = [np.amin(lon)-lon_margin, np.amax(lon)+lon_margin]
@@ -153,11 +154,8 @@ class TS_Assoc(object):
     x_num = int((lon_range[1]-lon_range[0]) / self.xy_grid)
     y_num = int((lat_range[1]-lat_range[0]) / self.xy_grid)
     # calc time table
-    for net_sta, sta_loc in self.sta_dict.items():
+    for net_sta, [lat,lon,ele,_] in self.sta_dict.items():
         # convert to x-y grid_idx
-        lon = sta_loc['sta_lon']
-        lat = sta_loc['sta_lat']
-        ele = sta_loc['sta_ele']
         sta_x = int((lon-lon_range[0]) / self.xy_grid)
         sta_y = int((lat-lat_range[0]) / self.xy_grid)
         # calc P travel time
@@ -180,15 +178,13 @@ class TS_Assoc(object):
     num_sta = len(event_pick)
     mag = -np.ones(num_sta)
     for i,pick in enumerate(event_pick):
-        # get sta_loc
-        sta_loc = self.sta_dict[pick['net_sta']]
+        sta_lat, sta_lon, sta_ele = self.sta_dict[pick['net_sta']][0:3]
         # get S amp
         if 's_amp' not in pick.dtype.names: continue
         amp = pick['s_amp'] * 1e6 # m to miu m
         # calc epi dist
-        dist_lat = 111*(sta_loc['sta_lat'] - event_loc['evt_lat'])
-        dist_lon = 111*(sta_loc['sta_lon'] - event_loc['evt_lon']) \
-                   * np.cos(sta_loc['sta_lat'] * np.pi/180)
+        dist_lat = 111*(sta_lat - event_loc['evt_lat'])
+        dist_lon = 111*(sta_lon - event_loc['evt_lon']) * np.cos(sta_lat*np.pi/180)
         dist_dep = event_loc['evt_dep']
         dist = np.sqrt(dist_lon**2 + dist_lat**2 + dist_dep**2)
         mag[i] = np.log10(amp) + np.log10(dist) + 1
