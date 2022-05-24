@@ -6,7 +6,6 @@ PAL is an earthquake detection and location architecture. <br>
 1. phase **P**icking
 2. phase **A**ssociation
 3. event **L**ocation
-
 ![Zhou et al., (2021)](./doc/PALM_workflow.jpg)
 
 - **Usage** (see *example_pal_workdir*)
