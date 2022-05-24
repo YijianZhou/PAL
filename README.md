@@ -7,6 +7,8 @@ PAL is an earthquake detection and location architecture. <br>
 2. phase **A**ssociation
 3. event **L**ocation
   
+- **Usage** (see *example_pal_workdir*)
+  
 * phase **P**ickers  
 *picker_pal.py* defines the default PAL phase picker. 
 ```python
