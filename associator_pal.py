@@ -185,7 +185,7 @@ class TS_Assoc(object):
         # calc epi dist
         dist_lat = 111*(sta_lat - event_loc['evt_lat'])
         dist_lon = 111*(sta_lon - event_loc['evt_lon']) * np.cos(sta_lat*np.pi/180)
-        dist_dep = event_loc['evt_dep']
+        dist_dep = event_loc['evt_dep'] + sta_ele/1e3
         dist = np.sqrt(dist_lon**2 + dist_lat**2 + dist_dep**2)
         mag[i] = np.log10(amp) + np.log10(dist) + 1
     # remove one outlier
