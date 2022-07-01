@@ -3,7 +3,6 @@
 import os
 import numpy as np
 
-
 class Config(object):
   def __init__(self):
 
