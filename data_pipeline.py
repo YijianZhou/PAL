@@ -5,7 +5,6 @@ import numpy as np
 import obspy
 from obspy import read, UTCDateTime
 
-
 # get data path dict
 def get_data_dict(date, data_dir):
     # get data paths
@@ -21,7 +20,6 @@ def get_data_dict(date, data_dir):
     todel = [net_sta for net_sta in data_dict if len(data_dict[net_sta])!=3]
     for net_sta in todel: data_dict.pop(net_sta)
     return data_dict
-
 
 # read stream data
 def read_data(st_paths, sta_dict):
@@ -54,7 +52,6 @@ def read_data(st_paths, sta_dict):
         for ii in range(3): st[ii].data = st[ii].data / [ge,gn,gz][ii]
     return st
 
-
 # get station loc & gain dict
 def get_sta_dict(sta_file):
     sta_dict = {}
@@ -79,7 +76,6 @@ def get_sta_dict(sta_file):
            sta_dict[net_sta][-1].append(gain[0]) # if format 3
     return sta_dict
 
-
 # get PAL picks (for assoc)
 def get_picks(date, pick_dir):
     picks = []
@@ -102,6 +98,31 @@ def get_picks(date, pick_dir):
         picks.append((net_sta, sta_ot, tp, ts, amp, p_snr, fd))
     return np.array(picks, dtype=dtype)
 
+# get CERP picks (for assoc)
+def get_cerp_picks(date, pick_dir):
+    picks = []
+    dtype = [('net_sta','O'),
+             ('sta_ot','O'),
+             ('tp','O'),
+             ('ts','O'),
+             ('s_amp','O')]
+    fname = str(date.date) + '.pick'
+    pick_path = os.path.join(pick_dir, fname)
+    f=open(pick_path); lines=f.readlines(); f.close()
+    for line in lines:
+        codes = line.split(',')
+        net_sta = codes[0]
+        tp, ts = [UTCDateTime(code) for code in codes[1:3]]
+        sta_ot = calc_ot(tp, ts)
+        s_amp = float(codes[3])
+        picks.append((net_sta, sta_ot, tp, ts, s_amp))
+    return np.array(picks, dtype=dtype)
+
+def calc_ot(tp, ts):
+    vp, vs = 5.9, 3.4
+    d = (ts-tp) / (1/vs - 1/vp)
+    tt_p = d / vp
+    return tp - tt_p
 
 """ customized data_pipelines
 """
