@@ -293,7 +293,7 @@ class STA_LTA_Kurtosis(object):
             interp_fill = np.array([trace.data[idx0] + ii*delta for ii in range(idx1-idx0)])
             trace.data[idx0:idx1] = interp_fill
     # filter
-    stream.detrend('demean').detrend('linear').taper(max_percentage=0.05, max_length=10.)
+    stream.detrend('demean').detrend('linear').taper(max_percentage=0.05, max_length=5.)
     freq_min, freq_max = freq_band
     if freq_min and freq_max:
         return stream.filter('bandpass', freqmin=freq_min, freqmax=freq_max)
