@@ -1,9 +1,7 @@
 import numpy as np
 from scipy.stats import kurtosis
 
-
 class STA_LTA_Kurtosis(object):
-
   """ STA/LTA based P&S Picker
     trigger picker: Z chn STA/LTA reach trig_thres
     --> pick P: find STA/LTA peak within p_win
@@ -44,7 +42,6 @@ class STA_LTA_Kurtosis(object):
                det_gap    = 5.,
                to_prep    = True,
                freq_band  = [1., 40]):
-
     self.win_sta    = win_sta
     self.win_lta    = win_lta
     self.trig_thres = trig_thres
@@ -90,7 +87,6 @@ class STA_LTA_Kurtosis(object):
     win_kurt_npts  = [int(samp_rate * win) for win in self.win_kurt]
     amp_win_npts   = [int(samp_rate * win) for win in self.amp_win]
     det_gap_npts   =  int(samp_rate * self.det_gap)
-
     # pick P and S
     picks = []
     # 1. trig picker
@@ -180,7 +176,6 @@ class STA_LTA_Kurtosis(object):
     # convert to structed np.array
     return np.array(picks, dtype=dtype)
 
-
   # calc STA/LTA for a trace of data (abs or square)
   def calc_sta_lta(self, data, win_lta_npts, win_sta_npts):
     npts = len(data)
@@ -200,7 +195,6 @@ class STA_LTA_Kurtosis(object):
     sta_lta[np.isnan(sta_lta)] = 0.
     return sta_lta
 
-
   # calc P wave filter
   def calc_pca_filter(self, data, idx_p, pca_range_npts, pca_win_npts):
     p_mat = data[:, idx_p : idx_p + pca_win_npts]
@@ -215,7 +209,6 @@ class STA_LTA_Kurtosis(object):
         pca_filter[i] = 1 - s_r * abs_cos
     return pca_filter
 
-
   # calc pol_rate & pol_vec
   def calc_pol(self, mat):
     cov = np.cov(mat)
@@ -226,14 +219,12 @@ class STA_LTA_Kurtosis(object):
     pol_vec = eig_vec.T[np.argmax(eig_val)]
     return pol_rate, pol_vec
 
-
   # calculate origin time
   def calc_ot(self, tp, ts):
     vp, vs = 5.9, 3.4
     dist = (ts-tp) / (1/vs - 1/vp)
     tt_p = dist / vp
     return tp - tt_p
-
 
   # get S amplitide
   def get_s_amp(self, velo, samp_rate):
@@ -244,7 +235,6 @@ class STA_LTA_Kurtosis(object):
     disp /= samp_rate
     return np.amax(abs(np.sum(disp**2, axis=0)))**0.5
 
-
   # calc dominant frequency
   def calc_freq_dom(self, data, samp_rate):
     npts = len(data)
@@ -254,7 +244,6 @@ class STA_LTA_Kurtosis(object):
     psd = psd[:npts//2]
     return np.argmax(psd) * samp_rate / npts
 
-
   # calc kurtosis trace
   def calc_kurtosis(self, data, win_kurt_npts):
     npts = len(data) - win_kurt_npts + 1
@@ -262,7 +251,6 @@ class STA_LTA_Kurtosis(object):
     for i in range(npts):
         kurt[i] = kurtosis(data[i:i+win_kurt_npts])
     return kurt
-
 
   def find_first_peak(self, data):
     npts = len(data)
@@ -272,7 +260,6 @@ class STA_LTA_Kurtosis(object):
     neg_idx = np.where(delta_d<0)[0]
     pos_idx = np.where(delta_d>=0)[0]
     return max(neg_idx[0], pos_idx[0])
-
 
   def find_second_peak(self, data):
     npts = len(data)
@@ -288,13 +275,23 @@ class STA_LTA_Kurtosis(object):
     if len(neg_peak)==0 or len(pos_peak)==0: return first_peak
     return max(neg_peak[0], pos_peak[0])
 
-
   def preprocess(self, stream, freq_band):
     # time alignment
     start_time = max([trace.stats.starttime for trace in stream])
     end_time = min([trace.stats.endtime for trace in stream])
     if start_time > end_time: return []
     stream = stream.slice(start_time, end_time, nearest_sample=True)
+    # remove data gap
+    for trace in stream:
+        npts = len(trace.data)
+        gap_idx = np.where(trace.data==0)[0]
+        gap_list = np.split(gap_idx, np.where(np.diff(gap_idx)!=1)[0] + 1)
+        gap_list = [gap for gap in gap_list if len(gap)>=10]
+        for gap in gap_list:
+            idx0, idx1 = max(0, gap[0]-1), min(npts-1, gap[-1]+1)
+            delta = (trace.data[idx1] - trace.data[idx0]) / (idx1-idx0)
+            interp_fill = np.array([trace.data[idx0] + ii*delta for ii in range(idx1-idx0)])
+            trace.data[idx0:idx1] = interp_fill
     # filter
     stream.detrend('demean').detrend('linear').taper(max_percentage=0.05, max_length=10.)
     freq_min, freq_max = freq_band
