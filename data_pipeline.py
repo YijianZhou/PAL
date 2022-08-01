@@ -71,9 +71,9 @@ def get_sta_dict(sta_file):
             gain = [gain]
         else: print('false sta_file format!'); continue
         if net_sta not in sta_dict: 
-           sta_dict[net_sta] = [lat,lon,ele,gain]
+            sta_dict[net_sta] = [lat,lon,ele,gain]
         else: 
-           sta_dict[net_sta][-1].append(gain[0]) # if format 3
+            sta_dict[net_sta][-1].append(gain[0]) # if format 3
     return sta_dict
 
 # get PAL picks (for assoc)
