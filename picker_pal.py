@@ -293,6 +293,7 @@ class STA_LTA_Kurtosis(object):
             idx0, idx1 = max(0, gap[0]-1), min(npts-1, gap[-1]+1)
             if ii<num_gap-1: idx2 = min(idx1+(idx1-idx0), gap_list[ii+1][0])
             else: idx2 = min(idx1+(idx1-idx0), npts-1)
+            if idx1==idx2: continue
             if idx2==idx1+(idx1-idx0): data[idx0:idx1] = data[idx1:idx2]
             else:
                 num_tile = int(np.ceil((idx1-idx0)/(idx2-idx1)))
