@@ -283,15 +283,21 @@ class STA_LTA_Kurtosis(object):
     stream = stream.slice(start_time, end_time, nearest_sample=True)
     # remove data gap
     for trace in stream:
-        npts = len(trace.data)
-        gap_idx = np.where(trace.data==0)[0]
+        data = trace.data
+        npts = len(data)
+        gap_idx = np.where(data==0)[0]
         gap_list = np.split(gap_idx, np.where(np.diff(gap_idx)!=1)[0] + 1)
         gap_list = [gap for gap in gap_list if len(gap)>=10]
-        for gap in gap_list:
+        num_gap = len(gap_list)
+        for ii,gap in enumerate(gap_list):
             idx0, idx1 = max(0, gap[0]-1), min(npts-1, gap[-1]+1)
-            delta = (trace.data[idx1] - trace.data[idx0]) / (idx1-idx0)
-            interp_fill = np.array([trace.data[idx0] + ii*delta for ii in range(idx1-idx0)])
-            trace.data[idx0:idx1] = interp_fill
+            if ii<num_gap-1: idx2 = min(idx1+(idx1-idx0), gap_list[ii+1][0])
+            else: idx2 = min(idx1+(idx1-idx0), npts-1)
+            if idx2==idx1+(idx1-idx0): data[idx0:idx1] = data[idx1:idx2]
+            else:
+                num_tile = int(np.ceil((idx1-idx0)/(idx2-idx1)))
+                data[idx0:idx1] = np.tile(data[idx1:idx2], num_tile)[0:idx1-idx0]
+        trace.data = data
     # filter
     stream.detrend('demean').detrend('linear').taper(max_percentage=0.05, max_length=5.)
     freq_min, freq_max = freq_band
