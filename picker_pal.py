@@ -300,6 +300,9 @@ class STA_LTA_Kurtosis(object):
                 data[idx0:idx1] = np.tile(data[idx1:idx2], num_tile)[0:idx1-idx0]
         trace.data = data
     # filter
+    for trace in stream:
+        trace.data[np.isnan(trace.data)] = 0
+        trace.data[np.isinf(trace.data)] = 0
     stream.detrend('demean').detrend('linear').taper(max_percentage=0.05, max_length=5.)
     freq_min, freq_max = freq_band
     if freq_min and freq_max:
