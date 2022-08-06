@@ -275,13 +275,14 @@ class STA_LTA_Kurtosis(object):
     if len(neg_peak)==0 or len(pos_peak)==0: return first_peak
     return max(neg_peak[0], pos_peak[0])
 
-  def preprocess(self, stream, freq_band):
+  def preprocess(self, stream, freq_band, max_gap=5.):
     # time alignment
     start_time = max([trace.stats.starttime for trace in stream])
     end_time = min([trace.stats.endtime for trace in stream])
     if start_time > end_time: return []
     stream = stream.slice(start_time, end_time, nearest_sample=True)
-    # remove data gap
+    # fill data gap
+    max_gap_npts = int(max_gap*stream[0].stats.sampling_rate)
     for trace in stream:
         data = trace.data
         npts = len(data)
@@ -291,8 +292,8 @@ class STA_LTA_Kurtosis(object):
         num_gap = len(gap_list)
         for ii,gap in enumerate(gap_list):
             idx0, idx1 = max(0, gap[0]-1), min(npts-1, gap[-1]+1)
-            if ii<num_gap-1: idx2 = min(idx1+(idx1-idx0), gap_list[ii+1][0])
-            else: idx2 = min(idx1+(idx1-idx0), npts-1)
+            if ii<num_gap-1: idx2 = min(idx1+(idx1-idx0), idx1+max_gap_npts, gap_list[ii+1][0])
+            else: idx2 = min(idx1+(idx1-idx0), idx1+max_gap_npts, npts-1)
             if idx1==idx2: continue
             if idx2==idx1+(idx1-idx0): data[idx0:idx1] = data[idx1:idx2]
             else:
