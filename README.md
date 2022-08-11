@@ -9,8 +9,11 @@ PAL is an earthquake detection and location architecture. <br>
 ![Zhou et al., (2021)](./doc/PALM_workflow.jpg)
 
 - **Usage** (see *example_pal_workdir*)
-1. Prepare continuous data into consistent directory structure
-2. Run PAL
+1. Prepare continuous data into consistent directory structure  
+2. Run PAL  
+
+- **Tutorials**  
+2021/10 Online training in Chinese: vedio recording on [KouShare](https://www.koushare.com/lives/room/549779)  
 
 ## Installation
 
