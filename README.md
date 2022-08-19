@@ -14,6 +14,7 @@ PAL is an earthquake detection and location architecture. <br>
 
 - **Tutorials**  
 2021/10 Online training in Chinese: vedio recording on [KouShare](https://www.koushare.com/lives/room/549779)  
+2022/08 Online training in Chinese: vedio recording on [KouShare](https://www.koushare.com/video/videodetail/31656)  
 
 ## Installation
 
