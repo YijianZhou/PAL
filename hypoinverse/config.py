@@ -1,4 +1,5 @@
 """ Configure file for HypoInverse interface
+    Download hypoInverse at https://www.usgs.gov/software/hypoinverse-earthquake-location
 """
 import numpy as np
 
