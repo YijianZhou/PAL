@@ -1,4 +1,5 @@
 """ Configure file for hypoDD interface
+    Download hypoDD at https://www.ldeo.columbia.edu/~felixw/hypoDD.html
 """
 import os
 import numpy as np
