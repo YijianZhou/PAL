@@ -27,7 +27,7 @@ class Config(object):
     # 4. run_hyp
     self.num_workers = 10
     self.ztr_rng = np.arange(0,20,1)
-    self.p_wht = 0 # weight code
+    self.p_wht = 0 # weight code index
     self.s_wht = 1
     self.rms_wht = '4 0.3 1 3'
     self.dist_init = '1 50 1 2'
