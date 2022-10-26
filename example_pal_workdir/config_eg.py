@@ -1,6 +1,7 @@
 """ Configure file
 """
 import data_pipeline as dp
+import numpy as np
 
 class Config(object):
   def __init__(self):
@@ -26,7 +27,7 @@ class Config(object):
     self.max_res    = 1.5           # max P res for loc assoc
     self.xy_margin  = 0.1           # xy (lateral) range inferred from sta loc
     self.xy_grid    = 0.02          # xy (lateral) grid size (in degree)
-    self.z_grids    = [5]           # z (dep) grids (in km)
+    self.z_grids    = np.arange(2,20,3)  # z (dep) grids
     self.vp         = 5.9           # averaged P velocity
 
     # 3. data interface
