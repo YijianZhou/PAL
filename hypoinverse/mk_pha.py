@@ -24,7 +24,7 @@ for i,line in enumerate(lines):
   codes = line.split(',')
   if len(codes[0])>10:
     # write head line
-    ot, lat, lon, _, mag, _ = codes
+    ot, lat, lon, _, mag = codes[0:5]
     ot = UTCDateTime(ot)
     date, time = split_datetime(ot)
     mag = max(float(mag) + mag_corr, 0.) if not np.isnan(float(mag)) else 0
