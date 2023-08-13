@@ -282,13 +282,17 @@ class STA_LTA_Kurtosis(object):
     if start_time > end_time: return []
     stream = stream.slice(start_time, end_time, nearest_sample=True)
     # fill data gap
+    for trace in stream:
+        trace.data[np.isnan(trace.data)] = 0
+        trace.data[np.isinf(trace.data)] = 0
     max_gap_npts = int(max_gap*stream[0].stats.sampling_rate)
     for trace in stream:
         data = trace.data
         npts = len(data)
-        gap_idx = np.where(data==0)[0]
+        data_diff = np.diff(data)
+        gap_idx = np.where(data_diff==0)[0]
         gap_list = np.split(gap_idx, np.where(np.diff(gap_idx)!=1)[0] + 1)
-        gap_list = [gap for gap in gap_list if len(gap)>=10]
+        gap_list = [gap for gap in gap_list if len(gap)>=3]
         num_gap = len(gap_list)
         for ii,gap in enumerate(gap_list):
             idx0, idx1 = max(0, gap[0]-1), min(npts-1, gap[-1]+1)
@@ -301,9 +305,6 @@ class STA_LTA_Kurtosis(object):
                 data[idx0:idx1] = np.tile(data[idx1:idx2], num_tile)[0:idx1-idx0]
         trace.data = data
     # filter
-    for trace in stream:
-        trace.data[np.isnan(trace.data)] = 0
-        trace.data[np.isinf(trace.data)] = 0
     stream.detrend('demean').detrend('linear').taper(max_percentage=0.05, max_length=5.)
     freq_min, freq_max = freq_band
     if freq_min and freq_max:
