@@ -19,7 +19,7 @@ class Config(object):
     self.amp_win    = [1.,4.]       # time win to get S amplitude
     self.det_gap    = 5.            # time gap between detections
     self.to_prep    = True          # whether to preprocess the raw data
-    self.freq_band  = [2,40]        # frequency band 
+    self.freq_band  = [1,20]        # frequency band 
 
     # 2. assoc params
     self.min_sta    = 4             # min num of stations to assoc
