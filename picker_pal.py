@@ -2,7 +2,7 @@ import numpy as np
 from scipy.stats import kurtosis
 
 class STA_LTA_Kurtosis(object):
-  """ STA/LTA based P&S Picker
+  """ STA/LTA & kurtosis-based P&S Picker
     trigger picker: Z chn STA/LTA reach trig_thres
     --> pick P: find STA/LTA peak within p_win
     --> pick S: find kurtosis peak winthin s_win
