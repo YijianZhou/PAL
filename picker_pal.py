@@ -14,7 +14,9 @@ class STA_LTA_Kurtosis(object):
     pca_win: time win for calc pca filter
     pca_range: time range for pca filter
     win_kurt: win for calc kurtosis
-    fd_trhes: minimum value of dominant frequency
+    snr_ratio_thres: max value of snr ratio after peak rm
+    amp_ratio_thres: max value of amp ratio of P/P_tail & S
+    fd_trhes: min value of dominant frequency
     amp_win: time win to get S amplitude
     det_gap: time gap between detections
     to_prep: whether preprocess stream
