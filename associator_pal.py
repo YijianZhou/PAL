@@ -212,13 +212,11 @@ class TS_Assoc(object):
     lat = event_loc['evt_lat']
     dep = event_loc['evt_dep']
     mag = event_loc['mag']
-    res = event_loc['res']
-    out_pha.write('{},{},{},{},{},{}\n'.format(ot, lat, lon, dep, mag, res))
+    out_pha.write('{},{},{},{},{}\n'.format(ot, lat, lon, dep, mag))
     for pick in event_pick:
         net_sta = pick['net_sta']
         tp = pick['tp']
         ts = pick['ts']
         s_amp = pick['s_amp'] if 's_amp' in pick.dtype.names else -1
-        p_snr = pick['p_snr'] if 'p_snr' in pick.dtype.names else -1
-        out_pha.write('{},{},{},{},{:.1f}\n'.format(net_sta, tp, ts, s_amp, p_snr))
+        out_pha.write('{},{},{},{}\n'.format(net_sta, tp, ts, s_amp))
 
