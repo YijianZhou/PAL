@@ -45,7 +45,7 @@ for i,line in enumerate(lines):
     net_sta, tp, ts = codes[0:3]
     net, sta = net_sta.split('.')
     tp = UTCDateTime(tp) if tp!='-1' else -1
-    ts = UTCDateTime(ts) if ts[:-1]!='-1' else -1
+    ts = UTCDateTime(ts) if ts!='-1' else -1
     date = split_datetime(tp)[0] if tp!=-1 else split_datetime(ts)[0]
     hhmm = split_datetime(tp)[1][0:4] if tp!=-1 else split_datetime(ts)[1][0:4]
     tp_sec = split_datetime(tp)[1][4:] if tp!=-1 else ' '*4

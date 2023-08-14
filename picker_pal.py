@@ -31,36 +31,36 @@ class STA_LTA_Kurtosis(object):
   """
 
   def __init__(self, 
-               win_sta    = [.8, 0.4, 1.],
-               win_lta    = [6., 2., 2.],
-               trig_thres = 12.,
-               p_win      = [.5, 1.],
-               s_win      = 10,
-               pca_win    = 1.,
-               pca_range  = [0., 2],
-               win_kurt   = [5.,1.],
-               fd_thres   = 2.5, 
+               win_sta         = [.8, 0.4, 1.],
+               win_lta         = [6., 2., 2.],
+               trig_thres      = 12.,
+               p_win           = [.5, 1.],
+               s_win           = 10,
+               pca_win         = 1.,
+               pca_range       = [0., 2],
+               win_kurt        = [5.,1.],
+               fd_thres        = 2.5, 
                snr_ratio_thres = 10, 
                amp_ratio_thres = [10,2], 
                amp_win         = [1.,5.],
                det_gap         = 5.,
-               to_prep    = True,
-               freq_band  = [1., 40]):
-    self.win_sta    = win_sta
-    self.win_lta    = win_lta
+               to_prep         = True,
+               freq_band       = [1., 40]):
+    self.win_sta = win_sta
+    self.win_lta = win_lta
     self.trig_thres = trig_thres
-    self.p_win      = p_win
-    self.s_win      = s_win
-    self.pca_win    = pca_win
-    self.pca_range  = pca_range
-    self.win_kurt   = win_kurt
-    self.fd_thres   = fd_thres
+    self.p_win = p_win
+    self.s_win = s_win
+    self.pca_win = pca_win
+    self.pca_range = pca_range
+    self.win_kurt = win_kurt
+    self.fd_thres = fd_thres
     self.snr_ratio_thres = snr_ratio_thres
     self.amp_ratio_thres = amp_ratio_thres
-    self.amp_win    = amp_win
-    self.det_gap    = det_gap
-    self.to_prep    = to_prep
-    self.freq_band  = freq_band
+    self.amp_win = amp_win
+    self.det_gap = det_gap
+    self.to_prep = to_prep
+    self.freq_band = freq_band
 
 
   def pick(self, stream, out_file=None):
