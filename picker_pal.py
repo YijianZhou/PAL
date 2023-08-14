@@ -37,9 +37,11 @@ class STA_LTA_Kurtosis(object):
                pca_win    = 1.,
                pca_range  = [0., 2],
                win_kurt   = [5.,1.],
-               fd_thres   = 2.5,
-               amp_win    = [1.,5.],
-               det_gap    = 5.,
+               fd_thres   = 2.5, 
+               snr_ratio_thres = 10, 
+               amp_ratio_thres = [10,2], 
+               amp_win         = [1.,5.],
+               det_gap         = 5.,
                to_prep    = True,
                freq_band  = [1., 40]):
     self.win_sta    = win_sta
@@ -51,6 +53,8 @@ class STA_LTA_Kurtosis(object):
     self.pca_range  = pca_range
     self.win_kurt   = win_kurt
     self.fd_thres   = fd_thres
+    self.snr_ratio_thres = snr_ratio_thres
+    self.amp_ratio_thres = amp_ratio_thres
     self.amp_win    = amp_win
     self.det_gap    = det_gap
     self.to_prep    = to_prep
@@ -63,9 +67,7 @@ class STA_LTA_Kurtosis(object):
              ('sta_ot','O'),
              ('tp','O'),
              ('ts','O'),
-             ('s_amp','O'),
-             ('p_snr','O'),
-             ('freq_dom','O')]
+             ('s_amp','O')]
     # preprocess & extract data
     if len(stream)!=3: return np.array([], dtype=dtype)
     if self.to_prep: stream = self.preprocess(stream, self.freq_band)
@@ -106,8 +108,23 @@ class STA_LTA_Kurtosis(object):
         data_p = st_data[2,p_idx0:p_idx1]**2
         cf_p = self.calc_sta_lta(data_p, win_lta_npts[1], win_sta_npts[1])
         tp0_idx = np.argmax(cf_p) + p_idx0
-        dt_idx = self.find_second_peak(data_p[0:tp0_idx-p_idx0][::-1])
-        tp_idx = tp0_idx - dt_idx
+        # check potential glitch
+        data_clean = st_data[2,p_idx0:p_idx1].copy()
+        peak_idx0 = np.argmax(abs(data_clean))
+        peak_idx1 = peak_idx0 + self.find_first_peak(data_clean[peak_idx0:])
+        peak_idx0 -= self.find_second_peak(data_clean[0:peak_idx0][::-1])
+        peak_idx1 += self.find_second_peak(data_clean[peak_idx1:])+1
+        try: data_clean[peak_idx0:peak_idx1] = st_data[2, p_idx0+peak_idx1:p_idx0+2*peak_idx1-peak_idx0]
+        except: break
+        cf_p_clean = self.calc_sta_lta(data_clean**2, win_lta_npts[1], win_sta_npts[1])
+        snr_ratio = np.amax(cf_p) / np.amax(cf_p_clean)
+        if snr_ratio>self.snr_ratio_thres: 
+            # next detected phase
+            rest_det = np.where(trig_index > tp0_idx + det_gap_npts)[0] 
+            if len(rest_det)==0: break
+            slide_idx = rest_det[0]; continue
+        # refine initial pick on waveform
+        tp_idx = tp0_idx - self.find_second_peak(data_p[0:tp0_idx-p_idx0][::-1])
         tp = start_time + tp_idx / samp_rate
         # 2.2 pick S 
         # 2.2.1 pca for amp_peak
@@ -136,8 +153,7 @@ class STA_LTA_Kurtosis(object):
         # if kurt_long not stable, use STA/LTA
         if dt_min>=dt_max: 
             ts0_idx = tp_idx + dt_peak//2 + dt_min
-            dt_idx = self.find_second_peak(data_s[0:dt_min+win_lta_npts[2]][::-1])
-            ts_idx = ts0_idx - dt_idx
+            ts_idx = ts0_idx - self.find_second_peak(data_s[0:dt_min+win_lta_npts[2]][::-1])
         # else, pick peak of kurt_short
         else:
             s_idx0 = tp_idx + dt_peak//2 + dt_min - win_kurt_npts[1]
@@ -147,28 +163,29 @@ class STA_LTA_Kurtosis(object):
             kurt_short = self.calc_kurtosis(data_s, win_kurt_npts[1])
             kurt_max = np.argmax(kurt_short) if np.argmax(kurt_short)>0 else dt_max-dt_min
             ts0_idx = tp_idx + dt_peak//2 + dt_min + kurt_max
-            dt_idx = self.find_second_peak(data_s[0:s_idx0+win_kurt_npts[1]+kurt_max][::-1])
-            ts_idx = ts0_idx - dt_idx
+            ts_idx = ts0_idx - self.find_second_peak(data_s[0:s_idx0+win_kurt_npts[1]+kurt_max][::-1])
         ts = start_time + ts_idx / samp_rate
         # 3 get related S amplitude
         data_amp = st_data[:, tp_idx-amp_win_npts[0] : ts_idx+amp_win_npts[1]].copy()
         s_amp = self.get_s_amp(data_amp, samp_rate)
         # 4 get p_snr
         p_snr = np.amax(cf_trig[p_idx0:p_idx1])
-        # 5 calc dominant frequency
-        t0 = min(tp, ts)
-        t1 = max(tp+(ts-tp)/2, tp+self.win_sta[0])
-        st = stream.slice(t0,t1).copy()
+        # 5 calc dominant frequency & amp ratio
+        st = stream.slice(min(tp, ts), max(tp+(ts-tp)/2, tp+self.win_sta[0])).copy()
         fd = max([self.calc_freq_dom(tr.data, samp_rate) for tr in st])
+        A1 = np.array([np.amax(tr.data)-np.amin(tr.data) for tr in stream.slice(tp, tp+(ts-tp)/2)])
+        A2 = np.array([np.amax(tr.data)-np.amin(tr.data) for tr in stream.slice(tp+(ts-tp)/2, ts)])
+        A3 = np.array([np.amax(tr.data)-np.amin(tr.data) for tr in stream.slice(ts, ts+(ts-tp)/2)])
+        A12 = min([A1[ii]/A2[ii] for ii in range(3)])
+        A13 = min([A1[ii]/A3[ii] for ii in range(3)])
         # output
-        print('{}, {}, {}'.format(net_sta, tp, ts))
-        if tp<ts and fd>self.fd_thres:
+        if tp<ts and fd>self.fd_thres and A12<self.amp_ratio_thres[0] and A13<self.amp_ratio_thres[1]:
+            print('{}, {}, {}'.format(net_sta, tp, ts))
             sta_ot = self.calc_ot(tp, ts)
-            picks.append((net_sta, sta_ot, tp, ts, s_amp, p_snr, fd))
+            picks.append((net_sta, sta_ot, tp, ts, s_amp))
             if out_file: 
-                pick_line = '{},{},{},{},{},{:.2f},{:.2f}\n'\
-                    .format(net_sta, sta_ot, tp, ts, s_amp, p_snr, fd)
-                out_file.write(pick_line)
+                qual_code = '{:.1f},{:.1f},{:.1f},{:.1f},{:.1f}'.format(p_snr, fd, snr_ratio, A12, A13)
+                out_file.write('{},{},{},{},{},{}\n'.format(net_sta, sta_ot, tp, ts, s_amp, qual_code))
         # next detected phase
         rest_det = np.where(trig_index > max(trig_idx,ts_idx,tp_idx) + det_gap_npts)[0]
         if len(rest_det)==0: break
