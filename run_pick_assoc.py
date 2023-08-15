@@ -57,6 +57,7 @@ associator = associator_pal.TS_Assoc(\
     min_sta = cfg.min_sta,
     ot_dev = cfg.ot_dev,
     max_res = cfg.max_res,
+    max_drop = cfg.max_drop, 
     vp = cfg.vp)
 out_root = os.path.split(args.out_ctlg)[0]
 if not os.path.exists(out_root): os.makedirs(out_root)
