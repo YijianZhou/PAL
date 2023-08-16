@@ -1,6 +1,6 @@
-# PAL
+# PAL 3.0
 
-PAL is an earthquake detection and location architecture. <br>
+PAL is an earthquake detection and location architecture.  
   
 - **PAL Workflow**
 1. phase **P**icking
