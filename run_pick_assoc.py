@@ -48,7 +48,7 @@ picker = picker_pal.STA_LTA_Kurtosis(\
     det_gap = cfg.det_gap,
     to_prep = cfg.to_prep,
     freq_band = cfg.freq_band)
-associator = associator_pal.TS_Assoc(\
+associator = associator_pal.PS_Pair_Assoc(\
     sta_dict,
     xy_margin = cfg.xy_margin,
     xy_grid = cfg.xy_grid, 
