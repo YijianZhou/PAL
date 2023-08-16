@@ -24,7 +24,7 @@ if __name__ == '__main__':
                         default='./output/phase.tmp')
     args = parser.parse_args()
 
-# define func
+# PAL config
 cfg = config.Config()
 get_picks = cfg.get_picks
 sta_dict = cfg.get_sta_dict(args.sta_file)
@@ -57,9 +57,7 @@ for day_idx in range(num_day):
     date = start_date + day_idx*86400
     picks = get_picks(date, args.pick_dir)
     picks = picks[[net_sta in sta_dict for net_sta in picks['net_sta']]]
-    # 2. associate picks: picks --> event_picks & event_loc
+    # 2. associate picks: picks --> events
     associator.associate(picks, out_ctlg, out_pha)
-
-# finish making catalog
 out_pha.close()
 out_ctlg.close()

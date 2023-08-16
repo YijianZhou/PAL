@@ -27,7 +27,6 @@ if __name__ == '__main__':
                         default='./output/picks')
     args = parser.parse_args()
 
-
 # PAL config
 cfg = config.Config()
 get_data_dict = cfg.get_data_dict
@@ -59,6 +58,8 @@ associator = associator_pal.TS_Assoc(\
     max_res = cfg.max_res,
     max_drop = cfg.max_drop, 
     vp = cfg.vp)
+
+# i/o paths
 out_root = os.path.split(args.out_ctlg)[0]
 if not os.path.exists(out_root): os.makedirs(out_root)
 if not os.path.exists(args.out_pick_dir): os.makedirs(args.out_pick_dir)
@@ -87,9 +88,7 @@ for day_idx in range(num_days):
         picks_i = picker.pick(stream, out_pick)
         picks = picks_i if i==0 else np.append(picks, picks_i)
     out_pick.close()
-    # 2. associate picks: picks --> event_picks & event_loc
+    # 2. associate picks: picks --> events
     associator.associate(picks, out_ctlg, out_pha)
-
-# finish making catalog
 out_pha.close()
 out_ctlg.close()
