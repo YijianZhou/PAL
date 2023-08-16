@@ -1,7 +1,7 @@
 import numpy as np
 
-class TS_Assoc(object):
-  """ Associate picks by searching ot (time, T) and loc (space, S) clustering
+class PSP_Assoc(object):
+  """ Associate P- & S-pick Pairs (PSP) by searching ot and loc clustering
   Inputs
     sta_dict: station location dict
     xy_margin: ratio of lateral (x-y) margin relative to the station range
@@ -14,7 +14,7 @@ class TS_Assoc(object):
     *note: lateral distance (x-y) in degree; depth in km; elevation in m
   Usage
     import associator_pal
-    associator = associator_pal.TS_Assoc(sta_dict)
+    associator = associator_pal.PSP_Assoc(sta_dict)
     associator.associate(picks, out_ctlg, out_pha)
   """
   def __init__(self,
@@ -27,16 +27,16 @@ class TS_Assoc(object):
                max_res   = 1.5,
                max_drop  = 1, 
                min_sta   = 4):
-    self.sta_dict  = sta_dict
+    self.sta_dict = sta_dict
     self.xy_margin = xy_margin
-    self.xy_grid   = xy_grid
-    self.z_grids   = z_grids
-    self.vp        = vp
-    self.ot_dev    = ot_dev
-    self.max_res   = max_res
-    self.max_drop  = max_drop
-    self.min_sta   = min_sta
-    self.tt_dict   = self.calc_tt()
+    self.xy_grid = xy_grid
+    self.z_grids = z_grids
+    self.vp = vp
+    self.ot_dev = ot_dev
+    self.max_res = max_res
+    self.max_drop = max_drop
+    self.min_sta = min_sta
+    self.tt_dict = self.calc_tt()
 
   def associate(self, picks, out_ctlg=None, out_pha=None):
     events_loc, events_pick = [], []
@@ -132,7 +132,7 @@ class TS_Assoc(object):
                  'res': round(res,1)}
     return event_loc, event_pick, assoc_idx, drop_idx
 
-  # calc time table
+  # calc P travel time table
   def calc_tt(self):
     print('making time table')
     tt_dict = {}
@@ -162,7 +162,6 @@ class TS_Assoc(object):
     self.lat_min, self.lon_min = lat_min, lon_min
     return tt_dict
 
-  # calc mag with picks (s_amp)
   def calc_mag(self, event_pick, event_loc):
     num_sta = len(event_pick)
     mag = -np.ones(num_sta)
@@ -183,7 +182,6 @@ class TS_Assoc(object):
     event_loc['mag'] = round(np.median(mag),2)
     return event_loc
 
-  # write event loc into catalog
   def write_catalog(self, event_loc, out_ctlg):
     ot  = event_loc['evt_ot']
     lon = event_loc['evt_lon']
@@ -192,7 +190,6 @@ class TS_Assoc(object):
     mag = event_loc['mag'] if 'mag' in event_loc else -1
     out_ctlg.write('{},{},{},{},{}\n'.format(ot, lat, lon, dep, mag))
 
-  # write sta phase into phase file
   def write_phase(self, event_loc, event_pick, out_pha):
     ot  = event_loc['evt_ot']
     lon = event_loc['evt_lon']
