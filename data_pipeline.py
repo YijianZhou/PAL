@@ -83,9 +83,7 @@ def get_picks(date, pick_dir):
              ('sta_ot','O'),
              ('tp','O'),
              ('ts','O'),
-             ('s_amp','O'),
-             ('p_snr','O'),
-             ('freq_dom','O')]
+             ('s_amp','O')]
     fname = str(date.date) + '.pick'
     pick_path = os.path.join(pick_dir, fname)
     if not os.path.exists(pick_path): return np.array([], dtype=dtype)
@@ -93,9 +91,9 @@ def get_picks(date, pick_dir):
     for line in lines:
         codes = line.split(',')
         net_sta = codes[0]
-        sta_ot, tp, ts = [UTCDateTime(t) for t in codes[1:4]]
-        amp, p_snr, fd = [float(x) for x in codes[4:7]]
-        picks.append((net_sta, sta_ot, tp, ts, amp, p_snr, fd))
+        sta_ot, tp, ts = [UTCDateTime(code) for code in codes[1:4]]
+        s_amp = float(codes[4])
+        picks.append((net_sta, sta_ot, tp, ts, s_amp))
     return np.array(picks, dtype=dtype)
 
 # get CERP picks (for assoc)
@@ -120,8 +118,8 @@ def get_cerp_picks(date, pick_dir):
 
 def calc_ot(tp, ts):
     vp, vs = 5.9, 3.4
-    d = (ts-tp) / (1/vs - 1/vp)
-    tt_p = d / vp
+    dist = (ts-tp) / (1/vs - 1/vp)
+    tt_p = dist / vp
     return tp - tt_p
 
 """ customized data_pipelines
