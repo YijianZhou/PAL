@@ -80,7 +80,7 @@ for day_idx in range(num_days):
     for net_sta in todel: data_dict.pop(net_sta)
     if data_dict=={}: continue
     # 1. phase picking: waveform --> picks
-    fpick_path = os.path.join(args.out_pick_dir, str(date.date)+'.pick')
+    fpick_path = os.path.join(args.out_pick_dir, '%s.pick'%date.date)
     out_pick = open(fpick_path,'w')
     for i, st_paths in enumerate(data_dict.values()):
         print('-'*40)
