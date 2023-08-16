@@ -24,12 +24,11 @@ if __name__ == '__main__':
                         default='./output/phase.tmp')
     args = parser.parse_args()
 
-
 # define func
 cfg = config.Config()
 get_picks = cfg.get_picks
 sta_dict = cfg.get_sta_dict(args.sta_file)
-associator = associator_pal.TS_Assoc(\
+associator = associator_pal.PS_Pair_Assoc(\
     sta_dict,
     xy_margin = cfg.xy_margin,
     xy_grid = cfg.xy_grid,
@@ -39,6 +38,7 @@ associator = associator_pal.TS_Assoc(\
     max_res = cfg.max_res,
     max_drop = cfg.max_drop,
     vp = cfg.vp)
+
 # i/o paths
 out_root = os.path.split(args.out_ctlg)[0]
 if not os.path.exists(out_root): os.makedirs(out_root)
