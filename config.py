@@ -22,20 +22,17 @@ class Config(object):
     self.det_gap    = 5.            # time gap between detections
     self.to_prep    = True          # whether to preprocess the raw data
     self.freq_band  = [1,20]        # frequency band 
-
     # 2. assoc params
-    self.min_sta    = 4             # min num of stations to assoc
-    self.ot_dev     = 2.            # max time deviation for ot assoc
-    self.max_res    = 1.5           # max P res for loc assoc
-    self.max_drop   = 1             # max num of drop of each pick
-    self.xy_margin  = 0.1           # ratio of lateral margin, relative to sta range
-    self.xy_grid    = 0.02          # lateral grid width, in degree
+    self.min_sta    = 4                  # min num of stations to assoc
+    self.ot_dev     = 2.                 # max time deviation for ot assoc
+    self.max_res    = 1.5                # max P res for loc assoc
+    self.max_drop   = 1                  # max num of drop of each pick
+    self.xy_margin  = 0.1                # ratio of lateral margin, relative to sta range
+    self.xy_grid    = 0.02               # lateral grid width, in degree
     self.z_grids    = np.arange(2,20,3)  # z (dep) grids
-    self.vp         = 5.9           # averaged P velocity
-
-    # 3. data interface
+    self.vp         = 5.9                # averaged P velocity
+    # 3. data pipeline
     self.get_data_dict = dp.get_data_dict
     self.get_sta_dict = dp.get_sta_dict
     self.get_picks = dp.get_picks
     self.read_data = dp.read_data
-
