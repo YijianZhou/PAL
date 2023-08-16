@@ -16,23 +16,23 @@ class Config(object):
     self.pca_win    = 1.            # win_len for PCA filter
     self.pca_range  = [0.,2.]       # time range to apply PCA filter
     self.fd_thres   = 2.5           # min value of dominant frequency
+    self.snr_ratio_thres = 10       # max value of SNR ratio after peak rm
+    self.amp_ratio_thres = [10,2]   # max value of amp ratio for P/P_tail & S
     self.amp_win    = [1.,4.]       # time win to get S amplitude
     self.det_gap    = 5.            # time gap between detections
     self.to_prep    = True          # whether to preprocess the raw data
-    self.freq_band  = [2,40]        # frequency band 
-
+    self.freq_band  = [1,20]        # frequency band 
     # 2. assoc params
-    self.min_sta    = 4             # min num of sta to assoc
-    self.ot_dev     = 2.            # max time deviation for ot assoc
-    self.max_res    = 1.5           # max P res for loc assoc
-    self.xy_margin  = 0.1           # xy (lateral) range inferred from sta loc
-    self.xy_grid    = 0.02          # xy (lateral) grid size (in degree)
+    self.min_sta    = 4                  # min num of stations to assoc
+    self.ot_dev     = 2.                 # max time deviation for ot assoc
+    self.max_res    = 1.5                # max P res for loc assoc
+    self.max_drop   = 1                  # max num of drop of each pick
+    self.xy_margin  = 0.1                # ratio of lateral margin, relative to sta range
+    self.xy_grid    = 0.02               # lateral grid width, in degree
     self.z_grids    = np.arange(2,20,3)  # z (dep) grids
-    self.vp         = 5.9           # averaged P velocity
-
-    # 3. data interface
+    self.vp         = 5.9                # averaged P velocity
+    # 3. data pipeline
     self.get_data_dict = dp.get_data_dict
     self.get_sta_dict = dp.get_sta_dict
     self.get_picks = dp.get_picks
     self.read_data = dp.read_data
-
