@@ -29,7 +29,6 @@ class STA_LTA_Kurtosis(object):
     picker = picker_pal.STA_LTA_Kurtosis()
     picks = picker.pick(stream)
   """
-
   def __init__(self, 
                win_sta         = [.8, 0.4, 1.],
                win_lta         = [6., 2., 2.],
@@ -62,9 +61,8 @@ class STA_LTA_Kurtosis(object):
     self.to_prep = to_prep
     self.freq_band = freq_band
 
-
   def pick(self, stream, out_file=None):
-    # set output format
+    # set output format for picks
     dtype = [('net_sta','O'),
              ('sta_ot','O'),
              ('tp','O'),
@@ -167,12 +165,12 @@ class STA_LTA_Kurtosis(object):
             ts0_idx = tp_idx + dt_peak//2 + dt_min + kurt_max
             ts_idx = ts0_idx - self.find_second_peak(data_s[0:s_idx0+win_kurt_npts[1]+kurt_max][::-1])
         ts = start_time + ts_idx / samp_rate
-        # 3 get related S amplitude
+        # 3. get related S amplitude
         data_amp = st_data[:, tp_idx-amp_win_npts[0] : ts_idx+amp_win_npts[1]].copy()
         s_amp = self.get_s_amp(data_amp, samp_rate)
-        # 4 get p_snr
+        # 4. get p_snr
         p_snr = np.amax(cf_trig[p_idx0:p_idx1])
-        # 5 calc dominant frequency & amp ratio
+        # 5. calc dominant frequency & amp ratio
         st = stream.slice(min(tp, ts), max(tp+(ts-tp)/2, tp+self.win_sta[0])).copy()
         fd = max([self.calc_freq_dom(tr.data, samp_rate) for tr in st])
         A1 = np.array([np.amax(tr.data)-np.amin(tr.data) for tr in stream.slice(tp, tp+(ts-tp)/2)])
@@ -180,7 +178,7 @@ class STA_LTA_Kurtosis(object):
         A3 = np.array([np.amax(tr.data)-np.amin(tr.data) for tr in stream.slice(ts, ts+(ts-tp)/2)])
         A12 = min([A1[ii]/A2[ii] for ii in range(3)])
         A13 = min([A1[ii]/A3[ii] for ii in range(3)])
-        # output
+        # output picks
         if tp<ts and fd>self.fd_thres and A12<self.amp_ratio_thres[0] and A13<self.amp_ratio_thres[1]:
             print('{}, {}, {}'.format(net_sta, tp, ts))
             sta_ot = self.calc_ot(tp, ts)
