@@ -1,7 +1,7 @@
 import numpy as np
 
-class PSP_Assoc(object):
-  """ Associate P- & S-pick Pairs (PSP) by searching ot and loc clustering
+class PS_Pair_Assoc(object):
+  """ Associate P- & S-pick Pairs by searching ot and loc clustering
   Inputs
     sta_dict: station location dict
     xy_margin: ratio of lateral (x-y) margin relative to the station range
@@ -14,7 +14,7 @@ class PSP_Assoc(object):
     *note: lateral distance (x-y) in degree; depth in km; elevation in m
   Usage
     import associator_pal
-    associator = associator_pal.PSP_Assoc(sta_dict)
+    associator = associator_pal.PS_Pair_Assoc(sta_dict)
     associator.associate(picks, out_ctlg, out_pha)
   """
   def __init__(self,
