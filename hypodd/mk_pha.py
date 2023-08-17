@@ -74,5 +74,5 @@ for line in lines:
         tts = ts - ot
         for idx in fout_idx: fouts[idx].write('{:<5}{}{:6.3f}  {:6.3f}   S\n'.format(sta, ' '*6, tts, ws))
 
-np.save('input/evid_lists.npy', evid_lists)
+np.save('input/evid_lists.npy', np.array(evid_lists, dtype=object))
 for fout in fouts: fout.close()
