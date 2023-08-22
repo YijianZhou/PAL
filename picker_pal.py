@@ -164,7 +164,7 @@ class STA_LTA_Kurtosis(object):
             kurt_max = np.argmax(kurt_short) if np.argmax(kurt_short)>0 else dt_max-dt_min
             ts0_idx = tp_idx + dt_peak//2 + dt_min + kurt_max
             ts_idx = ts0_idx - self.find_second_peak(data_s[0:s_idx0+win_kurt_npts[1]+kurt_max][::-1])
-        ts = start_time + ts_idx / samp_rate
+        ts = start_time + ts_idx / samp_rate if ts_idx>tp_idx else start_time + ts0_idx / samp_rate
         # 3. get related S amplitude
         data_amp = st_data[:, tp_idx-amp_win_npts[0] : ts_idx+amp_win_npts[1]].copy()
         s_amp = self.get_s_amp(data_amp, samp_rate)
