@@ -125,7 +125,7 @@ class STA_LTA_Kurtosis(object):
             slide_idx = rest_det[0]; continue
         # refine initial pick on waveform
         tp_idx = tp0_idx - self.find_second_peak(data_p[0:tp0_idx-p_idx0][::-1])
-        tp = start_time + tp_idx / samp_rate
+        tp = start_time + tp_idx/samp_rate
         # 2.2 pick S 
         # 2.2.1 pca for amp_peak
         if len(st_data[0]) < tp_idx + s_win_npts: break
@@ -164,7 +164,7 @@ class STA_LTA_Kurtosis(object):
             kurt_max = np.argmax(kurt_short) if np.argmax(kurt_short)>0 else dt_max-dt_min
             ts0_idx = tp_idx + dt_peak//2 + dt_min + kurt_max
             ts_idx = ts0_idx - self.find_second_peak(data_s[0:s_idx0+win_kurt_npts[1]+kurt_max][::-1])
-        ts = start_time + ts_idx / samp_rate if ts_idx>tp_idx else start_time + ts0_idx / samp_rate
+        ts = start_time + ts_idx/samp_rate if ts_idx>tp_idx else start_time + ts0_idx/samp_rate
         # 3. get related S amplitude
         data_amp = st_data[:, tp_idx-amp_win_npts[0] : ts_idx+amp_win_npts[1]].copy()
         s_amp = self.get_s_amp(data_amp, samp_rate)
@@ -179,7 +179,7 @@ class STA_LTA_Kurtosis(object):
         A12 = min([A1[ii]/A2[ii] for ii in range(3)])
         A13 = min([A1[ii]/A3[ii] for ii in range(3)])
         # output picks
-        if tp<ts and fd>self.fd_thres and A12<self.amp_ratio_thres[0] and A13<self.amp_ratio_thres[1]:
+        if fd>self.fd_thres and A12<self.amp_ratio_thres[0] and A13<self.amp_ratio_thres[1]:
             print('{}, {}, {}'.format(net_sta, tp, ts))
             sta_ot = self.calc_ot(tp, ts)
             picks.append((net_sta, sta_ot, tp, ts, s_amp))
