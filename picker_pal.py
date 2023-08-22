@@ -171,7 +171,7 @@ class STA_LTA_Kurtosis(object):
         # 4. get p_snr
         p_snr = np.amax(cf_trig[p_idx0:p_idx1])
         # 5. calc dominant frequency & amp ratio
-        st = stream.slice(min(tp, ts), max(tp+(ts-tp)/2, tp+self.win_sta[0])).copy()
+        st = stream.slice(tp, max(tp+(ts-tp)/2, tp+self.pca_win)).copy()
         fd = max([self.calc_freq_dom(tr.data, samp_rate) for tr in st])
         A1 = np.array([np.amax(tr.data)-np.amin(tr.data) for tr in stream.slice(tp, tp+(ts-tp)/2)])
         A2 = np.array([np.amax(tr.data)-np.amin(tr.data) for tr in stream.slice(tp+(ts-tp)/2, ts)])
