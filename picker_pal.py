@@ -302,6 +302,11 @@ class STA_LTA_Kurtosis(object):
     for trace in stream:
         trace.data[np.isnan(trace.data)] = 0
         trace.data[np.isinf(trace.data)] = 0
+    # check missed chn
+    if max(stream.max())==0: return []
+    if 0 in stream.max():
+        is_miss = np.array(stream.max()==0)
+        for ii in np.where(is_miss)[0]: stream[ii] = stream[np.where(~is_miss)[0][-1]].copy()
     # fill data gap
     max_gap_npts = int(max_gap*stream[0].stats.sampling_rate)
     for trace in stream:
