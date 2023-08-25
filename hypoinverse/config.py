@@ -17,7 +17,6 @@ class Config(object):
     # 3. sum2csv: format output files
     self.ref_ele = 2.5 # ref ele for CRE mod (max sta ele)
     self.grd_ele = 1.5 # typical station elevation
-    self.fsums = 'output/%s-*.sum'%self.ctlg_code
     self.out_ctlg = 'output/%s.ctlg'%self.ctlg_code
     self.out_pha = 'output/%s.pha'%self.ctlg_code
     self.out_pha_full = 'output/%s_full.pha'%self.ctlg_code
