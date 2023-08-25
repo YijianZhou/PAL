@@ -298,10 +298,11 @@ class STA_LTA_Kurtosis(object):
     end_time = min([trace.stats.endtime for trace in stream])
     if start_time > end_time: return []
     stream = stream.slice(start_time, end_time, nearest_sample=True)
-    # fill data gap
+    # remove nan & inf
     for trace in stream:
         trace.data[np.isnan(trace.data)] = 0
         trace.data[np.isinf(trace.data)] = 0
+    # fill data gap
     max_gap_npts = int(max_gap*stream[0].stats.sampling_rate)
     for trace in stream:
         data = trace.data
