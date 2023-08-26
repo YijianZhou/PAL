@@ -10,7 +10,6 @@ ctlg_code = cfg.ctlg_code
 grd_ele = cfg.grd_ele # typical station elevation
 lat_code = cfg.lat_code
 lon_code = cfg.lon_code
-fsums = glob.glob('output/%s-*.sum'%ctlg_code)
 out_ctlg = open(cfg.out_ctlg,'w')
 out_sum = open(cfg.out_sum,'w')
 out_bad = open(cfg.out_bad,'w')
@@ -36,7 +35,7 @@ def write_csv(fout, line, evid, is_full=False):
 
 # read sum files
 sum_dict = {}
-for fsum in fsums:
+for fsum in glob.glob('output/%s-*.sum'%ctlg_code):
     f=open(fsum); sum_lines=f.readlines(); f.close()
     for sum_line in sum_lines:
         evid = sum_line.split()[-1]
