@@ -7,7 +7,6 @@ import config
 # i/o paths
 cfg = config.Config()
 grd_ele = cfg.grd_ele # typical station elevation
-mag_corr = cfg.mag_corr # hypoInv do not support neg mag
 lat_code = cfg.lat_code
 lon_code = cfg.lon_code
 fsums = glob.glob(cfg.fsums)
@@ -19,7 +18,7 @@ out_pha = open(cfg.out_pha,'w')
 out_pha_full = open(cfg.out_pha_full,'w')
 
 
-def write_csv(fout, line, evid=None):
+def write_csv(fout, line, evid, is_full=False):
     codes = line.split()
     date, hrmn, sec = codes[0:3]
     dtime = date + hrmn + sec.zfill(5)
@@ -30,27 +29,29 @@ def write_csv(fout, line, evid=None):
     lon_min = float(line[33:38])
     lon = lon_deg + lon_min/60 if lon_code=='E' else -lon_deg - lon_min/60
     dep = float(line[38:44])
-    mag = float(line[48:52]) - mag_corr
-    if evid: fout.write('{},{:.4f},{:.4f},{:.1f},{:.2f},{}\n'.format(dtime, lat, lon, dep+grd_ele, mag, evid))
+    mag = mag_dict[evid]
+    if is_full: fout.write('{},{:.4f},{:.4f},{:.1f},{:.2f},{}\n'.format(dtime, lat, lon, dep+grd_ele, mag, evid))
     else: fout.write('{},{:.4f},{:.4f},{:.1f},{:.2f}\n'.format(dtime, lat, lon, dep+grd_ele, mag))
-
 
 # read sum files
 sum_dict = {}
 for fsum in fsums:
-  f=open(fsum); sum_lines=f.readlines(); f.close()
-  for sum_line in sum_lines:
-    evid = sum_line.split()[-1]
-    if evid not in sum_dict: sum_dict[evid] = [sum_line]
-    else: sum_dict[evid].append(sum_line)
+    f=open(fsum); sum_lines=f.readlines(); f.close()
+    for sum_line in sum_lines:
+        evid = sum_line.split()[-1]
+        if evid not in sum_dict: sum_dict[evid] = [sum_line]
+        else: sum_dict[evid].append(sum_line)
 
 # read PAL pha
-pha_dict = {}
+pha_dict, mag_dict = {}, {}
 evid=0
 f=open(cfg.fpha); lines=f.readlines(); f.close()
 for line in lines:
     codes = line.split(',')
-    if len(codes[0])>14: pha_dict[str(evid)] = []; evid+=1
+    if len(codes[0])>10:
+        pha_dict[str(evid)] = []
+        mag_dict[str(evid)] = float(codes[4])
+        evid += 1
     else: pha_dict[str(evid-1)].append(line)
 
 
@@ -72,15 +73,15 @@ for evid, sum_lines in sum_dict.items():
     sum_list_loc = sum_list[sum_list['is_loc']==1]
     num_loc = len(sum_list_loc)
     # if no reliable loc
-    if num_loc==0: 
+    if num_loc==0:
         sum_list_loc = sum_list
-        write_csv(out_bad, sum_list_loc[0]['line'])
+        write_csv(out_bad, sum_list_loc[0]['line'], evid)
     else:
-        write_csv(out_good, sum_list_loc[0]['line'])
-    write_csv(out_ctlg, sum_list_loc[0]['line'])
+        write_csv(out_good, sum_list_loc[0]['line'], evid)
+    write_csv(out_ctlg, sum_list_loc[0]['line'], evid)
     out_sum.write(sum_list_loc[0]['line'])
-    write_csv(out_pha, sum_list_loc[0]['line'])
-    write_csv(out_pha_full, sum_list_loc[0]['line'], evid)
+    write_csv(out_pha, sum_list_loc[0]['line'], evid)
+    write_csv(out_pha_full, sum_list_loc[0]['line'], evid, True)
     pha_lines = pha_dict[evid]
     for pha_line in pha_lines: 
         out_pha.write(pha_line)

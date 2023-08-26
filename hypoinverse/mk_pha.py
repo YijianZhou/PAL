@@ -9,7 +9,6 @@ cfg = config.Config()
 fout = open('input/phase.dat','w')
 lat_code = cfg.lat_code
 lon_code = cfg.lon_code
-mag_corr = cfg.mag_corr # hypoInv do not support neg mag
 p_wht = cfg.p_wht
 s_wht = cfg.s_wht
 
@@ -27,7 +26,7 @@ for i,line in enumerate(lines):
     ot, lat, lon, _, mag = codes[0:5]
     ot = UTCDateTime(ot)
     date, time = split_datetime(ot)
-    mag = max(float(mag) + mag_corr, 0.) if not np.isnan(float(mag)) else 0
+    mag = 0  # output mag is directly passed from input
     lat = abs(float(lat))
     lon = abs(float(lon))
     lon_deg = int(lon)

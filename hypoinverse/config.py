@@ -13,7 +13,6 @@ class Config(object):
     self.lon_code = 'W'
     # 2. mk_pha: format phase file
     self.fpha = 'input/eg_pal.pha'
-    self.mag_corr = 2. # hypoInv do not support neg mag
     # 3. sum2csv: format output files
     self.ref_ele = 2.5 # ref ele for CRE mod (max sta ele)
     self.grd_ele = 1.5 # typical station elevation
