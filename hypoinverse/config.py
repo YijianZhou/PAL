@@ -33,6 +33,6 @@ class Config(object):
     self.dist_init = '1 50 1 2'
     self.dist_wht = '4 20 1 3'
     self.wht_code = '1 0.6 0.3 0.2'
-    self.pmod = 'input/example_p.cre'
-    self.smod = [None, 'input/example_s.cre'][0]
+    self.pmod = 'input/velo_p_eg.cre'
+    self.smod = [None, 'input/velo_s_eg.cre'][0]
     self.pos = 1.73 # provide smod or pos
