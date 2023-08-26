@@ -6,10 +6,11 @@ import config
 
 # i/o paths
 cfg = config.Config()
+ctlg_code = cfg.ctlg_code
 grd_ele = cfg.grd_ele # typical station elevation
 lat_code = cfg.lat_code
 lon_code = cfg.lon_code
-fsums = glob.glob(cfg.fsums)
+fsums = 'output/%s-*.sum'%ctlg_code
 out_ctlg = open(cfg.out_ctlg,'w')
 out_sum = open(cfg.out_sum,'w')
 out_bad = open(cfg.out_bad,'w')
@@ -54,9 +55,8 @@ for line in lines:
         evid += 1
     else: pha_dict[str(evid-1)].append(line)
 
-
+# merge sum lines
 for evid, sum_lines in sum_dict.items():
-    # merge sum lines
     sum_list = []
     dtype = [('line','O'),('is_loc','O'),('qua','O'),('azm','O'),('npha','O'),('rms','O')]
     for sum_line in sum_lines:
