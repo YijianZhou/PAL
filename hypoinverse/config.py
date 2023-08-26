@@ -8,7 +8,7 @@ class Config(object):
 
     self.ctlg_code = 'eg_pal_hyp'
     # i/o paths
-    self.fsta = 'input/example_pal.sta'
+    self.fsta = 'input/example_pal_format1.sta'
     self.fpha = 'input/eg_pal.pha'
     self.out_ctlg = 'output/%s.ctlg'%self.ctlg_code
     self.out_pha = 'output/%s.pha'%self.ctlg_code
