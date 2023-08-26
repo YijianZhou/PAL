@@ -1,9 +1,8 @@
 """ Run hypoInverse (main function)
   Usage:
-    1. modify template hyp control file (if necessary)
-    2. manually write velo mod (e.g., CRE file), include ref ele if necessary
-    3. set i/o paths & weighting params in config file
-    4. python run_hyp.py
+    1. manually write velo mod (e.g., CRE file), include ref ele if necessary
+    2. set i/o paths & weighting params in config file
+    3. python run_hyp.py
   Output:
     csv catalog & phase
     sum file (hyp)
@@ -14,24 +13,25 @@ import multiprocessing as mp
 import subprocess
 import config
 
-# i/o paths
+# set config
 cfg = config.Config()
 ctlg_code = cfg.ctlg_code
 ztr_rng = cfg.ztr_rng
 ref_ele = cfg.ref_ele
-fhyp_temp = cfg.fhyp_temp
 fsums = 'output/%s-*.sum'%ctlg_code
 keep_fsums = cfg.keep_fsums
+get_prt = cfg.get_prt
+get_arc = cfg.get_arc
 pmod = cfg.pmod
 smod = cfg.smod
 pos = cfg.pos
-get_prt = cfg.get_prt
-get_arc = cfg.get_arc
-num_workers = cfg.num_workers
+if not pos and not smod: print('Provide pos or smod')
+fhyp_temp = 'temp_hyp/temp_vp-pos.hyp' if pos else 'temp_hyp/temp_vp-vs.hyp'
 rms_wht = cfg.rms_wht
 dist_init = cfg.dist_init
 dist_wht = cfg.dist_wht
 wht_code = cfg.wht_code
+num_workers = cfg.num_workers
 
 # format input
 print('formatting input station file')
