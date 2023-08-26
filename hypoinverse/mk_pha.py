@@ -23,7 +23,7 @@ for i,line in enumerate(lines):
   codes = line.split(',')
   if len(codes[0])>10:
     # write head line
-    ot, lat, lon, _, mag = codes[0:5]
+    ot, lat, lon = codes[0:3]
     ot = UTCDateTime(ot)
     date, time = split_datetime(ot)
     mag = 0  # output mag is directly passed from input
