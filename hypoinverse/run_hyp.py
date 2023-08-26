@@ -18,7 +18,7 @@ cfg = config.Config()
 ctlg_code = cfg.ctlg_code
 ztr_rng = cfg.ztr_rng
 ref_ele = cfg.ref_ele
-fsums = glob.glob('output/%s-*.sum'%ctlg_code)
+fsums_str = 'output/%s-*.sum'%ctlg_code
 keep_fsums = cfg.keep_fsums
 get_prt = cfg.get_prt
 get_arc = cfg.get_arc
@@ -38,7 +38,7 @@ print('formatting input station file')
 os.system('python mk_sta.py')
 print('formatting input phase file')
 os.system('python mk_pha.py')
-for fsum in fsums: os.unlink(fsum)
+for fsum in glob.glob(fsums_str): os.unlink(fsum)
 
 def run_hyp(ztr):
     # 1. set control file
@@ -81,5 +81,5 @@ os.system('python sum2csv.py')
 for fname in glob.glob('fort.*'): os.unlink(fname)
 for fname in glob.glob('input/%s-*.hyp'%ctlg_code): os.unlink(fname)
 if not keep_fsums:
-    for fsum in fsums: os.unlink(fsum)
+    for fsum in glob.glob(fsums_str): os.unlink(fsum)
 
