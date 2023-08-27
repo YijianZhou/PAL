@@ -1,17 +1,17 @@
 import os, shutil
 from obspy import UTCDateTime
 
-# parallel params
+# i/o paths
 pal_dir = '/home/zhouyj/software/PAL'
 shutil.copyfile('config_eg.py', os.path.join(pal_dir, 'config.py'))
-data_dir = '/data/Example_data'
-time_range = '20190704-20190707'
 sta_file = 'input/example_pal_format1.sta'
-num_workers = 3
+data_dir = '/data/Example_data'
 out_root = 'output/eg'
-out_pick_dir = 'output/eg/picks'
+out_pick_dir = os.path.join(out_root, 'picks')
+# parallel params
+time_range = '20190704-20190707'
+num_workers = 3
 
-# divide by time
 start_date, end_date = [UTCDateTime(date) for date in time_range.split('-')]
 dt = (end_date - start_date) / num_workers
 for proc_idx in range(num_workers):
