@@ -1,4 +1,4 @@
-# PAL 3.0
+# PAL 3.x
 
 PAL is an earthquake detection and location architecture.  
   
