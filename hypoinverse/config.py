@@ -22,17 +22,17 @@ class Config(object):
     # geo ref
     self.lat_code = 'N'
     self.lon_code = 'W'
-    self.ref_ele = 2.5 # ref ele for CRE mod (max sta ele)
-    self.grd_ele = 1.5 # typical station elevation
+    self.ref_ele = 2.5  # ref ele for CRE mod (max sta ele)
+    self.grd_ele = 1.5  # typical station elevation
     # loc params
     self.num_workers = 10
     self.ztr_rng = np.arange(0,20,1)
-    self.p_wht = 0 # weight code index
+    self.p_wht = 0  # weight code index
     self.s_wht = 1
     self.rms_wht = '4 0.3 1 3'
-    self.dist_init = '1 50 1 2'
-    self.dist_wht = '4 20 1 3'
+    self.dist_init = '1 60 1 2'
+    self.dist_wht = '4 40 1 3'
     self.wht_code = '1 0.6 0.3 0.2'
     self.pmod = 'input/velo_p_eg.cre'
     self.smod = [None, 'input/velo_s_eg.cre'][0]
-    self.pos = 1.73 # provide smod or pos
+    self.pos = 1.73  # provide smod or pos
