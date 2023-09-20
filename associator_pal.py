@@ -73,7 +73,7 @@ class PS_Pair_Assoc(object):
             if out_ctlg: self.write_catalog(event_loc_mag, out_ctlg)
             if out_pha: self.write_phase(event_loc_mag, event_pick, out_pha)
             events_loc.append(event_loc_mag)
-            event_pick.append(event_pick)
+            events_pick.append(event_pick)
         # del picks that are associated or dropped to many times
         drop_idx = np.array(drop_idx, dtype=np.int32) + to_assoc_idx[0]
         assoc_idx = np.array(assoc_idx, dtype=np.int32) + to_assoc_idx[0]
