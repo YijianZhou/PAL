@@ -96,8 +96,8 @@ def get_picks(date, pick_dir):
         picks.append((net_sta, sta_ot, tp, ts, s_amp))
     return np.array(picks, dtype=dtype)
 
-# get CERP picks (for assoc)
-def get_cerp_picks(date, pick_dir):
+# get RSeL picks (for assoc)
+def get_rsel_picks(date, pick_dir):
     picks = []
     dtype = [('net_sta','O'),
              ('sta_ot','O'),
