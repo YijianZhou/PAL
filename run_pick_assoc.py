@@ -14,17 +14,17 @@ warnings.filterwarnings("ignore")
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str,
-                        default='/data2/ZSY_SAC')
+                        default='/data/Example_data')
     parser.add_argument('--time_range', type=str,
-                        default='20171003-20171004')
+                        default='20190704-20190707')
     parser.add_argument('--sta_file', type=str,
-                        default='input/station.dat')
+                        default='input/example_pal_format1.sta')
     parser.add_argument('--out_ctlg', type=str,
-                        default='./output/tmp.ctlg')
+                        default='output/eg/catalog.dat')
     parser.add_argument('--out_pha', type=str,
-                        default='./output/tmp.pha')
+                        default='output/eg/phase.dat')
     parser.add_argument('--out_pick_dir', type=str,
-                        default='./output/picks')
+                        default='output/eg/picks')
     args = parser.parse_args()
 
 # PAL config
