@@ -41,7 +41,6 @@ picker = picker_pal.STA_LTA_Kurtosis(\
     pca_win = cfg.pca_win, 
     pca_range = cfg.pca_range,
     fd_thres = cfg.fd_thres,
-    snr_ratio_thres = cfg.snr_ratio_thres,
     amp_ratio_thres = cfg.amp_ratio_thres,
     amp_win = cfg.amp_win,
     win_kurt = cfg.win_kurt,

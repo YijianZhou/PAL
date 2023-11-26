@@ -14,8 +14,7 @@ class STA_LTA_Kurtosis(object):
     pca_win: time win for calc pca filter
     pca_range: time range for pca filter
     win_kurt: win for calc kurtosis
-    snr_ratio_thres: max value of snr ratio after peak rm
-    amp_ratio_thres: max value of amp ratio of P/P_tail & S
+    amp_ratio_thres: max value of amp ratio, peak_rm, P/P_tail, & P/S
     fd_trhes: min value of dominant frequency
     amp_win: time win to get S amplitude
     det_gap: time gap between detections
@@ -39,8 +38,7 @@ class STA_LTA_Kurtosis(object):
                pca_range       = [0., 2],
                win_kurt        = [5.,1.],
                fd_thres        = 2.5, 
-               snr_ratio_thres = 10, 
-               amp_ratio_thres = [10,2], 
+               amp_ratio_thres = [6,10,2], 
                amp_win         = [1.,5.],
                det_gap         = 5.,
                to_prep         = True,
@@ -54,7 +52,6 @@ class STA_LTA_Kurtosis(object):
     self.pca_range = pca_range
     self.win_kurt = win_kurt
     self.fd_thres = fd_thres
-    self.snr_ratio_thres = snr_ratio_thres
     self.amp_ratio_thres = amp_ratio_thres
     self.amp_win = amp_win
     self.det_gap = det_gap
@@ -108,21 +105,6 @@ class STA_LTA_Kurtosis(object):
         data_p = st_data[2,p_idx0:p_idx1]**2
         cf_p = self.calc_sta_lta(data_p, win_lta_npts[1], win_sta_npts[1])
         tp0_idx = np.argmax(cf_p) + p_idx0
-        # check potential glitch
-        data_clean = st_data[2,p_idx0:p_idx1].copy()
-        peak_idx0 = np.argmax(abs(data_clean))
-        peak_idx1 = peak_idx0 + self.find_first_peak(data_clean[peak_idx0:])
-        peak_idx0 -= self.find_second_peak(data_clean[0:peak_idx0][::-1])
-        peak_idx1 += self.find_second_peak(data_clean[peak_idx1:])+1
-        try: data_clean[peak_idx0:peak_idx1] = st_data[2, p_idx0+peak_idx1:p_idx0+2*peak_idx1-peak_idx0]
-        except: break
-        cf_p_clean = self.calc_sta_lta(data_clean**2, win_lta_npts[1], win_sta_npts[1])
-        snr_ratio = np.amax(cf_p) / np.amax(cf_p_clean)
-        if snr_ratio>self.snr_ratio_thres: 
-            # next detected phase
-            rest_det = np.where(trig_index > tp0_idx + det_gap_npts)[0] 
-            if len(rest_det)==0: break
-            slide_idx = rest_det[0]; continue
         # refine initial pick on waveform
         tp_idx = tp0_idx - self.find_second_peak(data_p[0:tp0_idx-p_idx0][::-1])
         tp = start_time + tp_idx/samp_rate
@@ -170,21 +152,24 @@ class STA_LTA_Kurtosis(object):
         s_amp = self.get_s_amp(data_amp, samp_rate)
         # 4. get p_snr
         p_snr = np.amax(cf_trig[p_idx0:p_idx1])
-        # 5. calc dominant frequency & amp ratio
+        # 5. quality control with dominant freq & amp ratio
         st = stream.slice(tp, max(tp+(ts-tp)/2, tp+self.pca_win)).copy()
         fd = max([self.calc_freq_dom(tr.data, samp_rate) for tr in st])
+        p_amp_ratio = self.calc_peak_amp_ratio(stream.slice(tp, tp+self.pca_win*3), pca_win_npts)
+        s_amp_ratio = self.calc_peak_amp_ratio(stream.slice(ts, ts+self.pca_win*3), pca_win_npts)
+        amp_ratio = max(min(p_amp_ratio), min(s_amp_ratio))
         A1 = np.array([np.amax(tr.data)-np.amin(tr.data) for tr in stream.slice(tp, tp+(ts-tp)/2)])
         A2 = np.array([np.amax(tr.data)-np.amin(tr.data) for tr in stream.slice(tp+(ts-tp)/2, ts)])
         A3 = np.array([np.amax(tr.data)-np.amin(tr.data) for tr in stream.slice(ts, ts+(ts-tp)/2)])
         A12 = min([A1[ii]/A2[ii] for ii in range(3)])
         A13 = min([A1[ii]/A3[ii] for ii in range(3)])
         # output picks
-        if fd>self.fd_thres and A12<self.amp_ratio_thres[0] and A13<self.amp_ratio_thres[1]:
+        if fd>self.fd_thres and amp_ratio<self.amp_ratio_thres[0] and A12<self.amp_ratio_thres[1] and A13<self.amp_ratio_thres[2]:
             print('{}, {}, {}'.format(net_sta, tp, ts))
             sta_ot = self.calc_ot(tp, ts)
             picks.append((net_sta, sta_ot, tp, ts, s_amp))
             if out_file: 
-                qual_code = '{:.1f},{:.1f},{:.1f},{:.1f},{:.1f}'.format(p_snr, fd, snr_ratio, A12, A13)
+                qual_code = '{:.1f},{:.1f},{:.1f},{:.1f},{:.1f}'.format(p_snr, fd, amp_ratio, A12, A13)
                 out_file.write('{},{},{},{},{},{}\n'.format(net_sta, sta_ot, tp, ts, s_amp, qual_code))
         # next detected phase
         rest_det = np.where(trig_index > max(trig_idx,ts_idx,tp_idx) + det_gap_npts)[0]
@@ -268,6 +253,19 @@ class STA_LTA_Kurtosis(object):
     for i in range(npts):
         kurt[i] = kurtosis(data[i:i+win_kurt_npts])
     return kurt
+
+  def calc_peak_amp_ratio(self, st, win_peak_npts):
+    amp_ratio = []
+    for tr in st:
+        idx0 = np.argmax(abs(tr.data[0:win_peak_npts]))
+        idx1 = idx0 + self.find_first_peak(tr.data[idx0:])
+        idx0 -= self.find_second_peak(tr.data[0:idx0][::-1])
+        idx1 += self.find_second_peak(tr.data[idx1:])+1
+        idx0 = max(0,idx0)
+        amp_peak = np.amax(tr.data[idx0:idx1]) - np.amin(tr.data[idx0:idx1])
+        amp_tail = np.amax(tr.data[idx1:2*idx1-idx0]) - np.amin(tr.data[idx1:2*idx1-idx0])
+        amp_ratio.append(amp_peak/amp_tail)
+    return amp_ratio
 
   def find_first_peak(self, data):
     npts = len(data)

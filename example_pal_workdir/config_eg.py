@@ -7,21 +7,20 @@ class Config(object):
   def __init__(self):
 
     # 1. picker params
-    self.win_sta    = [0.8,0.4,1.]  # win for STA: det, p, s
-    self.win_lta    = [6.,2.,2.]    # win for LTA: det, p, s
-    self.win_kurt   = [5.,1.]       # win for kurtosis: long & short
-    self.trig_thres = 12.           # threshold to trig picker (by energy)
-    self.p_win      = [.5,1.]       # search win for P 
-    self.s_win      = 10.           # search win for S 
-    self.pca_win    = 1.            # win_len for PCA filter
-    self.pca_range  = [0.,2.]       # time range to apply PCA filter
-    self.fd_thres   = 2.5           # min value of dominant frequency
-    self.snr_ratio_thres = 10       # max value of SNR ratio after peak rm
-    self.amp_ratio_thres = [10,2]   # max value of amp ratio for P/P_tail & S
-    self.amp_win    = [1.,4.]       # time win to get S amplitude
-    self.det_gap    = 5.            # time gap between detections
-    self.to_prep    = True          # whether to preprocess the raw data
-    self.freq_band  = [1,20]        # frequency band 
+    self.win_sta    = [0.8,0.4,1.]   # win for STA: det, p, s
+    self.win_lta    = [6.,2.,2.]     # win for LTA: det, p, s
+    self.win_kurt   = [5.,1.]        # win for kurtosis: long & short
+    self.trig_thres = 12.            # threshold to trig picker (by energy)
+    self.p_win      = [.5,1.]        # search win for P 
+    self.s_win      = 10.            # search win for S 
+    self.pca_win    = 1.             # win_len for PCA filter
+    self.pca_range  = [0.,2.]        # time range to apply PCA filter
+    self.fd_thres   = 2.5            # min value of dominant frequency
+    self.amp_ratio_thres = [6,10,2]  # max value of amp ratio for P/P_tail & S
+    self.amp_win    = [1.,4.]        # time win to get S amplitude
+    self.det_gap    = 5.             # time gap between detections
+    self.to_prep    = True           # whether to preprocess the raw data
+    self.freq_band  = [1,20]         # frequency band 
     # 2. assoc params
     self.min_sta    = 4                  # min num of stations to assoc
     self.ot_dev     = 2.                 # max time deviation for ot assoc
