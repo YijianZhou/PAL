@@ -255,13 +255,17 @@ class STA_LTA_Kurtosis(object):
     return kurt
 
   def calc_peak_amp_ratio(self, st, win_peak_npts):
+    # find peak idx
+    peak_data = np.array([abs(tr.data[0:win_peak_npts]) for tr in st])
+    chn_idx = np.unravel_index(np.argmax(peak_data), peak_data.shape)[0]
+    idx0 = np.argmax(abs(st[chn_idx].data[0:win_peak_npts]))
+    idx1 = idx0 + self.find_first_peak(st[chn_idx].data[idx0:])
+    idx0 -= self.find_second_peak(st[chn_idx].data[0:idx0][::-1])
+    idx1 += self.find_second_peak(st[chn_idx].data[idx1:])+1
+    idx0 = max(0,idx0)
+    # calc peak amp ratio 
     amp_ratio = []
     for tr in st:
-        idx0 = np.argmax(abs(tr.data[0:win_peak_npts]))
-        idx1 = idx0 + self.find_first_peak(tr.data[idx0:])
-        idx0 -= self.find_second_peak(tr.data[0:idx0][::-1])
-        idx1 += self.find_second_peak(tr.data[idx1:])+1
-        idx0 = max(0,idx0)
         amp_peak = np.amax(tr.data[idx0:idx1]) - np.amin(tr.data[idx0:idx1])
         amp_tail = np.amax(tr.data[idx1:2*idx1-idx0]) - np.amin(tr.data[idx1:2*idx1-idx0])
         amp_ratio.append(amp_peak/amp_tail)
