@@ -77,7 +77,7 @@ def get_sta_dict(sta_file):
     return sta_dict
 
 # get PAL picks (for assoc)
-def get_picks(date, pick_dir):
+def get_pal_picks(date, pick_dir):
     picks = []
     dtype = [('net_sta','O'),
              ('sta_ot','O'),
@@ -96,8 +96,8 @@ def get_picks(date, pick_dir):
         picks.append((net_sta, sta_ot, tp, ts, s_amp))
     return np.array(picks, dtype=dtype)
 
-# get RSeL picks (for assoc)
-def get_rsel_picks(date, pick_dir):
+# get picks (for assoc)
+def get_picks(date, pick_dir):
     picks = []
     dtype = [('net_sta','O'),
              ('sta_ot','O'),
