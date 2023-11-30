@@ -16,7 +16,7 @@ class Config(object):
     self.pca_win    = 1.             # win_len for PCA filter
     self.pca_range  = [0.,2.]        # time range to apply PCA filter
     self.fd_thres   = 2.5            # min value of dominant frequency
-    self.amp_ratio_thres = [5,8,2]   # max amp ratio for Peak_rm, P/P_tail, & P/S
+    self.amp_ratio_thres = [5,8,3]   # max amp ratio for Peak_rm, P/P_tail, & P/S
     self.amp_win    = [1.,5.]        # time win to get S amplitude
     self.det_gap    = 5.             # time gap between detections
     self.to_prep    = True           # whether to preprocess the raw data
