@@ -63,7 +63,7 @@ def run_hyp(ztr):
         fout.write(line)
     fout.close()
     # 2. run hypoinverse
-    p = subprocess.Popen(['hypoInv'], stdin=subprocess.PIPE)
+    p = subprocess.Popen(['hypoINV'], stdin=subprocess.PIPE)
     s = "@{}".format(fhyp)
     p.communicate(s.encode())
 
