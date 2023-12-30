@@ -1,0 +1,26 @@
+Set 1:
+      parameter(MAXEVE=   29000,
+     &          MAXDATA=  2500000,
+     &          MAXEVE0=  2,
+     &          MAXDATA0= 1,
+     &          MAXLAY=   10,
+     &          MAXSTA=   55,
+     &          MAXCL=    1)
+
+Set 2:
+      parameter(MAXEVE=   23500,
+     &          MAXDATA=  6000000,
+     &          MAXEVE0=  2,
+     &          MAXDATA0= 1,
+     &          MAXLAY=   12,
+     &          MAXSTA=   60,
+     &          MAXCL=    1)
+
+Set 3:
+      parameter(MAXEVE=   23000,
+     &          MAXDATA=  6200000,
+     &          MAXEVE0=  2,
+     &          MAXDATA0= 1,
+     &          MAXLAY=   12,
+     &          MAXSTA=   60,
+     &          MAXCL=    1)
