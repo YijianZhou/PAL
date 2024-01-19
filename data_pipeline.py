@@ -117,7 +117,7 @@ def get_picks(date, pick_dir):
     return np.array(picks, dtype=dtype)
 
 def calc_ot(tp, ts):
-    vp, vs = 5.9, 3.4
+    vp, vs = 6., 3.45
     dist = (ts-tp) / (1/vs - 1/vp)
     tt_p = dist / vp
     return tp - tt_p
