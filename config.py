@@ -16,7 +16,7 @@ class Config(object):
     self.pca_win    = 1.             # win_len for PCA filter
     self.pca_range  = [0.,2.]        # time range to apply PCA filter
     self.fd_thres   = 2.5            # min value of dominant frequency
-    self.amp_ratio_thres = [5,8,3]   # max amp ratio for Peak_rm, P/P_tail, & P/S
+    self.amp_ratio_thres = [5,8,3]   # max amp ratio for Peak, P/P_tail, & P/S
     self.amp_win    = [1.,5.]        # time win to get S amplitude
     self.det_gap    = 5.             # time gap between detections
     self.to_prep    = True           # whether to preprocess the raw data
@@ -29,7 +29,8 @@ class Config(object):
     self.xy_margin  = 0.1                # ratio of lateral margin, relative to sta range
     self.xy_grid    = 0.02               # lateral grid width, in degree
     self.z_grids    = np.arange(2,20,3)  # z (dep) grids
-    self.vp         = 5.9                # averaged P velocity
+    self.vp         = 6.0                # averaged P velocity
+    self.vs         = 3.45               # averaged S velocity
     # 3. data pipeline
     self.get_data_dict = dp.get_data_dict
     self.get_sta_dict = dp.get_sta_dict

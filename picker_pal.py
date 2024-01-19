@@ -42,7 +42,9 @@ class STA_LTA_Kurtosis(object):
                amp_win         = [1.,5.],
                det_gap         = 5.,
                to_prep         = True,
-               freq_band       = [1., 40]):
+               freq_band       = [1., 40],
+               vp              = 6.0,
+               vs              = 3.45):
     self.win_sta = win_sta
     self.win_lta = win_lta
     self.trig_thres = trig_thres
@@ -57,6 +59,8 @@ class STA_LTA_Kurtosis(object):
     self.det_gap = det_gap
     self.to_prep = to_prep
     self.freq_band = freq_band
+    self.vp = vp
+    self.vs = vs
 
   def pick(self, stream, out_file=None):
     # set output format for picks
@@ -223,9 +227,8 @@ class STA_LTA_Kurtosis(object):
 
   # calculate origin time
   def calc_ot(self, tp, ts):
-    vp, vs = 5.9, 3.4
-    dist = (ts-tp) / (1/vs - 1/vp)
-    tt_p = dist / vp
+    dist = (ts-tp) / (1/self.vs - 1/self.vp)
+    tt_p = dist / self.vp
     return tp - tt_p
 
   # get S amplitide
