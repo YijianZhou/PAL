@@ -144,12 +144,12 @@ class PS_Pair_Assoc(object):
     lat_margin = self.xy_margin * (np.amax(lat) - np.amin(lat))
     lon_min, lon_max = np.amin(lon)-lon_margin, np.amax(lon)+lon_margin
     lat_min, lat_max = np.amin(lat)-lat_margin, np.amax(lat)+lat_margin
-    cos_lat = np.cos((lat_max+lat_min)/2 * np.pi/180)
     # set x-y grid
     x_num = int((lon_max-lon_min) / self.xy_grid)
     y_num = int((lat_max-lat_min) / self.xy_grid)
     # calc P travel time table
     for net_sta, [sta_lat,sta_lon,sta_ele,_] in self.sta_dict.items():
+        cos_lat = np.cos(sta_lat * np.pi/180)
         ttp = -np.ones([len(self.z_grids), x_num, y_num])
         for xi in range(x_num):
           for yi in range(y_num):
