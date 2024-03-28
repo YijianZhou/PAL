@@ -1,4 +1,4 @@
-1. Modidy hypoDD Makefile  
+1. Modify hypoDD Makefile  
     vim hypoDD/Makefile
     modify line 26 from "FFLAGS  = -I$(INCLDIR)" to "FFLAGS  = -I$(INCLDIR) -mcmodel=medium"
 
