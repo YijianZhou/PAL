@@ -14,19 +14,18 @@ num_workers = cfg.num_workers
 keep_grids = cfg.keep_grids
 hypo_root = cfg.hypo_root
 
-
 # read fpha with evid
 def read_fpha():
-    pha_dict = {}
+    pha_dict, mag_dict = {}, {}
     f=open(cfg.fpha); lines=f.readlines(); f.close()
     for line in lines:
         codes = line.split(',')
         if len(codes[0])>=14:
             evid = codes[-1][:-1]
             pha_dict[evid] = []
+            mag_dict[evid] = float(codes[4])
         else: pha_dict[evid].append(line)
-    return pha_dict
-
+    return pha_dict, mag_dict
 
 # write hypoDD input file
 def write_fin(i,j):
@@ -38,7 +37,6 @@ def write_fin(i,j):
         if 'hypoDD.reloc' in line: line = 'output/hypoDD_%s-%s.reloc \n'%(i,j)
         fout.write(line)
     fout.close()
-
 
 def run_ph2dt():
     for i in range(num_grids[0]):
@@ -77,10 +75,10 @@ class Run_HypoDD(Dataset):
         evid = codes[0]
         if int(evid) not in evid_list: continue
         pha_lines = pha_dict[evid]
+        mag = mag_dict[evid]
         # get loc info
         lat, lon, dep = codes[1:4]
         dep = round(float(dep) - dep_corr, 2)
-        mag = float(codes[16])
         # get time info
         year, mon, day, hour, mnt, sec = codes[10:16]
         sec = '59.999' if sec=='60.000' else sec
@@ -102,7 +100,7 @@ class Run_HypoDD(Dataset):
 if __name__ == '__main__':
     # 1. format fpha & fsta
     print('format input files')
-    pha_dict = read_fpha()
+    pha_dict, mag_dict = read_fpha()
     os.system('python mk_sta.py')
     os.system('python mk_pha.py')
     evid_lists = np.load('input/evid_lists.npy', allow_pickle=True)
@@ -119,7 +117,6 @@ if __name__ == '__main__':
     os.system('cat output/%s_*.ctlg > output/%s.ctlg'%(ctlg_code,ctlg_code))
     os.system('cat output/%s_[0-9]*-*[0-9].pha > output/%s.pha'%(ctlg_code,ctlg_code))
     os.system('cat output/%s_*_full.pha > output/%s_full.pha'%(ctlg_code,ctlg_code))
-    
     # delete grid files
     reloc_grids = glob.glob('output/hypoDD_[0-9]*-*[0-9].reloc*')
     ctlg_grids = glob.glob('output/%s_*.ctlg'%ctlg_code)
@@ -133,4 +130,3 @@ if __name__ == '__main__':
         for ctlg_grid in ctlg_grids: os.unlink(ctlg_grid)
         for pha_grid in pha_grids: os.unlink(pha_grid)
         for input_file in input_files: os.unlink(input_file)
-
