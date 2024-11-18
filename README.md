@@ -1,5 +1,4 @@
-# PALM 4.x
-
+# PALM 4.x  
 An Earthquake Detection and Location Architecture for Continuous Seismograms: Phase Picking, Association, Location, and Matched Filter (PALM)  
   
 ## **PALM Workflow**  
