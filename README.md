@@ -1,16 +1,30 @@
-# PAL 3.x
+# PALM 4.x
 
-PAL is an earthquake detection and location architecture.  
+An Earthquake Detection and Location Architecture for Continuous Seismograms: Phase Picking, Association, Location, and Matched Filter (PALM)  
   
-- **PAL Workflow**
+## **PALM Workflow**  
+![Zhou et al., (2021)](./doc/PALM_workflow.jpg)  
+
+### 1. PAL
 1. phase **P**icking
 2. phase **A**ssociation
 3. event **L**ocation
-![Zhou et al., (2021)](./doc/PALM_workflow.jpg)
 
 - **Usage** (see *example_pal_workdir*)
 1. Prepare continuous data into consistent directory structure  
 2. Run PAL  
+
+### 2. MESS  
+1. **M**atch: calculate CC trace on every station (matched filter)  
+2. **E**xpand: expand peak values on CC traces  
+3. **S**hift: time shift to origin times for all CC traces  
+4. **S**tack: stack CC traces of different stations & detect events on the stacked trace  
+5. *dt_p* and *dt_s* are picked by cross-correlation  
+
+- **Usage** (see *example_mess_workdir*)  
+1. Prepare template phase file (i.e. run PAL) & cut template waveform  
+2. Run MESS  
+
 
 - **Tutorials**  
 2021/10 Online training in Chinese: vedio recording on [KouShare](https://www.koushare.com/lives/room/549779)  
@@ -18,7 +32,7 @@ PAL is an earthquake detection and location architecture.
 
 ## Installation
 
-PAL is a set of codes. All you need is to setup proper Python environment. This can be accomplished easily by installing [Anaconda](https://www.anaconda.com/products/individual#Downloads) and [Obspy](https://github.com/obspy/obspy/wiki/Installation-via-Anaconda) sequentially.  
+PALM is a set of codes. All you need is to setup proper Python environment. This can be accomplished easily by installing [Anaconda](https://www.anaconda.com/products/individual#Downloads) and [Obspy](https://github.com/obspy/obspy/wiki/Installation-via-Anaconda) sequentially.  
 
 ## References
 
