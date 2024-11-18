@@ -10,7 +10,7 @@ An Earthquake Detection and Location Architecture for Continuous Seismograms: Ph
 1.2 phase **A**ssociation
 1.3 event **L**ocation
 
-- **Usage** (see *run_pal* for example workdir)
+- **Usage** (see *run_pal* for example workdir)  
 (1) Prepare continuous data into consistent directory structure  
 (2) Run PAL  
 
