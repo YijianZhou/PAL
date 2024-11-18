@@ -26,11 +26,12 @@ An Earthquake Detection and Location Architecture for Continuous Seismograms: Ph
 (2) Run MESS  
 
 
-- **Tutorials**  
+## Tutorials  
+
 2021/10 Online training in Chinese: vedio recording on [KouShare](https://www.koushare.com/lives/room/549779)  
 2022/08 Online training in Chinese: vedio recording on [KouShare](https://www.koushare.com/video/videodetail/31656)  
 
-## Installation
+## Installation  
 
 PALM is a set of codes. All you need is to setup proper Python environment. This can be accomplished easily by installing [Anaconda](https://www.anaconda.com/products/individual#Downloads) and [Obspy](https://github.com/obspy/obspy/wiki/Installation-via-Anaconda) sequentially.  
 
