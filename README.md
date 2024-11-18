@@ -6,24 +6,24 @@ An Earthquake Detection and Location Architecture for Continuous Seismograms: Ph
 ![Zhou et al., (2021)](./doc/PALM_workflow.jpg)  
 
 ### 1. PAL
-1. phase **P**icking
-2. phase **A**ssociation
-3. event **L**ocation
+1.1 phase **P**icking
+1.2 phase **A**ssociation
+1.3 event **L**ocation
 
 - **Usage** (see *run_pal* for example workdir)
-1. Prepare continuous data into consistent directory structure  
-2. Run PAL  
+(1) Prepare continuous data into consistent directory structure  
+(2) Run PAL  
 
 ### 2. MESS  
-1. **M**atch: calculate CC trace on every station (matched filter)  
-2. **E**xpand: expand peak values on CC traces  
-3. **S**hift: time shift to origin times for all CC traces  
-4. **S**tack: stack CC traces of different stations & detect events on the stacked trace  
-5. *dt_p* and *dt_s* are picked by cross-correlation  
+2.1 **M**atch: calculate CC trace on every station (matched filter)  
+2.2 **E**xpand: expand peak values on CC traces  
+2.3 **S**hift: time shift to origin times for all CC traces  
+2.4 **S**tack: stack CC traces of different stations & detect events on the stacked trace  
+2.5 *dt_p* and *dt_s* are picked by cross-correlation  
 
 - **Usage** (see *run_mess* for example workdir)  
-1. Prepare template phase file (i.e. run PAL) & cut template waveform  
-2. Run MESS  
+(1) Prepare template phase file (i.e. run PAL) & cut template waveform  
+(2) Run MESS  
 
 
 - **Tutorials**  
