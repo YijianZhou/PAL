@@ -6,9 +6,9 @@ An Earthquake Detection and Location Architecture for Continuous Seismograms: Ph
 ![Zhou et al., (2021)](./doc/PALM_workflow.jpg)  
 
 ### 1. PAL
-1.1 phase **P**icking
-1.2 phase **A**ssociation
-1.3 event **L**ocation
+1.1 phase **P**icking  
+1.2 phase **A**ssociation  
+1.3 event **L**ocation  
 
 - **Usage** (see *run_pal* for example workdir)  
 (1) Prepare continuous data into consistent directory structure  
