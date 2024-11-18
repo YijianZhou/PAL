@@ -10,7 +10,7 @@ An Earthquake Detection and Location Architecture for Continuous Seismograms: Ph
 2. phase **A**ssociation
 3. event **L**ocation
 
-- **Usage** (see *example_pal_workdir*)
+- **Usage** (see *run_pal* for example workdir)
 1. Prepare continuous data into consistent directory structure  
 2. Run PAL  
 
@@ -21,7 +21,7 @@ An Earthquake Detection and Location Architecture for Continuous Seismograms: Ph
 4. **S**tack: stack CC traces of different stations & detect events on the stacked trace  
 5. *dt_p* and *dt_s* are picked by cross-correlation  
 
-- **Usage** (see *example_mess_workdir*)  
+- **Usage** (see *run_mess* for example workdir)  
 1. Prepare template phase file (i.e. run PAL) & cut template waveform  
 2. Run MESS  
 
